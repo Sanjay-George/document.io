@@ -1,23 +1,26 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import project from "./libs/controllers/project";
 
 dotenv.config();
-
-let swaggerDocs = null;
-
-if(process.env.NODE_ENV === 'development') {
-    swaggerDocs = await import('./swagger/swagger.js');
-}
 
 const port = process.env.PORT || 5000;
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.listen(port, () => {
+// Routes
+app.use('/project', project);  
+
+
+app.listen(port, async () => {
     console.log(`Node server listening on port: ${port}`);
-    if(swaggerDocs) {
+
+    // Serve Swagger Docs
+    if(process.env.NODE_ENV === 'development') {
+        console.log(process.env.NODE_ENV);
+        const swaggerDocs = await import('./swagger/swagger');
         swaggerDocs.default(app, port);
     }
 });
