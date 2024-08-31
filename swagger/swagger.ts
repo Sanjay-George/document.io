@@ -1,13 +1,11 @@
 import swaggerUi from 'swagger-ui-express';
 import swaggerAutogen from 'swagger-autogen';
-import { createRequire } from "module";
 import dotenv from "dotenv";
-
-const require = createRequire(import.meta.url);
-const swaggerFile = require('./output.json');
-const swaggerFilePath = require.resolve('./output.json');
+import * as swaggerFile from './output.json';
 
 dotenv.config();
+
+const swaggerFilePath = require.resolve('./output.json');
 
 const options = {
     info: {
@@ -21,12 +19,11 @@ const options = {
 };
 
 // Auto-generate swagger documentation file
-// const outputFilePath = './swagger-output.json';
-const routes = ['../server.js'];
+const routes = ['./server.ts']; // Entry file for the project
 swaggerAutogen()(swaggerFilePath, routes, options);
 
 // Serve Swagger Docs
-function swaggerDocs(app, port) {
+export default function serveDocs(app, port) {
     // Serve Swagger Page
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
     // Documentation in JSON format
@@ -38,4 +35,3 @@ function swaggerDocs(app, port) {
 }
 
 
-export default swaggerDocs
