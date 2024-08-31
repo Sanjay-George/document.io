@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+      "module": "ES2022",
+      "target": "ES2020",
+      "outDir": "dist",
+      "rootDir": ".",
+      "sourceMap": true,
+      "strict": false,
+      "moduleResolution": "Bundler",
+      "resolveJsonModule": true,
+      "esModuleInterop": true,
+      "composite": true,
+      "declaration": true,
+      "declarationMap": true,
+      "allowUnreachableCode": false
+    },
+    "include": [
+      "server.ts",
+      "swagger/swagger.ts",
+      "libs/**/*",
+      "globals.d.ts",
+      "swagger/**/*",
+      "swagger/output.json"
+    ]
+  }
