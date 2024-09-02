@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import projectRouter from "./libs/controllers/project";
-import documentRouter from "./libs/controllers/document";
+import projectRouter from "./libs/controllers/projects";
+import documentRouter from "./libs/controllers/documents";
 
 dotenv.config();
 
@@ -12,8 +12,8 @@ app.use(express.json());
 app.use(cors());
 
 // Routes
-app.use('/project', projectRouter);
-app.use('/document', documentRouter);
+app.use('/projects', projectRouter);
+app.use('/documents', documentRouter);
 
 
 app.listen(port, async () => {
