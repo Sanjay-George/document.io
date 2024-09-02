@@ -14,7 +14,7 @@ export default function Home() {
                             <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-black">Your Web Documentation Hub </span>
                         </H1>
                         <p className="mb-6 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
-                        Document.io lets you easily capture and annotate web pages with notes and voice memos. Simplify collaboration and keep your team aligned with clear, accessible documentation.
+                            Document.io lets you easily capture and annotate web pages with notes and voice memos. Simplify collaboration and keep your team aligned with clear, accessible documentation.
                         </p>
 
                         <Button as={Link} href="/projects" className="bg-emerald-700 text-white" variant="flat" radius="sm" size="lg">
