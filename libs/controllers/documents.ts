@@ -1,7 +1,8 @@
 import express from 'express';
-import Document from '../database/document';
+import DocumentDB from '../database/document';
+import { IDocument } from '../models/document';
 
-const documentDB = new Document();
+const documentDB = new DocumentDB();
 const router = express.Router();
 
 /**
@@ -48,7 +49,7 @@ router.get("/:id", async (req, res) => {
  */
 router.post("/", async (req, res) => {
     try {
-        const document = req.body as Document;
+        const document = req.body as IDocument;
         const id = await documentDB.insert(document);
         res.send(id);
     }

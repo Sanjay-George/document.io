@@ -1,4 +1,4 @@
-interface Document {
+export interface IDocument {
     id: string;
     title: string;
     project: string;
