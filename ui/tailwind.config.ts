@@ -1,4 +1,4 @@
-import {nextui} from '@nextui-org/theme';
+import { nextui } from '@nextui-org/theme';
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -21,6 +21,18 @@ const config: Config = {
       padding: "2rem",
     },
   },
-  plugins: [nextui()],
+  plugins: [nextui({
+    themes: {
+      light: {
+        colors: {
+          primary: "#047858",
+          secondary: "#000",
+          success: "#22C55E",
+          warning: "#B77206",
+          danger: "#B74606",
+        },
+      },
+    }
+  })],
 };
 export default config;

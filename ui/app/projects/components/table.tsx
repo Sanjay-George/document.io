@@ -3,6 +3,8 @@
 import React from 'react';
 import { Space, Table as Tbl, Tag } from 'antd';
 import { Chip } from '@nextui-org/chip';
+import EditIcon from './edit_icon';
+import DeleteIcon from './delete_icon';
 
 interface DataType {
   key: string;
@@ -12,69 +14,20 @@ interface DataType {
   tags: string[];
 }
 
-// const columns: TableProps<DataType>['columns'] = [
-//   {
-//     title: 'Name',
-//     dataIndex: 'name',
-//     key: 'name',
-//     render: (text) => <a>{text}</a>,
-//   },
-//   {
-//     title: 'Age',
-//     dataIndex: 'age',
-//     key: 'age',
-//   },
-//   {
-//     title: 'Address',
-//     dataIndex: 'address',
-//     key: 'address',
-//   },
-//   {
-//     title: 'Tags',
-//     key: 'tags',
-//     dataIndex: 'tags',
-//     render: (_, { tags }) => (
-//       <>
-//         {tags.map((tag) => {
-//           let color = tag.length > 5 ? 'geekblue' : 'green';
-//           if (tag === 'loser') {
-//             color = 'volcano';
-//           }
-//           return (
-//             <Tag color={color} key={tag}>
-//               {tag.toUpperCase()}
-//             </Tag>
-//           );
-//         })}
-//       </>
-//     ),
-//   },
-//   {
-//     title: 'Action',
-//     key: 'action',
-//     render: (_, record) => (
-//       <Space size="middle">
-//         <a>Invite {record.name}</a>
-//         <a>Delete</a>
-//       </Space>
-//     ),
-//   },
-// ];
-
 const projects = [
   {
     id: "1",
     name: "Project 1",
-    description: "Description 1",
+    description: "A long description of project 1 that explains what it is about. Also, it is a very long description.",
     status: "Active",
-    updated: "2021-07-01T00:00:00.000Z"
+    updated: "2024-07-01T00:00:00.000Z"
   },
   {
     id: "2",
     name: "Project 2",
-    description: "Description 2",
+    description: "Yet another long description of project 2 that explains what it is about. Also, it is a very long description.",
     status: "Inactive",
-    updated: "2021-07-01T00:00:00.000Z"
+    updated: "2021-11-18T00:00:00.000Z"
   }
 ];
 
@@ -83,7 +36,6 @@ const columns = [
     title: 'Name',
     dataIndex: 'name',
     key: 'name',
-    colSpan: 2,
   },
   {
     title: 'Description',
@@ -116,6 +68,16 @@ const columns = [
         }
       )}
     </p>,
+  },
+  {
+    title: 'Actions',
+    key: 'action',
+    render: (text: any, record: any) => (
+      <Space size="middle">
+        <a><EditIcon color="text-emerald-800" /></a>
+        <a><DeleteIcon color="text-red-600" /></a>
+      </Space>
+    ),
   },
 ];
 

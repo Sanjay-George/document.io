@@ -33,7 +33,7 @@ export default function Nav() {
                     <Link href="#">Login</Link>
                 </NavbarItem>
                 <NavbarItem>
-                    <Button as={Link} className="bg-emerald-700 text-white" href="#" variant="flat" radius="full">
+                    <Button as={Link} className="bg-emerald-700 bg-zinc-800 text-white" href="#" variant="flat" radius="full">
                         Sign Up
                     </Button>
                 </NavbarItem>
