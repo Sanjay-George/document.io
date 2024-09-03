@@ -1,10 +1,13 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Space, Table as Tbl, Tag } from 'antd';
 import { Chip } from '@nextui-org/chip';
 import EditIcon from './edit_icon';
 import DeleteIcon from './delete_icon';
+import { get } from '../projects';
+import { Project } from '@/data/defintions';
+import useSWR from 'swr';
 
 interface DataType {
   key: string;
@@ -14,28 +17,12 @@ interface DataType {
   tags: string[];
 }
 
-const projects = [
-  {
-    id: "1",
-    name: "Project 1",
-    description: "A long description of project 1 that explains what it is about. Also, it is a very long description.",
-    status: "Active",
-    updated: "2024-07-01T00:00:00.000Z"
-  },
-  {
-    id: "2",
-    name: "Project 2",
-    description: "Yet another long description of project 2 that explains what it is about. Also, it is a very long description.",
-    status: "Inactive",
-    updated: "2021-11-18T00:00:00.000Z"
-  }
-];
 
 const columns = [
   {
-    title: 'Name',
-    dataIndex: 'name',
-    key: 'name',
+    title: 'Title',
+    dataIndex: 'title',
+    key: 'title',
   },
   {
     title: 'Description',
@@ -48,11 +35,11 @@ const columns = [
     key: 'status',
     render: (status: string) => {
       let color = status === 'Active' ? 'success' : 'danger' as any;
-      return (
+      return status ? (
         <Chip color={color} variant='flat' size='sm'>
           {status}
         </Chip>
-      );
+      ) : null;
     }
   },
   {
@@ -65,6 +52,8 @@ const columns = [
           year: 'numeric',
           month: 'long',
           day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
         }
       )}
     </p>,
@@ -74,15 +63,22 @@ const columns = [
     key: 'action',
     render: (text: any, record: any) => (
       <Space size="middle">
-        <a><EditIcon color="text-emerald-800" /></a>
+        <a><EditIcon color="text-emerald-600" /></a>
         <a><DeleteIcon color="text-red-600" /></a>
       </Space>
     ),
   },
 ];
 
+// TODO: fix TS error later.
+const fetcher = (...args: any[]) => fetch(...args).then((res) => res.json())
+
+
 export default function Table() {
+  const { data, isLoading, error } = useSWR('http://localhost:5000/documents/', fetcher);
+
+
   return (
-    <Tbl columns={columns} dataSource={projects} pagination={false} />
+    <Tbl columns={columns} dataSource={data}  />
   );
 }

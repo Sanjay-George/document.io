@@ -16,10 +16,6 @@ export default function Page() {
         setIsModalOpen(true);
     };
 
-    const handleOk = () => {
-        setIsModalOpen(false);
-    };
-
     const handleCancel = () => {
         setIsModalOpen(false);
     };
@@ -38,8 +34,8 @@ export default function Page() {
             <Table />
 
 
-            <Modal title="Add project" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
-                <Form />
+            <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
+                <Form postSubmit={() => setIsModalOpen(false)} />
             </Modal>
 
         </>
