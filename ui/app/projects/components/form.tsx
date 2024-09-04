@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { add } from "../projects";
+import { add } from "@/data/routes/projects";
 import { mutate } from "swr";
 
 export default function Form({postSubmit} : {postSubmit: (data?: any) => void}) {
