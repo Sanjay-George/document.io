@@ -63,7 +63,7 @@ const columns = [
     key: 'action',
     render: (text: any, record: any) => (
       <Space size="middle">
-        <a><EditIcon color="text-emerald-600" /></a>
+        {/* <a><EditIcon color="text-emerald-600" /></a> */}
         <a><DeleteIcon color="text-red-600" /></a>
       </Space>
     ),
@@ -79,6 +79,6 @@ export default function Table() {
 
 
   return (
-    <Tbl columns={columns} dataSource={data}  />
+    <Tbl columns={columns} dataSource={data} />
   );
 }
