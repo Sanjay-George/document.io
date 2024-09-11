@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { dbName, getClient, uri } from './db_client';
-import { IDocument } from '../models/documentation';
+import { Documentation as IDocument } from '../models/documentation';
 
 const client = getClient();
 
@@ -34,7 +34,9 @@ export default class Documentation {
             {
                 $set: {
                     title: data.title,
+                    description: data.description,
                     project: data.project,
+                    status: data.status,
                     updated: new Date(),
                 }
             }

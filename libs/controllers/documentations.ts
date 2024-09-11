@@ -1,14 +1,14 @@
 import express from 'express';
-import Documentation from '../database/documentation';
-import { IDocument } from '../models/documentation';
+import DocumentationDB from '../database/documentation';
+import { Documentation } from '../models/documentation';
 
-const documentationDB = new Documentation();
+const documentationDB = new DocumentationDB();
 const router = express.Router();
 
 /**
- * Gets all documents by project Id
- * @param {string} req.query.projectId - The ID of the project to retrieve documents for
- * @returns {Document[]} A list of all documents
+ * Gets all documentations by project Id
+ * @param {string} req.query.projectId - Project ID to retrieve documents for (optional)
+ * @returns {Document[]} A list of all documentations
  * @throws {Error} Throws an error if the documents could not be retrieved
  */
 router.get("/", async (req, res) => {
@@ -25,7 +25,7 @@ router.get("/", async (req, res) => {
 
 
 /**
- * Gets a document by ID
+ * Gets a documentation by ID
  * @param {string} req.params.id - The ID of the document to retrieve
  * @returns {Document} The document with the specified ID
  * @throws {Error} Throws an error if the document could not be retrieved
@@ -43,13 +43,13 @@ router.get("/:id", async (req, res) => {
 });
 
 /**
- * Inserts a new document
+ * Inserts a new documentation
  * @param {Document} req.body - The document to insert
  * @returns {string} The ID of the inserted document
  */
 router.post("/", async (req, res) => {
     try {
-        const document = req.body as IDocument;
+        const document = req.body as Documentation;
         const id = await documentationDB.insert(document);
         res.send(id);
     }
@@ -60,7 +60,7 @@ router.post("/", async (req, res) => {
 });
 
 /**
- * Updates a document
+ * Updates a documentation
  * @param {string} req.params.id - The ID of the document to update
  * @param {Document} req.body - The updated document
  * @returns {boolean} True if the document was updated, false otherwise
@@ -80,7 +80,7 @@ router.put("/:id", async (req, res) => {
 });
 
 /**
- * Deletes a document
+ * Deletes a documentation
  * @param {string} req.params.id - The ID of the document to delete
  * @returns {boolean} True if the document was deleted, false otherwise
  * @throws {Error} Throws an error if the document could not be deleted

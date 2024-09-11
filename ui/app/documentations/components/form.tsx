@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { add } from "@/data/documentations/routes";
+import { add, edit } from "@/data/documentations/routes";
 import { mutate } from "swr";
-import { ALL_DOCUMENTATIONS_KEY, useDocumentation } from "@/data/documentations/useSWR";
+import { ALL_DOCUMENTATIONS_KEY, SINGLE_DOCUMENT_KEY, useDocumentation } from "@/data/documentations/useSWR";
 import { Documentation } from "@/data/defintions/documentation";
 
 export default function Form({ docId, postSubmit }: { docId: string | null, postSubmit: (data?: any) => void }) {
@@ -22,7 +22,7 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
         }
     }, [documentation]);
 
-    const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleTextChange = (e: any) => {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
@@ -47,9 +47,14 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
             return;
         }
 
-        // TODO: if docId is not null, update the documentation.
         try {
-            await add({ title, description, status });
+            if (!docId) {
+                await add({ title, description, status });
+            }
+            else {
+                await edit(docId, { title, description, status });
+                mutate(SINGLE_DOCUMENT_KEY(docId));
+            }
         }
         catch (error) {
             console.error(error);
@@ -58,7 +63,6 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
 
         // Refetch data with useSWR
         mutate(ALL_DOCUMENTATIONS_KEY);
-
         form.reset();
         postSubmit();
     }
@@ -69,12 +73,12 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
         <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
             <div className="mb-5">
                 <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
-                <input defaultValue={documentation?.title || ''} type="text" id="title" name="title" onChange={handleTextChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500 dark:shadow-sm-light" placeholder="eg: Lead Form - User Flow" required />
+                <input value={formData.title} type="text" id="title" name="title" onChange={handleTextChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500 dark:shadow-sm-light" placeholder="eg: Lead Form - User Flow" required />
             </div>
 
             <div className="mb-5">
                 <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                <textarea defaultValue={documentation?.description || ''} id="description" name="description" rows={4} onChange={handleTextChange} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500" placeholder="Documentation description..."></textarea>
+                <textarea value={formData.description} id="description" name="description" rows={4} onChange={handleTextChange} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500" placeholder="Documentation description..."></textarea>
             </div>
 
             <div className="mb-5">
