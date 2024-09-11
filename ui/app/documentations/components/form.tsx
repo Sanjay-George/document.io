@@ -3,37 +3,51 @@
 import { useEffect, useState } from "react";
 import { add } from "@/data/documentations/routes";
 import { mutate } from "swr";
-// import { Project } from "@/data/defintions";
 import { ALL_DOCUMENTATIONS_KEY, useDocumentation } from "@/data/documentations/useSWR";
+import { Documentation } from "@/data/defintions/documentation";
 
-export default function Form({ projectId, postSubmit }: { projectId: string | null, postSubmit: (data?: any) => void }) {
-    const [isProjectActive, setIsProjectActive] = useState(true);
-
-    const [formData, setFormData] = useState({} as any);
-    const project = useDocumentation(projectId as any)?.data;
+export default function Form({ docId, postSubmit }: { docId: string | null, postSubmit: (data?: any) => void }) {
+    const [formData, setFormData] = useState({
+        title: '',
+        description: '',
+        status: 'Active'
+    });
+    const documentation: Documentation = useDocumentation(docId as any)?.data;
 
     useEffect(() => {
-        if (project) {
-            setIsProjectActive(project.status === 'Active');
+        if (documentation) {
+            setFormData({
+                ...documentation
+            })
         }
-    }, [project]);
+    }, [documentation]);
 
+    const handleTextChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({
+            ...formData,
+            status: e.target.checked ? 'Active' : 'Inactive'
+        });
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const form = e.currentTarget;
-        const formData = new FormData(form);
-        const title = formData.get('title') as string;
-        const description = formData.get('description') as string;
-        const status = isProjectActive ? 'Active' : 'Inactive';
 
+        const { title, description, status } = formData;
         if (!title) {
             // TODO: show alert.
             console.error('Title is required');
             return;
         }
 
-        // TODO: if projectId is not null, update the project.
+        // TODO: if docId is not null, update the documentation.
         try {
             await add({ title, description, status });
         }
@@ -42,30 +56,30 @@ export default function Form({ projectId, postSubmit }: { projectId: string | nu
             return;
         }
 
-        // Revalidate data with useSWR
+        // Refetch data with useSWR
         mutate(ALL_DOCUMENTATIONS_KEY);
 
         form.reset();
         postSubmit();
     }
 
+    const isProjectActive = formData.status === 'Active';
+
     return (
         <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
-            <h2>{project?.title}</h2>
-
             <div className="mb-5">
-                <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Project Title</label>
-                <input value={project?.title || ''} type="text" id="title" name="title" className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500 dark:shadow-sm-light" placeholder="Onboarding - ABC Tool" required />
+                <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Title</label>
+                <input defaultValue={documentation?.title || ''} type="text" id="title" name="title" onChange={handleTextChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500 dark:shadow-sm-light" placeholder="eg: Lead Form - User Flow" required />
             </div>
 
             <div className="mb-5">
-                <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your message</label>
-                <textarea value={project?.description || ''} id="description" name="description" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500" placeholder="Project description..."></textarea>
+                <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+                <textarea defaultValue={documentation?.description || ''} id="description" name="description" rows={4} onChange={handleTextChange} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500" placeholder="Documentation description..."></textarea>
             </div>
 
             <div className="mb-5">
                 <label className="inline-flex items-center mb-5 cursor-pointer">
-                    <input type="checkbox" value="" className="sr-only peer" checked={isProjectActive} onChange={() => setIsProjectActive(!isProjectActive)} />
+                    <input name='status' type="checkbox" className="sr-only peer" checked={isProjectActive} onChange={handleStatusChange} />
                     <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-500 dark:peer-focus:ring-emerald-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-600"></div>
                     <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
                         {isProjectActive ? 'Active' : 'Inactive'}</span>

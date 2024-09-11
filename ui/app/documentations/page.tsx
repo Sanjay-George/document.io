@@ -6,29 +6,28 @@ import H2 from "@/components/h2";
 import Form from "./components/form";
 import { useState } from "react";
 import { Modal } from "antd";
-import { useProjects } from "@/data/projects/useSWR";
 
 export default function Page() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeProject, setActiveProject] = useState<null | string>(null);
+    const [activeDocumentation, setActiveDocumentation] = useState<null | string>(null);
 
     const showModal = () => {
         setIsModalOpen(true);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
-        setActiveProject(null);
+        setActiveDocumentation(null);
     };
 
     const handleAddClick = () => {
-        console.log('Add project');
-        setActiveProject(null);
+        console.log('Add documentation');
+        setActiveDocumentation(null);
         showModal();
     }
 
-    const handleEditProjectClick = (id: string) => {
-        console.log('Edit project', id);
-        setActiveProject(id);
+    const handleEditDocumentationClick = (id: string) => {
+        console.log('Edit documentation', id);
+        setActiveDocumentation(id);
         showModal();
     };
 
@@ -44,10 +43,10 @@ export default function Page() {
                 </Button>
             </div>
 
-            <Table onRowEdit={handleEditProjectClick} />
+            <Table onRowEdit={handleEditDocumentationClick} />
 
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
-                <Form projectId={activeProject} postSubmit={() => setIsModalOpen(false)} />
+                <Form docId={activeDocumentation} postSubmit={() => setIsModalOpen(false)} />
             </Modal>
 
         </>
