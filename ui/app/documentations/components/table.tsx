@@ -7,7 +7,7 @@ import EditIcon from './edit_icon';
 import DeleteIcon from './delete_icon';
 import useSWR, { mutate } from 'swr';
 import { remove } from '@/data/documentations/routes';
-import { ALL_DOCUMENTATIONS_KEY, useProjects } from '@/data/documentations/useSWR';
+import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data/documentations/useSWR';
 
 interface DataType {
 	key: string;
@@ -71,7 +71,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 		},
 	];
 
-	const { data, isLoading, error } = useProjects();
+	const { data, isLoading, error } = useDocumentations();
 
 	const handleDelete = async (id: string) => {
 		console.log(id);

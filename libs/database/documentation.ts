@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { dbName, getClient, uri } from './db_client';
-import { IDocument } from '../models/document';
+import { IDocument } from '../models/documentation';
 
 const client = getClient();
 

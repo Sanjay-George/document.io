@@ -3,12 +3,14 @@
 import { useEffect, useState } from "react";
 import { add } from "@/data/documentations/routes";
 import { mutate } from "swr";
-import { Project } from "@/data/defintions";
-import { ALL_DOCUMENTATIONS_KEY, useProject } from "@/data/documentations/useSWR";
+// import { Project } from "@/data/defintions";
+import { ALL_DOCUMENTATIONS_KEY, useDocumentation } from "@/data/documentations/useSWR";
 
 export default function Form({ projectId, postSubmit }: { projectId: string | null, postSubmit: (data?: any) => void }) {
     const [isProjectActive, setIsProjectActive] = useState(true);
-    const project = useProject(projectId as any)?.data;
+
+    const [formData, setFormData] = useState({} as any);
+    const project = useDocumentation(projectId as any)?.data;
 
     useEffect(() => {
         if (project) {

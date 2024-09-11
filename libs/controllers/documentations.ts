@@ -1,6 +1,6 @@
 import express from 'express';
 import Documentation from '../database/documentation';
-import { IDocument } from '../models/document';
+import { IDocument } from '../models/documentation';
 
 const documentationDB = new Documentation();
 const router = express.Router();
