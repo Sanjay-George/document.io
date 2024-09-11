@@ -1,11 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { add } from "@/data/routes/projects";
+import { useEffect, useState } from "react";
+import { add } from "@/data/documentations/routes";
 import { mutate } from "swr";
+import { Project } from "@/data/defintions";
+import { ALL_DOCUMENTATIONS_KEY, useProject } from "@/data/documentations/useSWR";
 
-export default function Form({postSubmit} : {postSubmit: (data?: any) => void}) {
+export default function Form({ projectId, postSubmit }: { projectId: string | null, postSubmit: (data?: any) => void }) {
     const [isProjectActive, setIsProjectActive] = useState(true);
+    const project = useProject(projectId as any)?.data;
+
+    useEffect(() => {
+        if (project) {
+            setIsProjectActive(project.status === 'Active');
+        }
+    }, [project]);
+
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -14,8 +24,14 @@ export default function Form({postSubmit} : {postSubmit: (data?: any) => void}) 
         const title = formData.get('title') as string;
         const description = formData.get('description') as string;
         const status = isProjectActive ? 'Active' : 'Inactive';
-        
-        console.log({ title, description, status });
+
+        if (!title) {
+            // TODO: show alert.
+            console.error('Title is required');
+            return;
+        }
+
+        // TODO: if projectId is not null, update the project.
         try {
             await add({ title, description, status });
         }
@@ -25,8 +41,7 @@ export default function Form({postSubmit} : {postSubmit: (data?: any) => void}) 
         }
 
         // Revalidate data with useSWR
-        // TODO: Use better? keys for API. Move to common file.
-        mutate('http://localhost:5000/documents/');
+        mutate(ALL_DOCUMENTATIONS_KEY);
 
         form.reset();
         postSubmit();
@@ -34,14 +49,16 @@ export default function Form({postSubmit} : {postSubmit: (data?: any) => void}) 
 
     return (
         <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
+            <h2>{project?.title}</h2>
+
             <div className="mb-5">
                 <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Project Title</label>
-                <input type="text" id="title" name="title" className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500 dark:shadow-sm-light" placeholder="Onboarding - ABC Tool" required />
+                <input value={project?.title || ''} type="text" id="title" name="title" className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500 dark:shadow-sm-light" placeholder="Onboarding - ABC Tool" required />
             </div>
 
             <div className="mb-5">
                 <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your message</label>
-                <textarea id="description" name="description" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500" placeholder="Project description..."></textarea>
+                <textarea value={project?.description || ''} id="description" name="description" rows={4} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-emerald-500 dark:focus:border-emerald-500" placeholder="Project description..."></textarea>
             </div>
 
             <div className="mb-5">

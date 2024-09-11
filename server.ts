@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import projectRouter from "./libs/controllers/projects";
-import documentRouter from "./libs/controllers/documents";
+import documentRouter from "./libs/controllers/documentations";
 
 dotenv.config();
 
@@ -13,14 +13,14 @@ app.use(cors());
 
 // Routes
 app.use('/projects', projectRouter);
-app.use('/documents', documentRouter);
+app.use('/documentations', documentRouter);
 
 
 app.listen(port, async () => {
     console.log(`Node server listening on port: ${port}`);
 
     // Serve Swagger Docs
-    if(process.env.NODE_ENV === 'development') {
+    if (process.env.NODE_ENV === 'development') {
         const swaggerDocs = await import('./swagger/swagger');
         swaggerDocs.default(app, port);
     }
@@ -33,6 +33,6 @@ process.on('unhandledRejection', async (err: any) => {
 });
 
 // handle uncaught exceptionss
-process.on('uncaughtException', async (err: any) => {    
+process.on('uncaughtException', async (err: any) => {
     console.error('Uncaught Exception', err);
 });

@@ -6,7 +6,8 @@ import { Chip } from '@nextui-org/chip';
 import EditIcon from './edit_icon';
 import DeleteIcon from './delete_icon';
 import useSWR, { mutate } from 'swr';
-import { remove } from '@/data/routes/projects';
+import { remove } from '@/data/documentations/routes';
+import { ALL_DOCUMENTATIONS_KEY, useProjects } from '@/data/documentations/useSWR';
 
 interface DataType {
 	key: string;
@@ -16,15 +17,7 @@ interface DataType {
 	tags: string[];
 }
 
-
-// TODO: fix TS error later.
-const fetcher = (...args: any[]) => fetch(...args).then((res) => res.json())
-
-
-export default function Table() {
-	const { data, isLoading, error } = useSWR('http://localhost:5000/documents/', fetcher);
-
-
+export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }) {
 	const columns = [
 		{
 			title: 'Title',
@@ -71,21 +64,26 @@ export default function Table() {
 			dataIndex: '_id',
 			render: (id: string) => (
 				<Space size="middle">
-					{/* <a><EditIcon color="text-emerald-600" /></a> */}
+					<a onClick={() => handleEdit(id)}><EditIcon color="text-emerald-600" /></a>
 					<a onClick={() => handleDelete(id)}><DeleteIcon color="text-red-600" /></a>
 				</Space>
 			),
 		},
 	];
 
+	const { data, isLoading, error } = useProjects();
+
 	const handleDelete = async (id: string) => {
 		console.log(id);
 		await remove(id);
-		mutate('http://localhost:5000/documents/');
+		mutate(ALL_DOCUMENTATIONS_KEY);
 	}
 
+	const handleEdit = (id: string) => {
+		onRowEdit && onRowEdit(id);
+	};
 
 	return (
-		<Tbl columns={columns} dataSource={data} />
+		data && <Tbl columns={columns} dataSource={[...data]} />
 	);
 }

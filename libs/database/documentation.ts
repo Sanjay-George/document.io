@@ -4,7 +4,7 @@ import { IDocument } from '../models/document';
 
 const client = getClient();
 
-export default class Document {
+export default class Documentation {
     private db = client.db(dbName);
     private collection = this.db.collection('documents');
 

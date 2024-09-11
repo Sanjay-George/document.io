@@ -1,8 +1,8 @@
 import express from 'express';
-import DocumentDB from '../database/document';
+import Documentation from '../database/documentation';
 import { IDocument } from '../models/document';
 
-const documentDB = new DocumentDB();
+const documentationDB = new Documentation();
 const router = express.Router();
 
 /**
@@ -14,7 +14,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
     try {
         const projectId = req.query.projectId as string;
-        const documents = await documentDB.getAll(projectId);
+        const documents = await documentationDB.getAll(projectId);
         res.send(JSON.stringify(documents));
     }
     catch (ex) {
@@ -33,7 +33,7 @@ router.get("/", async (req, res) => {
 router.get("/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        const document = await documentDB.get(id);
+        const document = await documentationDB.get(id);
         res.send(JSON.stringify(document));
     }
     catch (ex) {
@@ -50,7 +50,7 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         const document = req.body as IDocument;
-        const id = await documentDB.insert(document);
+        const id = await documentationDB.insert(document);
         res.send(id);
     }
     catch (ex) {
@@ -70,7 +70,7 @@ router.put("/:id", async (req, res) => {
     try {
         const id = req.params.id;
         const document = req.body;
-        const result = await documentDB.update(id, document);
+        const result = await documentationDB.update(id, document);
         res.send(result);
     }
     catch (ex) {
@@ -88,7 +88,7 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        const result = await documentDB.delete(id);
+        const result = await documentationDB.delete(id);
         res.send(result);
     }
     catch (ex) {
