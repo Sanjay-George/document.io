@@ -6,8 +6,8 @@ import { Chip } from '@nextui-org/chip';
 import EditIcon from './edit_icon';
 import DeleteIcon from './delete_icon';
 import useSWR, { mutate } from 'swr';
-import { remove } from '@/data/documentations/routes';
-import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data/documentations/useSWR';
+import { remove } from '@/data/api/documentations';
+import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data/swr/documentations';
 
 interface DataType {
 	key: string;

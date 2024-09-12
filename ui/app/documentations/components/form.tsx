@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { add, edit } from "@/data/documentations/routes";
+import { add, edit } from "@/data/api/documentations";
 import { mutate } from "swr";
-import { ALL_DOCUMENTATIONS_KEY, SINGLE_DOCUMENT_KEY, useDocumentation } from "@/data/documentations/useSWR";
-import { Documentation } from "@/data/defintions/documentation";
+import { ALL_DOCUMENTATIONS_KEY, SINGLE_DOCUMENT_KEY, useDocumentation } from "@/data/swr/documentations";
+import { Documentation } from "@/data/models/documentation";
 
 export default function Form({ docId, postSubmit }: { docId: string | null, postSubmit: (data?: any) => void }) {
     const [formData, setFormData] = useState({
