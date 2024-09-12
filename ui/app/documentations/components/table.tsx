@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import { Space, Table as Tbl, Tag } from 'antd';
 import { Chip } from '@nextui-org/chip';
-import EditIcon from './edit_icon';
-import DeleteIcon from './delete_icon';
+import EditIcon from '@/components/icons/edit_icon';
+import DeleteIcon from '@/components/icons/delete_icon';
 import useSWR, { mutate } from 'swr';
 import { remove } from '@/data/api/documentations';
 import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data/swr/documentations';
 import Link from 'next/link';
+import Spinner from '@/components/icons/spinner';
 
 
 export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }) {
@@ -79,6 +80,9 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 		onRowEdit && onRowEdit(id);
 	};
 
+	if (isLoading) {
+		return <Spinner />;
+	}
 	return (
 		data && <Tbl columns={columns} dataSource={[...data]} />
 	);
