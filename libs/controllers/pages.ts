@@ -15,6 +15,10 @@ const router = express.Router();
 router.get("/", async (req, res) => {
     try {
         const documentationId = req.query.documentationId as string;
+        if (!documentationId) {
+            res.sendStatus(400);
+            return;
+        }
         const pages = await pageDB.getAll(documentationId);
         res.send(JSON.stringify(pages));
     }
@@ -43,8 +47,6 @@ router.get("/:id", async (req, res) => {
 });
 
 
-
-
 /**
  * Inserts a new page
  * @param {Page} req.body - The page to insert
@@ -53,6 +55,12 @@ router.get("/:id", async (req, res) => {
 router.post("/", async (req, res) => {
     try {
         const page = req.body as Page;
+        const { documentationId } = page;
+        if (!documentationId) {
+            res.sendStatus(400);
+            return;
+        }
+
         const id = await pageDB.insert(page);
         res.send(id);
     }

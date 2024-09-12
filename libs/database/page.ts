@@ -13,8 +13,13 @@ export default class Page {
         client.connect();
     }
 
-    async insert(data: any) {
-        const result = await this.collection.insertOne({ ...data, created: new Date(), updated: new Date() });
+    async insert(data: IPage) {
+        const result = await this.collection.insertOne({
+            ...data,
+            documentationId: new ObjectId(data.documentationId),
+            created: new Date(),
+            updated: new Date()
+        });
         return result.insertedId;
     }
 
@@ -23,8 +28,8 @@ export default class Page {
         return page as any as IPage;
     }
 
-    async getAll(documentationId?: string): Promise<IPage[]> {
-        const query = documentationId ? { documentationId } : {};
+    async getAll(documentationId: string): Promise<IPage[]> {
+        const query = { documentationId: new ObjectId(documentationId) };
         const pages = await this.collection.find(query).toArray();
         return pages as any as IPage[];
     }
@@ -36,7 +41,6 @@ export default class Page {
                 $set: {
                     title: data.title,
                     url: data.url,
-                    documentationId: data.documentationId,
                     updated: new Date(),
                 }
             }
