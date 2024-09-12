@@ -38,7 +38,6 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const form = e.currentTarget;
 
         const { title, description, status } = formData;
         if (!title) {
@@ -63,7 +62,11 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
 
         // Refetch data with useSWR
         mutate(ALL_DOCUMENTATIONS_KEY);
-        form.reset();
+        setFormData({
+            title: '',
+            description: '',
+            status: 'Active'
+        });
         postSubmit();
     }
 
