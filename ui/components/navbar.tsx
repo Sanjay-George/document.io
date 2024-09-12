@@ -12,7 +12,6 @@ const links = [
 ];
 export default function Nav() {
     const pathname = usePathname();
-
     return (
         <Navbar>
             <NavbarBrand>

@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useEffect } from 'react';
 import { Space, Table as Tbl, Tag } from 'antd';
 import { Chip } from '@nextui-org/chip';
@@ -8,14 +6,8 @@ import DeleteIcon from './delete_icon';
 import useSWR, { mutate } from 'swr';
 import { remove } from '@/data/api/documentations';
 import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data/swr/documentations';
+import Link from 'next/link';
 
-interface DataType {
-	key: string;
-	name: string;
-	age: number;
-	address: string;
-	tags: string[];
-}
 
 export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }) {
 	const columns = [
@@ -23,6 +15,10 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			title: 'Title',
 			dataIndex: 'title',
 			key: 'title',
+			render: (title: string, record: any) => {
+				const id = record._id;
+				return <Link className='text-black hover:text-black hover:underline' href={`documentations/${id}`}>{title}</Link>
+			}
 		},
 		{
 			title: 'Description',
