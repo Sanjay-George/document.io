@@ -1,8 +1,9 @@
-interface Page {
+export interface Page {
     id: string;
     title: string;
-    documentId: string;
-    projectId: string;
+    url: string;
+    documentationId: string;
+    projectId?: string;
     created: Date;
-    updated: Date;    
+    updated: Date;
 }

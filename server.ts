@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import projectRouter from "./libs/controllers/projects";
 import documentRouter from "./libs/controllers/documentations";
+import pageRouter from "./libs/controllers/pages";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(cors());
 // Routes
 app.use('/projects', projectRouter);
 app.use('/documentations', documentRouter);
+app.use('/pages', pageRouter);
 
 
 app.listen(port, async () => {
