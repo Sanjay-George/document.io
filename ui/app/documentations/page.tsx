@@ -27,7 +27,7 @@ export default function Page() {
         showModal();
     }
 
-    const handleEditDocumentationClick = (id: string) => {
+    const handleEditClick = (id: string) => {
         console.log('Edit documentation', id);
         setActiveDocumentation(id);
         showModal();
@@ -42,7 +42,7 @@ export default function Page() {
                     onClick={handleAddClick} />
             </div>
 
-            <Table onRowEdit={handleEditDocumentationClick} />
+            <Table onRowEdit={handleEditClick} />
 
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
                 <Form docId={activeDocumentation} postSubmit={() => setIsModalOpen(false)} />
