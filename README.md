@@ -1,9 +1,30 @@
 # Document.io
 
-Under development ☕️ + 🧑‍💻
+( ⚠️ _Under development_ ☕️ + 🧑‍💻 )
+
+**Document.io** is a streamlined tool for capturing, annotating, and documenting websites directly from your browser. Whether you’re building tutorials, managing workflows, or documenting app interfaces, Document.io makes the process easy and collaborative.
+
+## 🚀 Features
+
+- **Capture Website Components**: Document UI elements on any web page.
+- **Add Annotations**: Use text, markdown, or WYSIWYG editors to add detailed notes.
+- **Voice Notes**: Attach audio recordings to provide context or explanations.
+- **Collaboration Ready**: Share your documented pages with teammates for seamless collaboration.
+- **Dynamic Documentation**: View and interact with live, documented pages within the app.
+
+## 🎯 Motivation
+
+- Simplify the process of documenting web-based workflows, user interfaces, and tutorials.
+- Enable teams to share and collaborate on detailed website documentation.
+- Provide an easy-to-use platform for knowledge transfer, application onboarding, and more.
+
+ 
+<!-- ## 📦 Getting Started -->
 
 
-## Screenshots 📷
+
+
+## 📷 Screenshots 
 
 ### Landing page
 
