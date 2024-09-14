@@ -51,8 +51,8 @@ export default function Table({ documentationId, onRowEdit }:
             render: (id: string) => (
                 <Space size="middle">
                     <a onClick={() => handleEdit(id)}><EditIcon color="text-emerald-600" /></a>
-                    <a onClick={() => null}><SettingsIcon color="text-gray-800" /></a>
-                    <a onClick={() => null}><PlayIcon color="text-blue-600" /></a>
+                    <a onClick={() => null}><SettingsIcon color="text-slate-500" /></a>
+                    <a onClick={() => null}><PlayIcon color="text-slate-500" /></a>
                     <a onClick={() => null}><DeleteIcon color="text-red-600" /></a>
                 </Space>
             ),
