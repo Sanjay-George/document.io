@@ -1,8 +1,10 @@
 import express from 'express';
 import DocumentationDB from '../database/documentation';
+import PageDB from '../database/page';
 import { Documentation } from '../models/documentation';
 
 const documentationDB = new DocumentationDB();
+const pagesDB = new PageDB();
 const router = express.Router();
 
 /**
@@ -22,6 +24,29 @@ router.get("/", async (req, res) => {
         res.sendStatus(500);
     }
 });
+
+/**
+ * Gets all pages by documentation
+ * @param {string} req.query.documentationId - documentationId ID to retrieve pages for (optional)
+ * @returns {Page[]} A list of all pages
+ * @throws {Error} Throws an error if the documents could not be retrieved
+ */
+router.get("/:id/pages", async (req, res) => {
+    try {
+        const documentationId = req.params.id as string;
+        if (!documentationId) {
+            res.sendStatus(400);
+            return;
+        }
+        const pages = await pagesDB.getAll(documentationId);
+        res.send(JSON.stringify(pages));
+    }
+    catch (ex) {
+        console.error(ex);
+        res.sendStatus(500);
+    }
+});
+
 
 
 /**

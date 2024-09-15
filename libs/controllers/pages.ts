@@ -7,25 +7,24 @@ const router = express.Router();
 
 
 /**
- * Gets all page by documentation
- * @param {string} req.query.documentationId - documentationId ID to retrieve pages for (optional)
+ * Gets all pages by filters.
  * @returns {Page[]} A list of all pages
  * @throws {Error} Throws an error if the documents could not be retrieved
  */
 router.get("/", async (req, res) => {
-    try {
-        const documentationId = req.query.documentationId as string;
-        if (!documentationId) {
-            res.sendStatus(400);
-            return;
-        }
-        const pages = await pageDB.getAll(documentationId);
-        res.send(JSON.stringify(pages));
-    }
-    catch (ex) {
-        console.error(ex);
-        res.sendStatus(500);
-    }
+    // try {
+    //     const documentationId = req.query.documentationId as string;
+    //     if (!documentationId) {
+    //         res.sendStatus(400);
+    //         return;
+    //     }
+    //     const pages = await pageDB.getAll(documentationId);
+    //     res.send(JSON.stringify(pages));
+    // }
+    // catch (ex) {
+    //     console.error(ex);
+    //     res.sendStatus(500);
+    // }
 });
 
 /**
@@ -45,6 +44,26 @@ router.get("/:id", async (req, res) => {
         res.sendStatus(500);
     }
 });
+
+// TODO: Implement this.
+/**
+ * Gets all annotatations for a page
+ * @param {string} req.params.id - The ID of the page to retrieve
+ * @returns {Page} The page with the specified ID
+ * @throws {Error} Throws an error if the page could not be retrieved
+ */
+router.get("/:id/annotations", async (req, res) => {
+    try {
+        const id = req.params.id;
+        const page = await pageDB.get(id);
+        res.send(JSON.stringify(page));
+    }
+    catch (ex) {
+        console.error(ex);
+        res.sendStatus(500);
+    }
+});
+
 
 
 /**
