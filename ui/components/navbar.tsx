@@ -3,12 +3,14 @@ import { Button } from "@nextui-org/button";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/navbar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import LinkIcon from "./icons/link_icon";
+import RightArrowIcon from "./icons/right_arrow";
 
 
 const links = [
     { name: "Documentations", href: "/documentations" },
-    { name: "Teams", href: "#" },
-    { name: "Integrations", href: "#" },
+    // { name: "Teams", href: "#" },
+    // { name: "Integrations", href: "#" },
 ];
 export default function Nav() {
     const pathname = usePathname();
@@ -29,11 +31,11 @@ export default function Nav() {
 
             <NavbarContent justify="end">
                 <NavbarItem className="hidden lg:flex">
-                    <Link href="#">Login</Link>
+                    <Link href="#" >GitHub</Link>
                 </NavbarItem>
                 <NavbarItem>
-                    <Button as={Link} className="bg-emerald-700 bg-zinc-800 text-white" href="#" variant="flat" radius="full">
-                        Sign Up
+                    <Button as={Link} className="bg-emerald-700 bg-slate-700 text-white" href="#" variant="flat" radius="full">
+                        Download Extension
                     </Button>
                 </NavbarItem>
             </NavbarContent>
