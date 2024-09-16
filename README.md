@@ -31,8 +31,7 @@
 #### a. Custom Context Menu to Open Editor Panel
 *Right-click on the target element on the page to reveal a custom context menu item for annotation.*
 
-![Screenshot 2024-09-16 at 08 31 21](https://github.com/user-attachments/assets/9487a4e6-e9f7-4c04-a154-233630bbf112)
-
+![Screenshot 2024-09-16 at 08 31 21](https://github.com/user-attachments/assets/2e5d67f0-70b2-4172-8145-68c0a3495852)
 
 
 #### b. Editor Panel
