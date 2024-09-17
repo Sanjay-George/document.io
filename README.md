@@ -4,6 +4,8 @@
 
 **Document.io** is a streamlined tool for capturing, annotating, and documenting websites directly from your browser. Whether you’re building tutorials, managing workflows, or documenting app interfaces, Document.io makes the process easy and collaborative.
 
+Companion chrome extension repo: https://github.com/Sanjay-George/document.io-chrome-extension
+
 ## 🚀 Features
 
 - **Capture Website Components**: Document UI elements on any web page.
