@@ -8,7 +8,9 @@ import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
 import { ALL_PAGES_KEY, usePages } from '@/data/swr/pages';
 import PlayIcon from '@/components/icons/play_icon';
-import SettingsIcon from '@/components/icons/settings_icon';
+import OpenExternalIcon from '@/components/icons/open_external';
+import { Page } from '@/data/models/page';
+import { render } from 'react-dom';
 
 
 export default function Table({ documentationId, onRowEdit }:
@@ -20,6 +22,15 @@ export default function Table({ documentationId, onRowEdit }:
             dataIndex: 'title',
             width: '15%',
             key: 'title',
+        },
+        {
+            title: '',
+            dataIndex: '_id',
+            width: '5%',
+            key: 'open',
+            render: (id: string, record: Page) => (
+                <a onClick={() => handleConfigure(id, record)} className='text-slate-700'><OpenExternalIcon /></a>
+            ),
         },
         {
             title: 'URL',
@@ -48,12 +59,11 @@ export default function Table({ documentationId, onRowEdit }:
             title: 'Actions',
             key: 'action',
             dataIndex: '_id',
-            render: (id: string) => (
+            render: (id: string, record: Page) => (
                 <Space size="middle">
-                    <a onClick={() => handleEdit(id)}><EditIcon color="text-emerald-600" /></a>
-                    <a onClick={() => null}><SettingsIcon color="text-slate-500" /></a>
-                    <a onClick={() => null}><PlayIcon color="text-slate-500" /></a>
-                    <a onClick={() => null}><DeleteIcon color="text-red-600" /></a>
+
+                    <a onClick={() => handleEdit(id)} className='text-emerald-600'><EditIcon /></a>
+                    <a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
                 </Space>
             ),
         },
@@ -70,6 +80,19 @@ export default function Table({ documentationId, onRowEdit }:
     const handleEdit = (id: string) => {
         onRowEdit && onRowEdit(id);
     };
+
+    const handleConfigure = (id: string, record: Page) => {
+        const { title, url } = record;
+
+        let newUrl = url.includes('?')
+            ? `${url}&pageId=${id}` : `${url}?pageId=${id}`;
+        newUrl += `&mode=edit`;
+
+        console.log(`Configure page ${id} with url: ${newUrl}`);
+
+        // Open a new window with the url
+        window.open(newUrl, '_blank');
+    }
 
     return (
         data && <Tbl columns={columns} dataSource={[...data]} />

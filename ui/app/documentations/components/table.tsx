@@ -8,6 +8,7 @@ import { remove } from '@/data/api/documentations';
 import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data/swr/documentations';
 import Link from 'next/link';
 import Spinner from '@/components/icons/spinner';
+import OpenExternalIcon from '@/components/icons/open_external';
 
 
 export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }) {
@@ -15,6 +16,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 		{
 			title: 'Title',
 			dataIndex: 'title',
+			width: '15%',
 			key: 'title',
 			render: (title: string, record: any) => {
 				const id = record._id;
@@ -22,9 +24,20 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			}
 		},
 		{
+			title: '',
+			dataIndex: '_id',
+			width: '5%',
+			key: 'open',
+			render: (id: string, record: any) => (
+				<Link className='text-black hover:text-black hover:underline' href={`documentations/${id}`}><OpenExternalIcon /></Link>
+			),
+		},
+		{
 			title: 'Description',
 			dataIndex: 'description',
 			key: 'description',
+			ellipsis: true,
+			width: '50%',
 		},
 		{
 			title: 'Status',
@@ -61,8 +74,8 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			dataIndex: '_id',
 			render: (id: string) => (
 				<Space size="middle">
-					<a onClick={() => handleEdit(id)}><EditIcon color="text-emerald-600" /></a>
-					<a onClick={() => handleDelete(id)}><DeleteIcon color="text-red-600" /></a>
+					<a onClick={() => handleEdit(id)} className='text-emerald-600'><EditIcon /></a>
+					<a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
 				</Space>
 			),
 		},
