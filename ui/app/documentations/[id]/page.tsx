@@ -48,15 +48,13 @@ export default function Page({ params }: { params: { id: string } }) {
                 <PrimaryBtn text="Add a page"
                     icon={<RightArrowIcon />}
                     onClick={handleAddClick} />
-
             </div>
 
             <div>
-                <p class="mb-5 text-gray-500 dark:text-gray-400">{documentationData?.description}</p>
+                <p className="mb-5 text-gray-500 dark:text-gray-400">{documentationData?.description}</p>
             </div>
 
             <Table documentationId={documentationId} onRowEdit={handleEditClick} />
-
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
                 <Form documentationId={documentationId}
                     pageId={activePage}
