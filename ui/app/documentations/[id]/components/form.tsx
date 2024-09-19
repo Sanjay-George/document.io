@@ -17,6 +17,9 @@ export default function Form({ documentationId, pageId, postSubmit }: { document
                 ...page
             })
         }
+        else {
+            setFormData({ title: '', url: '' } as Page);
+        }
     }, [page]);
 
     const handleTextChange = (e: any) => {

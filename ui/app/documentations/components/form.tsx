@@ -20,6 +20,9 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
                 ...documentation
             })
         }
+        else {
+            resetForm();
+        }
     }, [documentation]);
 
     const handleTextChange = (e: any) => {
@@ -35,6 +38,14 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
             status: e.target.checked ? 'Active' : 'Inactive'
         });
     };
+
+    const resetForm = () => {
+        setFormData({
+            title: '',
+            description: '',
+            status: 'Active'
+        });
+    }
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -62,11 +73,7 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
 
         // Refetch data with useSWR
         mutate(ALL_DOCUMENTATIONS_KEY);
-        setFormData({
-            title: '',
-            description: '',
-            status: 'Active'
-        });
+        resetForm();
         postSubmit();
     }
 
