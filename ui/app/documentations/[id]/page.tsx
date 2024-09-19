@@ -51,6 +51,10 @@ export default function Page({ params }: { params: { id: string } }) {
 
             </div>
 
+            <div>
+                <p class="mb-5 text-gray-500 dark:text-gray-400">{documentationData?.description}</p>
+            </div>
+
             <Table documentationId={documentationId} onRowEdit={handleEditClick} />
 
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
