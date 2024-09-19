@@ -10,7 +10,6 @@ import GithubIcon from "./icons/gh_icon";
 
 const links = [
     { name: "Documentations", href: "/documentations" },
-    { name: "Whitelist", href: "/whitelist" },
     // { name: "Teams", href: "#" },
     // { name: "Integrations", href: "#" },
 ];
