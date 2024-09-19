@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import projectRouter from "./libs/controllers/projects";
 import documentRouter from "./libs/controllers/documentations";
 import pageRouter from "./libs/controllers/pages";
+import annotationRouter from "./libs/controllers/annotations";
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(cors());
 app.use('/projects', projectRouter);
 app.use('/documentations', documentRouter);
 app.use('/pages', pageRouter);
+app.use('/annotations', annotationRouter);
 
 
 app.listen(port, async () => {

@@ -1,15 +1,17 @@
 import express from "express";
 import { Page } from "../models/page";
 import PageDB from "../database/page";
+import AnnotationDB from "../database/annotation";
 
 const pageDB = new PageDB();
+const annotationDB = new AnnotationDB();
 const router = express.Router();
 
 
 /**
  * Gets all pages by filters.
  * @returns {Page[]} A list of all pages
- * @throws {Error} Throws an error if the documents could not be retrieved
+ * @throws {Error} Throws an error if the pages could not be retrieved
  */
 router.get("/", async (req, res) => {
     // try {
@@ -25,6 +27,7 @@ router.get("/", async (req, res) => {
     //     console.error(ex);
     //     res.sendStatus(500);
     // }
+    res.sendStatus(404);
 });
 
 /**
@@ -47,16 +50,16 @@ router.get("/:id", async (req, res) => {
 
 // TODO: Implement this.
 /**
- * Gets all annotatations for a page
+ * Gets all annotations for a page
  * @param {string} req.params.id - The ID of the page to retrieve
- * @returns {Page} The page with the specified ID
- * @throws {Error} Throws an error if the page could not be retrieved
+ * @returns {Annotation[]} Annotations with the specified ID
+ * @throws {Error} Throws an error if annotations could not be retrieved
  */
 router.get("/:id/annotations", async (req, res) => {
     try {
-        const id = req.params.id;
-        const page = await pageDB.get(id);
-        res.send(JSON.stringify(page));
+        const pageId = req.params.id;
+        const annotations = await annotationDB.getAll(pageId);
+        res.send(JSON.stringify(annotations));
     }
     catch (ex) {
         console.error(ex);

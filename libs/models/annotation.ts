@@ -1,4 +1,4 @@
-interface Annotation {
+export interface Annotation {
     id: string;
     value: string;
     target: string;
