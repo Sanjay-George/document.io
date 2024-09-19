@@ -61,7 +61,6 @@ export default function Table({ documentationId, onRowEdit }:
             dataIndex: '_id',
             render: (id: string, record: Page) => (
                 <Space size="middle">
-
                     <a onClick={() => handleEdit(id)} className='text-emerald-600'><EditIcon /></a>
                     <a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
                 </Space>
@@ -87,8 +86,6 @@ export default function Table({ documentationId, onRowEdit }:
         let newUrl = url.includes('?')
             ? `${url}&pageId=${id}` : `${url}?pageId=${id}`;
         newUrl += `&mode=edit`;
-
-        console.log(`Configure page ${id} with url: ${newUrl}`);
 
         // Open a new window with the url
         window.open(newUrl, '_blank');
