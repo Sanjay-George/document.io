@@ -1,10 +1,12 @@
 import express from "express";
 import { Page } from "../models/page";
 import PageDB from "../database/page";
+import OriginDB from "../database/origin";
 import AnnotationDB from "../database/annotation";
 
 const pageDB = new PageDB();
 const annotationDB = new AnnotationDB();
+const originDB = new OriginDB();
 const router = express.Router();
 
 
@@ -84,6 +86,7 @@ router.post("/", async (req, res) => {
         }
 
         const id = await pageDB.insert(page);
+        await whitelistOrigin(page.url);
         res.send(id);
     }
     catch (ex) {
@@ -91,6 +94,11 @@ router.post("/", async (req, res) => {
         res.sendStatus(500);
     }
 });
+
+async function whitelistOrigin(url: string) {
+    const urlOrigin = (new URL(url)).origin;
+    await originDB.insert(urlOrigin);
+}
 
 
 /**
@@ -104,6 +112,7 @@ router.put("/:id", async (req, res) => {
         const id = req.params.id;
         const page = req.body as Page;
         const result = await pageDB.update(id, page);
+        await whitelistOrigin(page.url);
         res.send(result);
     }
     catch (ex) {
