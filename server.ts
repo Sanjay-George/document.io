@@ -18,18 +18,15 @@ app.use(express.json());
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 const corsOptions = {
     origin: function (origin, callback) {
-        console.log('origin', origin);
         if (!origin) {
             callback(null, true);
             return;
         }
         if (allowedOrigins.indexOf(origin) !== -1) {
-            console.log('allowed origin', origin);
             return callback(null, true);
         }
         originDB.getAll().then((whitelistedOrigins) => {
             if (whitelistedOrigins.includes(origin)) {
-                console.log('allowed origin', origin);
                 callback(null, true);
             } else {
                 callback(new Error('Not allowed by CORS'));

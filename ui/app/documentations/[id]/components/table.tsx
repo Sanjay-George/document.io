@@ -31,7 +31,7 @@ export default function Table({ documentationId, onRowEdit }:
             width: '5%',
             key: 'open',
             render: (id: string, record: Page) => (
-                <a onClick={() => handleConfigure(id, record)} className='text-slate-700'><OpenExternalIcon /></a>
+                <a onClick={() => handleConfigure(id, record)} className='text-slate-400 hover:text-slate-700'><OpenExternalIcon /></a>
             ),
         },
         {
@@ -85,13 +85,12 @@ export default function Table({ documentationId, onRowEdit }:
 
 
     const handleCopyClick = () => {
-
+        // TODO: Add export data call
     };
 
 
     const handleConfigure = (id: string, record: Page) => {
         const { title, url } = record;
-
         let newUrl = url.includes('?')
             ? `${url}&pageId=${id}` : `${url}?pageId=${id}`;
         newUrl += `&mode=edit`;

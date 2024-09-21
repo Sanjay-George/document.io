@@ -1,10 +1,13 @@
 import express from 'express';
 import DocumentationDB from '../database/documentation';
 import PageDB from '../database/page';
+import AnnotationDB from '../database/annotation';
 import { Documentation } from '../models/documentation';
+import { whitelistOrigin } from './pages';
 
 const documentationDB = new DocumentationDB();
 const pagesDB = new PageDB();
+const annotationDB = new AnnotationDB();
 const router = express.Router();
 
 /**
@@ -48,7 +51,6 @@ router.get("/:id/pages", async (req, res) => {
 });
 
 
-
 /**
  * Gets a documentation by ID
  * @param {string} req.params.id - The ID of the document to retrieve
@@ -83,6 +85,31 @@ router.post("/", async (req, res) => {
         res.sendStatus(500);
     }
 });
+
+/**
+ * Imports a page. Creates a new page with the provided data.
+ * @param {string} req.params.id - The ID of the document to import the page to
+ */
+router.post("/:id/import", async (req, res) => {
+    try {
+        const { page, annotations } = req.body;
+
+        page.documentationId = req.params.id;
+        const pageId = await pagesDB.insert(page);
+        await whitelistOrigin(page.url);
+
+        for (const annotation of annotations) {
+            annotation.pageId = pageId;
+            await annotationDB.insert(annotation);
+        }
+        res.send(pageId);
+    }
+    catch (ex) {
+        console.error(ex);
+        res.sendStatus(500);
+    }
+});
+
 
 /**
  * Updates a documentation

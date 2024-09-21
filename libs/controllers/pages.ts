@@ -50,7 +50,6 @@ router.get("/:id", async (req, res) => {
     }
 });
 
-// TODO: Implement this.
 /**
  * Gets all annotations for a page
  * @param {string} req.params.id - The ID of the page to retrieve
@@ -66,6 +65,37 @@ router.get("/:id/annotations", async (req, res) => {
     catch (ex) {
         console.error(ex);
         res.sendStatus(500);
+    }
+});
+
+/**
+ * Exports a page. Returns all data to recreate the page.
+ */
+router.get("/:id/export", async (req, res) => {
+    try {
+        const id = req.params.id;
+        let page = await pageDB.get(id);
+        page = cleanData(page);
+        let annotations = await annotationDB.getAll(id);
+        annotations = annotations.map(i => cleanData(i));
+
+        const data = {
+            page,
+            annotations
+        }
+        res.send(JSON.stringify(data));
+    }
+    catch (ex) {
+        console.error(ex);
+        res.sendStatus(500);
+    }
+
+    function cleanData(data: any) {
+        // Remove sensitive data
+        delete data._id;
+        delete data.pageId;
+        delete data.documentationId;
+        return data;
     }
 });
 
@@ -95,7 +125,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-async function whitelistOrigin(url: string) {
+export async function whitelistOrigin(url: string) {
     const urlOrigin = (new URL(url)).origin;
     await originDB.insert(urlOrigin);
 }
