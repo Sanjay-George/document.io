@@ -95,7 +95,7 @@ router.post("/:id/import", async (req, res) => {
         const { page, annotations } = req.body;
 
         page.documentationId = req.params.id;
-        const pageId = await pagesDB.insert(page);
+        const pageId = (await pagesDB.insert(page)).toString();
         await whitelistOrigin(page.url);
 
         for (const annotation of annotations) {

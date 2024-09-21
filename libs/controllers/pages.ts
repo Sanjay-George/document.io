@@ -159,6 +159,7 @@ router.put("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
     try {
         const id = req.params.id;
+        await annotationDB.deleteByPageId(id);
         const result = await pageDB.delete(id);
         res.send(result);
     }

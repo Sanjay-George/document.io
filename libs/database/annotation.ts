@@ -69,4 +69,9 @@ export default class Annotation {
         return result.deletedCount > 0;
     }
 
+    async deleteByPageId(pageId: string) {
+        const result = await this.collection.deleteMany({ pageId: new ObjectId(pageId) });
+        return result.deletedCount > 0;
+    }
+
 }

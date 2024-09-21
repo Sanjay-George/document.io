@@ -13,7 +13,7 @@ import { useState } from "react";
 import { usePages } from "@/data/swr/pages";
 import CopyIcon from "@/components/icons/copy_icon";
 import { Tooltip } from "@nextui-org/tooltip"
-import ImportForm from "../components/import_form";
+import ImportForm from "./components/import_form";
 import ImportIcon from "@/components/icons/import_icon";
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -87,7 +87,7 @@ export default function Page({ params }: { params: { id: string } }) {
             </Modal>
 
             <Modal open={isImportModalOpen} footer={null} onCancel={handleImportModalCancel}>
-                <ImportForm />
+                <ImportForm documentationId={documentationId} postSubmit={() => setImportModalOpen(false)} />
             </Modal>
         </>
     );

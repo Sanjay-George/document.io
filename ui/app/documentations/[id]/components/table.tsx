@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Space, Table as Tbl, Tag } from 'antd';
 import { Chip } from '@nextui-org/chip';
 import useSWR, { mutate } from 'swr';
-import { remove } from '@/data/api/pages';
+import { exportData, remove } from '@/data/api/pages';
 import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data/swr/documentations';
 import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
@@ -65,7 +65,7 @@ export default function Table({ documentationId, onRowEdit }:
                 <Space size="middle">
                     <a onClick={() => handleEdit(id)} className='text-emerald-600'><EditIcon /></a>
                     <a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
-                    <Tooltip content="Copy data (JSON)" placement="top" offset={10}><a onClick={() => handleCopyClick()} className='text-slate-400 hover:text-slate-700'>  <CopyIcon /></a></Tooltip>
+                    <Tooltip content="Copy data (JSON)" placement="top" offset={10}><a onClick={() => handleCopyClick(id)} className='text-slate-400 hover:text-slate-700'>  <CopyIcon /></a></Tooltip>
                 </Space>
             ),
         },
@@ -83,9 +83,18 @@ export default function Table({ documentationId, onRowEdit }:
         onRowEdit && onRowEdit(id);
     };
 
+    const copyToClipboard = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+        } catch (err) {
+            console.error('Failed to copy: ', err);
+        }
+    };
 
-    const handleCopyClick = () => {
-        // TODO: Add export data call
+
+    const handleCopyClick = async (id: string) => {
+        const pageData = await exportData(id);
+        copyToClipboard(JSON.stringify(pageData, null, 2));
     };
 
 

@@ -10,13 +10,11 @@ import PrimaryBtn from "@/components/primary_btn";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import { Tooltip } from "@nextui-org/tooltip";
 import ImportIcon from "@/components/icons/import_icon";
-import ImportForm from "./components/import_form";
+import ImportForm from "./[id]/components/import_form";
 
 
 export default function Page() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-
     const [activeDocumentation, setActiveDocumentation] = useState<null | string>(null);
 
     const showModal = () => {

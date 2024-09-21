@@ -20,7 +20,7 @@ export default class Page {
             created: new Date(),
             updated: new Date()
         });
-        return result.insertedId.toString();
+        return result.insertedId;
     }
 
     async get(id: string): Promise<IPage> {
