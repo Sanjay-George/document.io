@@ -8,9 +8,15 @@ import { useState } from "react";
 import { Modal } from "antd";
 import PrimaryBtn from "@/components/primary_btn";
 import RightArrowIcon from "@/components/icons/right_arrow";
+import { Tooltip } from "@nextui-org/tooltip";
+import ImportIcon from "@/components/icons/import_icon";
+import ImportForm from "./components/import_form";
+
 
 export default function Page() {
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+
     const [activeDocumentation, setActiveDocumentation] = useState<null | string>(null);
 
     const showModal = () => {
@@ -33,13 +39,17 @@ export default function Page() {
         showModal();
     };
 
+
     return (
         <>
             <div className="flex justify-between items-center pb-5">
                 <H2>Documentations</H2>
-                <PrimaryBtn text="Add documentation"
-                    icon={<RightArrowIcon />}
-                    onClick={handleAddClick} />
+
+                <div className="inline-flex space-x-1">
+                    <PrimaryBtn text="Add documentation"
+                        icon={<RightArrowIcon />}
+                        onClick={handleAddClick} />
+                </div>
             </div>
 
             <Table onRowEdit={handleEditClick} />
@@ -47,6 +57,8 @@ export default function Page() {
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
                 <Form docId={activeDocumentation} postSubmit={() => setIsModalOpen(false)} />
             </Modal>
+
+
 
         </>
     );

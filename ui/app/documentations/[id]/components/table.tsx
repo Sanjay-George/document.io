@@ -11,6 +11,8 @@ import PlayIcon from '@/components/icons/play_icon';
 import OpenExternalIcon from '@/components/icons/open_external';
 import { Page } from '@/data/models/page';
 import { render } from 'react-dom';
+import CopyIcon from '@/components/icons/copy_icon';
+import { Tooltip } from '@nextui-org/tooltip';
 
 
 export default function Table({ documentationId, onRowEdit }:
@@ -63,6 +65,7 @@ export default function Table({ documentationId, onRowEdit }:
                 <Space size="middle">
                     <a onClick={() => handleEdit(id)} className='text-emerald-600'><EditIcon /></a>
                     <a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
+                    <Tooltip content="Copy data (JSON)" placement="top" offset={10}><a onClick={() => handleCopyClick()} className='text-slate-400 hover:text-slate-700'>  <CopyIcon /></a></Tooltip>
                 </Space>
             ),
         },
@@ -79,6 +82,12 @@ export default function Table({ documentationId, onRowEdit }:
     const handleEdit = (id: string) => {
         onRowEdit && onRowEdit(id);
     };
+
+
+    const handleCopyClick = () => {
+
+    };
+
 
     const handleConfigure = (id: string, record: Page) => {
         const { title, url } = record;

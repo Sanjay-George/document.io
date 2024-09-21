@@ -11,6 +11,10 @@ import Spinner from "@/components/icons/spinner";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import { useState } from "react";
 import { usePages } from "@/data/swr/pages";
+import CopyIcon from "@/components/icons/copy_icon";
+import { Tooltip } from "@nextui-org/tooltip"
+import ImportForm from "../components/import_form";
+import ImportIcon from "@/components/icons/import_icon";
 
 export default function Page({ params }: { params: { id: string } }) {
     const documentationId = params.id;
@@ -18,6 +22,7 @@ export default function Page({ params }: { params: { id: string } }) {
     const { data: pagesData, isLoading } = usePages(documentationId as any);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isImportModalOpen, setImportModalOpen] = useState(false);
     const [activePage, setActivePage] = useState<null | string>(null);
 
     const showModal = () => {
@@ -38,16 +43,36 @@ export default function Page({ params }: { params: { id: string } }) {
         showModal();
     };
 
+    const handleImportModalCancel = () => {
+        setImportModalOpen(false);
+    }
+    const handleImportClick = () => {
+        setImportModalOpen(true);
+    }
+
+
     if (isLoading) {
         return <Spinner />;
     }
     return (
         <>
             <div className="flex justify-between items-center pb-5">
-                <H2>{documentationData?.title}</H2>
-                <PrimaryBtn text="Add a page"
-                    icon={<RightArrowIcon />}
-                    onClick={handleAddClick} />
+                <div className="inline-flex space-x-1 items-center">
+                    <H2>{documentationData?.title}</H2>
+                </div>
+                <div className="inline-flex space-x-1">
+                    <Tooltip content="Import data (JSON)" placement="left" offset={-10}>
+                        <button className=" text-slate-400 px-3 py-2 hover:text-slate-700"
+                            onClick={handleImportClick}>
+                            <ImportIcon />
+                        </button>
+                    </Tooltip>
+
+                    <PrimaryBtn text="Add a page"
+                        icon={<RightArrowIcon />}
+                        onClick={handleAddClick} />
+                </div>
+
             </div>
 
             <div>
@@ -61,6 +86,9 @@ export default function Page({ params }: { params: { id: string } }) {
                     postSubmit={() => setIsModalOpen(false)} />
             </Modal>
 
+            <Modal open={isImportModalOpen} footer={null} onCancel={handleImportModalCancel}>
+                <ImportForm />
+            </Modal>
         </>
     );
 }
