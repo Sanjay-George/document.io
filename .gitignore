@@ -42,9 +42,6 @@ yarn.lock
 
 
 # project specific
-data/
-captures/
-config/
 dist/
 *.zip
 *.txt
