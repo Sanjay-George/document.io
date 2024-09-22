@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
-import { Page } from "@/data/models/page";
-import { ALL_PAGES_KEY, SINGLE_PAGE_KEY, usePage } from "@/data/swr/pages";
-import { add, edit } from "@/data/api/pages";
+import { Page } from "@/data_access/models/page";
+import { ALL_PAGES_KEY, SINGLE_PAGE_KEY, usePage } from "@/data_access/swr/pages";
+import { add, edit } from "@/data_access/api/pages";
 
 
 export default function Form({ documentationId, pageId, postSubmit }: { documentationId: string, pageId: string | null, postSubmit: (data?: any) => void }) {

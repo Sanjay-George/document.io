@@ -6,11 +6,11 @@ import H2 from "@/components/h2";
 import PrimaryBtn from "@/components/primary_btn";
 import Form from "./components/form";
 import { Modal } from "antd";
-import { useDocumentation } from "@/data/swr/documentations";
+import { useDocumentation } from "@/data_access/swr/documentations";
 import Spinner from "@/components/icons/spinner";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import { useState } from "react";
-import { usePages } from "@/data/swr/pages";
+import { usePages } from "@/data_access/swr/pages";
 import CopyIcon from "@/components/icons/copy_icon";
 import { Tooltip } from "@nextui-org/tooltip"
 import ImportForm from "./components/import_form";

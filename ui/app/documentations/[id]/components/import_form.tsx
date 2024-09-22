@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { add, edit, importData } from "@/data/api/documentations";
+import { add, edit, importData } from "@/data_access/api/documentations";
 import { mutate } from "swr";
-import { ALL_DOCUMENTATIONS_KEY, SINGLE_DOCUMENT_KEY, useDocumentation } from "@/data/swr/documentations";
-import { Documentation } from "@/data/models/documentation";
-import { ALL_PAGES_KEY } from "@/data/swr/pages";
+import { ALL_DOCUMENTATIONS_KEY, SINGLE_DOCUMENT_KEY, useDocumentation } from "@/data_access/swr/documentations";
+import { Documentation } from "@/data_access/models/documentation";
+import { ALL_PAGES_KEY } from "@/data_access/swr/pages";
 
 export default function ImportForm({ documentationId, postSubmit }: { documentationId: string, postSubmit: () => void }) {
     const [pageData, setPageData] = useState(null) as any;
