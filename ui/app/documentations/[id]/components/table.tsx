@@ -65,7 +65,7 @@ export default function Table({ documentationId, onRowEdit }:
                 <Space size="middle">
                     <a onClick={() => handleEdit(id)} className='text-emerald-600'><EditIcon /></a>
                     <a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
-                    <Tooltip content="Copy data (JSON)" placement="top" offset={10}><a onClick={() => handleCopyClick(id)} className='text-slate-400 hover:text-slate-700'>  <CopyIcon /></a></Tooltip>
+                    <Tooltip content="Copy Page (JSON)" placement="top" offset={10}><a onClick={() => handleCopyClick(id)} className='text-slate-400 hover:text-slate-700'>  <CopyIcon /></a></Tooltip>
                 </Space>
             ),
         },

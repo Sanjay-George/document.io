@@ -23,7 +23,7 @@ export default function ImportForm({ documentationId, postSubmit }: { documentat
             <div className="mb-5">
                 <label htmlFor="description"
                     className="block mb-2 text-sm font-medium 
-                        text-gray-900 dark:text-white">Documentation Data (JSON)</label>
+                        text-gray-900 dark:text-white">Page Config</label>
                 <textarea id="description" name="description"
                     value={pageData}
                     onChange={(e) => setPageData(e.target.value)}
