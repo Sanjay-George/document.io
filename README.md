@@ -6,25 +6,92 @@
 
 _Companion chrome extension repo:_ https://github.com/Sanjay-George/document.io-chrome-extension
 
-## 🚀 Features
-
-- **Capture Website Components**: Document UI elements on any web page.
-- **Quick & Easy Annotations**: Simply right-click on any element and annotate it on the fly!
-- **Add Annotations**: Use a Markdown editor to add detailed notes.
-- **Collaborative Documentation**: Share your annotations with your team to speed up workflows and clarify designs.
-
-
 ## 🎯 Motivation
 
 - Simplify the process of documenting web-based workflows, user interfaces, and tutorials.
 - Enable teams to share and collaborate on detailed website documentation.
 - Provide an easy-to-use platform for knowledge transfer, application onboarding, idea generation and more.
 
+## 🚀 Features
+
+- **Capture Website Components**: Document UI elements on any web page.
+- **Quick & Easy Annotations**: Simply right-click on any element and annotate it on the fly!
+- **Add Annotations**: Use a Markdown editor to add detailed notes.
+- **Collaborative Documentation**: Share your annotations with your team to speed up workflows and clarify designs.
  
-<!-- ## 📦 Getting Started -->
+## 📦 Getting Started
+
+### Prerequisites
+Before getting started, make sure you have the following installed:
+
+- **Node.js** (v20 or higher preferred): [Download Node.js](https://nodejs.org/)
+- **Docker** : [Download Docker](https://www.docker.com/products/docker-desktop/)
+
+### Setup
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/Sanjay-George/document.io.git
+   cd document.io
+   ```
+
+2. **Install dependencies for both backend and frontend:**
+
+   ```bash
+   # Install dependencies for the backend
+   npm install
+   
+   # Install dependencies for the frontend
+   cd ui
+   npm install
+   ```
+
+3. **Environment Variables:**
+
+   Copy `.env.example` and create `.env` file,  in root and `ui` folders. Update the values appropriately.
+
+
+4. **Setup Database with Docker Compose**
+
+   The project includes a `docker-compose.yml` file to set up MongoDB and Mongo Express for database management. You can run this with Docker Compose:
+
+   ```bash
+   docker compose up -d
+   ```
+
+   By default, MongoDB is set up with the username `root` and password `example`. If you want to change the MongoDB password, modify the MONGO_INITDB_ROOT_PASSWORD field in the docker-compose.yml file and update the `.env` file with the new credentials.
+
+5. **Start the development servers:**
+
+   ```bash
+   # start node server in root folder
+   npm run dev
+
+   # start next server in ./ui
+   cd ui
+   npm run dev
+   ```
+
+   By default, the node server will run on port 5000, and next server on port 3000. If you modify the port of the node server, update `NEXT_PUBLIC_API_URL` variable in `ui/.env` file.
+
+   
+
+7. **Access the application:**
+   
+   - Visit `http://localhost:3000` to use the application
+  
+
+8. **Setup Companion Chrome Extension**
+   - Follow the instructions [in the repo](https://github.com/Sanjay-George/document.io-chrome-extension) to setup the companion extension, which is crucial to interact with anntoations on webpages.
+
+
+ Enjoy documenting 🎉
 
 
 
+
+<!--
 
 ## 📷 Screenshots 
 
@@ -58,3 +125,6 @@ _Companion chrome extension repo:_ https://github.com/Sanjay-George/document.io-
 
 #### b. Documentations page
 ![image](https://github.com/user-attachments/assets/c04c5b4e-852f-41d5-a52d-b03ef64d1397)
+
+
+-->
