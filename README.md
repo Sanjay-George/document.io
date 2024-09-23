@@ -18,8 +18,6 @@ _Companion chrome extension repo:_ https://github.com/Sanjay-George/document.io-
 - **Quick & Easy Annotations**: Simply right-click on any element and annotate it on the fly!
 - **Add Annotations**: Use a Markdown editor to add detailed notes.
 - **Collaborative Documentation**: Share your annotations with your team to speed up workflows and clarify designs.
-
-  <br />
  
 ## 📦 Getting Started
 
@@ -81,12 +79,15 @@ Before getting started, make sure you have the following installed:
 
 7. **Access the application:**
    
-   - Visit `http://localhost:3000` to use the application 
+   - Visit `http://localhost:3000` to use the application
+  
+
+8. **Setup Companion Chrome Extension**
+   - Follow the instructions [in the repo](https://github.com/Sanjay-George/document.io-chrome-extension) to setup the companion extension, which is crucial to interact with anntoations on webpages.
 
 
- Done 🎉
+ Enjoy documenting 🎉
 
-  <br />
 
 
 
