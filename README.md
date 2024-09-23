@@ -19,7 +19,7 @@ _Companion chrome extension repo:_ https://github.com/Sanjay-George/document.io-
 - **Add Annotations**: Use a Markdown editor to add detailed notes.
 - **Collaborative Documentation**: Share your annotations with your team to speed up workflows and clarify designs.
 
-
+  <br />
  
 ## 📦 Getting Started
 
@@ -86,7 +86,7 @@ Before getting started, make sure you have the following installed:
 
  Done 🎉
 
-
+  <br />
 
 
 
