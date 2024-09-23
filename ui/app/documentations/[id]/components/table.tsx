@@ -1,16 +1,12 @@
 import React, { useEffect } from 'react';
 import { Space, Table as Tbl, Tag } from 'antd';
-import { Chip } from '@nextui-org/chip';
 import useSWR, { mutate } from 'swr';
 import { exportData, remove } from '@/data_access/api/pages';
-import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data_access/swr/documentations';
 import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
 import { ALL_PAGES_KEY, usePages } from '@/data_access/swr/pages';
-import PlayIcon from '@/components/icons/play_icon';
 import OpenExternalIcon from '@/components/icons/open_external';
 import { Page } from '@/data_access/models/page';
-import { render } from 'react-dom';
 import CopyIcon from '@/components/icons/copy_icon';
 import { Tooltip } from '@nextui-org/tooltip';
 

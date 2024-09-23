@@ -6,7 +6,7 @@
     "build": "tsc",
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",
-    "start": "node dist/server.js",
+    "start": "NODE_ENV=production node dist/server.js",
     "dev": "npm run prestart && node dist/swagger/swagger.js && node dist/server.js"
   },
   "author": "Sanjay George",

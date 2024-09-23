@@ -3,8 +3,6 @@ import { Button } from "@nextui-org/button";
 import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/navbar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import LinkIcon from "./icons/link_icon";
-import RightArrowIcon from "./icons/right_arrow";
 import GithubIcon from "./icons/gh_icon";
 
 
