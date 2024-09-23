@@ -33,7 +33,11 @@ export default function Nav() {
                     <a href="https://github.com/Sanjay-George/document.io" target="_blank"><GithubIcon /></a>
                 </NavbarItem>
                 <NavbarItem>
-                    <Button as={Link} className="bg-emerald-700 bg-slate-700 text-white" href="#" variant="flat" radius="full">
+                    <Button as={Link}
+                        href="https://github.com/Sanjay-George/document.io-chrome-extension"
+                        target="_blank"
+                        className="bg-emerald-700 bg-slate-700 text-white"
+                        variant="flat" radius="full">
                         Download Extension
                     </Button>
                 </NavbarItem>
