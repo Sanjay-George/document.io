@@ -18,7 +18,7 @@ export default function Table({ documentationId, onRowEdit }:
         {
             title: 'Title',
             dataIndex: 'title',
-            width: '15%',
+            width: '20%',
             key: 'title',
         },
         {
@@ -34,7 +34,7 @@ export default function Table({ documentationId, onRowEdit }:
             title: 'URL',
             dataIndex: 'url',
             key: 'url',
-            width: '50%',
+            width: '35%',
             ellipsis: true,
         },
         {

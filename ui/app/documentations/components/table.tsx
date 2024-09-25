@@ -16,7 +16,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 		{
 			title: 'Title',
 			dataIndex: 'title',
-			width: '15%',
+			width: '20%',
 			key: 'title',
 			render: (title: string, record: any) => {
 				const id = record._id;
@@ -37,7 +37,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			dataIndex: 'description',
 			key: 'description',
 			ellipsis: true,
-			width: '50%',
+			width: '40%',
 		},
 		{
 			title: 'Status',
