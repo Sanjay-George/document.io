@@ -84,7 +84,6 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 	const { data, isLoading, error } = useDocumentations();
 
 	const handleDelete = async (id: string) => {
-		console.log(id);
 		await remove(id);
 		mutate(ALL_DOCUMENTATIONS_KEY);
 	}
