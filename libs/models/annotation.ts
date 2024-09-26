@@ -6,5 +6,6 @@ export interface Annotation {
     pageId: string;
     created: Date;
     updated: Date;
+    type: 'page' | 'component';
     comments?: string[];
 }

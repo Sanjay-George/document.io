@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import { dbName, getClient, uri } from "./db_client";
 import { Annotation as IAnnotation } from "../models/annotation";
 import { url } from "inspector";
+import { AnnotationFilters } from "../entities/annotation_filters";
 
 const client = getClient();
 
@@ -40,8 +41,8 @@ export default class Annotation {
         return annotation as any as IAnnotation;
     }
 
-    async getAll(pageId: string): Promise<IAnnotation[]> {
-        const query = { pageId: new ObjectId(pageId) };
+    async getAll(pageId: string, filters?: AnnotationFilters): Promise<IAnnotation[]> {
+        const query = { pageId: new ObjectId(pageId), ...filters };
         const annotatations = await this.collection.find(query).toArray();
         return annotatations as any as IAnnotation[];
     }

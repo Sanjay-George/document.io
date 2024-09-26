@@ -3,34 +3,13 @@ import { Page } from "../models/page";
 import PageDB from "../database/page";
 import OriginDB from "../database/origin";
 import AnnotationDB from "../database/annotation";
+import { AnnotationFilters } from "../entities/annotation_filters";
 
 const pageDB = new PageDB();
 const annotationDB = new AnnotationDB();
 const originDB = new OriginDB();
 const router = express.Router();
 
-
-/**
- * Gets all pages by filters.
- * @returns {Page[]} A list of all pages
- * @throws {Error} Throws an error if the pages could not be retrieved
- */
-router.get("/", async (req, res) => {
-    // try {
-    //     const documentationId = req.query.documentationId as string;
-    //     if (!documentationId) {
-    //         res.sendStatus(400);
-    //         return;
-    //     }
-    //     const pages = await pageDB.getAll(documentationId);
-    //     res.send(JSON.stringify(pages));
-    // }
-    // catch (ex) {
-    //     console.error(ex);
-    //     res.sendStatus(500);
-    // }
-    res.sendStatus(404);
-});
 
 /**
  * Gets a page by ID
@@ -59,7 +38,11 @@ router.get("/:id", async (req, res) => {
 router.get("/:id/annotations", async (req, res) => {
     try {
         const pageId = req.params.id;
-        const annotations = await annotationDB.getAll(pageId);
+        const filters = req.query as AnnotationFilters;
+        if (filters.url) {
+            filters.url = decodeURIComponent(filters.url);
+        }
+        const annotations = await annotationDB.getAll(pageId, filters);
         res.send(JSON.stringify(annotations));
     }
     catch (ex) {
