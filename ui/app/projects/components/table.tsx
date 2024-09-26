@@ -20,7 +20,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			key: 'title',
 			render: (title: string, record: any) => {
 				const id = record._id;
-				return <Link className='text-black hover:text-black hover:underline' href={`documentations/${id}`}>{title}</Link>
+				return <Link className='text-black hover:text-black hover:underline' href={`projects/${id}`}>{title}</Link>
 			}
 		},
 		{
@@ -29,7 +29,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			width: '5%',
 			key: 'open',
 			render: (id: string, record: any) => (
-				<Link className='text-slate-400 hover:text-slate-700 hover:underline' href={`documentations/${id}`}><OpenExternalIcon /></Link>
+				<Link className='text-slate-400 hover:text-slate-700 hover:underline' href={`projects/${id}`}><OpenExternalIcon /></Link>
 			),
 		},
 		{

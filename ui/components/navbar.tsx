@@ -7,7 +7,7 @@ import GithubIcon from "./icons/gh_icon";
 
 
 const links = [
-    { name: "Documentations", href: "/documentations" },
+    { name: "Projects", href: "/projects" },
     // { name: "Teams", href: "#" },
     // { name: "Integrations", href: "#" },
 ];

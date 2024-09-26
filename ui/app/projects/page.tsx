@@ -37,10 +37,10 @@ export default function Page() {
     return (
         <>
             <div className="flex justify-between items-center pb-5">
-                <H2>Documentations</H2>
+                <H2>Projects</H2>
 
                 <div className="inline-flex space-x-1">
-                    <PrimaryBtn text="Add documentation"
+                    <PrimaryBtn text="Add project"
                         icon={<RightArrowIcon />}
                         onClick={handleAddClick} />
                 </div>

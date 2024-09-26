@@ -61,14 +61,14 @@ export default function Page({ params }: { params: { id: string } }) {
                     <H2>{documentationData?.title}</H2>
                 </div>
                 <div className="inline-flex space-x-1">
-                    <Tooltip content="Import Page" placement="left" offset={-10}>
+                    <Tooltip content="Import data" placement="left" offset={-10}>
                         <button className=" text-slate-400 px-3 py-2 hover:text-slate-700"
                             onClick={handleImportClick}>
                             <ImportIcon />
                         </button>
                     </Tooltip>
 
-                    <PrimaryBtn text="Add a page"
+                    <PrimaryBtn text="Add documentation"
                         icon={<RightArrowIcon />}
                         onClick={handleAddClick} />
                 </div>
