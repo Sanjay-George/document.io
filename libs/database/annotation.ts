@@ -58,6 +58,7 @@ export default class Annotation {
                     value: data.value,
                     target: data.target,
                     url: data.url,
+                    type: data.type,
                     updated: new Date(),
                 }
             }
