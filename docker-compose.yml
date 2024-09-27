@@ -1,6 +1,29 @@
+name: document_io
 version: '3.1'
 
 services:
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ui/Dockerfile
+      target: frontend
+    ports:
+      - "3000:3000"
+    # depends_on:
+    #   - backend
+    restart: always
 
   mongo:
     image: mongo
@@ -10,6 +33,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    
 
   mongo-express:
     image: mongo-express
@@ -21,3 +45,9 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: false
+
+
+# TODO: https://docs.docker.com/samples/nodejs/
+
+# networks:
+#   db:
