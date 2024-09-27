@@ -1,30 +1,44 @@
-FROM node:20-alpine AS backend
+FROM node:20-alpine AS base
 
-# Set working directory for the backend
+# Stage 1: Install dependencies
+FROM base as builder
+# RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy backend package.json and package-lock.json to install dependencies
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the backend source code
+# Copy all backend source files
 COPY *.ts ./
 COPY tsconfig.json ./
 COPY libs ./libs
 COPY swagger ./swagger
+
+# Build TS
+RUN npm run build
+
+
+
+# Stage 2: Final image
+FROM base as backend
+WORKDIR /app
+ENV NODE_ENV=production
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
+
+COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
+COPY package*.json ./
+
+# Copy .env file and update
 COPY .env ./
-
-# # Build the backend using the TypeScript compiler
-# RUN npm run build
-
 RUN sed -i 's/MONGO_HOST=localhost/MONGO_HOST=mongo/' .env
 
-# Expose port 5000 for the backend
+RUN npm ci --production
+
+USER nodejs
 EXPOSE 5000
 
-# Start the backend server
-ENTRYPOINT [ "npm", "start" ]
+CMD [ "node", "dist/server.js" ]
 
 
