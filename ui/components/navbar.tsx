@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import GithubIcon from "./icons/gh_icon";
 import ButtonPrimary from "./ButtonPrimary";
 import ButtonAccent from "./ButtonAccent";
+import ButtonBlack from "./ButtonBlack";
 
 
 const links = [
@@ -35,7 +36,7 @@ export default function Nav() {
                     <a href="https://github.com/Sanjay-George/document.io" target="_blank"><GithubIcon /></a>
                 </NavbarItem>
                 <NavbarItem>
-                    <ButtonAccent
+                    <ButtonBlack
                         href="https://github.com/Sanjay-George/document.io-chrome-extension"
                         target="_blank"
                         text="Download Extension"
