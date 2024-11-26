@@ -2,8 +2,8 @@
 
 import { Button } from "@nextui-org/button";
 import Table from "./components/table";
-import H2 from "@/components/h2";
-import PrimaryBtn from "@/components/primary_btn";
+import H2 from "@/components/H2";
+import PrimaryBtn from "@/components/ButtonPrimary";
 import Form from "./components/form";
 import { Modal } from "antd";
 import { useDocumentation } from "@/data_access/swr/documentations";
@@ -76,7 +76,7 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
 
             <div>
-                <p className="mb-5 text-gray-500 dark:text-gray-400">{documentationData?.description}</p>
+                <p className="mb-10 text-slate-400 font-light dark:text-gray-400">{documentationData?.description}</p>
             </div>
 
             <Table documentationId={documentationId} onRowEdit={handleEditClick} />

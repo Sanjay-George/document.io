@@ -4,6 +4,8 @@ import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/navb
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import GithubIcon from "./icons/gh_icon";
+import ButtonPrimary from "./ButtonPrimary";
+import ButtonAccent from "./ButtonAccent";
 
 
 const links = [
@@ -14,16 +16,16 @@ const links = [
 export default function Nav() {
     const pathname = usePathname();
     return (
-        <Navbar>
+        <Navbar className="border-b-1 border-b-slate-50 py-2">
             <NavbarBrand>
                 {/* <Logo /> */}
-                <Link href='/'><p className="font-bold text-inherit text-emerald-600">DOCUMENT.IO</p></Link>
+                <Link href='/'><p className="font-bold text-slate-400 border-b-2 border-b-transparent hover:border-b-accent hover:text-slate-600 pb-1">DOCUMENT.IO</p></Link>
             </NavbarBrand>
 
             <NavbarContent className="hidden sm:flex gap-6" justify="center">
                 {links.map((link) => (
                     <NavbarItem key={link.name} isActive={link.href === pathname}>
-                        <Link color="foreground" href={link.href}>{link.name}</Link>
+                        <Link className="text-slate-400 border-b-2 border-b-transparent hover:border-b-accent hover:text-slate-600 pb-1" href={link.href}>{link.name}</Link>
                     </NavbarItem>
                 ))}
             </NavbarContent>
@@ -33,13 +35,12 @@ export default function Nav() {
                     <a href="https://github.com/Sanjay-George/document.io" target="_blank"><GithubIcon /></a>
                 </NavbarItem>
                 <NavbarItem>
-                    <Button as={Link}
+                    <ButtonAccent
                         href="https://github.com/Sanjay-George/document.io-chrome-extension"
                         target="_blank"
-                        className="bg-emerald-700 bg-slate-700 text-white"
-                        variant="flat" radius="full">
-                        Download Extension
-                    </Button>
+                        text="Download Extension"
+                        icon={null}
+                    />
                 </NavbarItem>
             </NavbarContent>
         </Navbar>

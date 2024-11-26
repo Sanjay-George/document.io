@@ -1,7 +1,10 @@
-import H1 from "@/components/h1";
-import Navbar from "@/components/navbar";
+import H1 from "@/components/H1";
+import Navbar from "@/components/Navbar";
+import ButtonAccent from "@/components/ButtonAccent";
 import { Button } from "@nextui-org/button";
 import Link from "next/link";
+import RightArrowIcon from "@/components/icons/right_arrow";
+import ButtonPrimary from "@/components/ButtonPrimary";
 
 export default function Home() {
     return (
@@ -11,18 +14,14 @@ export default function Home() {
                 <div className="flex items-center justify-center">
                     <div className="container text-center mx-auto pt-5">
                         <H1>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r to-emerald-600 from-black">Your Web Documentation Hub </span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r to-primary from-slate-700 font-semibold">Your Web Documentation Hub </span>
                         </H1>
-                        <p className="mb-6 text-lg font-normal text-gray-500 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
+                        <p className="mb-14 text-lg font-light text-slate-400 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
                             Document.io lets you easily capture and annotate web pages with notes and voice memos. Simplify collaboration and keep your team aligned with clear, accessible documentation.
                         </p>
 
-                        <Button as={Link} href="/projects" className="bg-emerald-700 text-white" variant="flat" radius="sm" size="lg">
-                            Manage Projects
-                            <svg className="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M1 5h12m0 0L9 1m4 4L9 9" />
-                            </svg>
-                        </Button>
+                        <ButtonPrimary href="/projects" text="Manage Projects" icon={<RightArrowIcon />} />
+
                     </div>
                 </div>
             </div>

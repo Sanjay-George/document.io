@@ -29,7 +29,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			width: '5%',
 			key: 'open',
 			render: (id: string, record: any) => (
-				<Link className='text-slate-400 hover:text-slate-700 hover:underline' href={`projects/${id}`}><OpenExternalIcon /></Link>
+				<Link className='text-primary hover:text-slate-700 hover:underline' href={`projects/${id}`}><OpenExternalIcon /></Link>
 			),
 		},
 		{
@@ -74,8 +74,8 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			dataIndex: '_id',
 			render: (id: string) => (
 				<Space size="middle">
-					<a onClick={() => handleEdit(id)} className='text-emerald-600'><EditIcon /></a>
-					<a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
+					<a onClick={() => handleEdit(id)} className='text-primary'><EditIcon /></a>
+					<a onClick={() => handleDelete(id)} className='text-accent'><DeleteIcon /></a>
 				</Space>
 			),
 		},

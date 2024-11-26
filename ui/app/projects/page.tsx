@@ -1,11 +1,11 @@
 "use client";
 
 import Table from "./components/table";
-import H2 from "@/components/h2";
+import H2 from "@/components/H2";
 import Form from "./components/form";
 import { useState } from "react";
 import { Modal } from "antd";
-import PrimaryBtn from "@/components/primary_btn";
+import PrimaryBtn from "@/components/ButtonPrimary";
 import RightArrowIcon from "@/components/icons/right_arrow";
 
 
