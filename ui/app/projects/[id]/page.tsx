@@ -4,7 +4,7 @@ import { Button } from "@nextui-org/button";
 import Table from "./components/table";
 import H2 from "@/components/H2";
 import PrimaryBtn from "@/components/ButtonPrimary";
-import Form from "./components/form";
+import Form from "./components/Form";
 import { Modal } from "antd";
 import { useDocumentation } from "@/data_access/swr/documentations";
 import Spinner from "@/components/icons/spinner";
@@ -13,7 +13,7 @@ import { useState } from "react";
 import { usePages } from "@/data_access/swr/pages";
 import CopyIcon from "@/components/icons/copy_icon";
 import { Tooltip } from "@nextui-org/tooltip"
-import ImportForm from "./components/import_form";
+import ImportForm from "./components/ImportForm";
 import ImportIcon from "@/components/icons/import_icon";
 
 export default function Page({ params }: { params: { id: string } }) {
