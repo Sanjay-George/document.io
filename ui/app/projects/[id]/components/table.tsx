@@ -9,6 +9,7 @@ import OpenExternalIcon from '@/components/icons/open_external';
 import { Page } from '@/data_access/models/page';
 import CopyIcon from '@/components/icons/copy_icon';
 import { Tooltip } from '@nextui-org/tooltip';
+import Link from 'next/link';
 
 
 export default function Table({ projectId, onRowEdit }:
@@ -20,6 +21,10 @@ export default function Table({ projectId, onRowEdit }:
             dataIndex: 'title',
             width: '20%',
             key: 'title',
+            render: (title: string, record: any) => {
+                const id = record._id;
+                return <Link className='text-black hover:text-black hover:underline' href={`/documentations/${id}`}>{title}</Link>
+            }
         },
         {
             title: '',
@@ -27,7 +32,7 @@ export default function Table({ projectId, onRowEdit }:
             width: '5%',
             key: 'open',
             render: (id: string, record: Page) => (
-                <a onClick={() => handleConfigure(id, record)} className='text-slate-400 hover:text-slate-700'><OpenExternalIcon /></a>
+                <Link className='text-primary hover:text-slate-700 hover:underline' href={`/documentations/${id}`}><OpenExternalIcon /></Link>
             ),
         },
         {

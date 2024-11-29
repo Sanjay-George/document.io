@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.1",
+    "@mdxeditor/editor": "^3.19.3",
     "@nextui-org/button": "^2.0.37",
     "@nextui-org/card": "^2.0.33",
     "@nextui-org/chip": "^2.0.32",
+    "@nextui-org/divider": "^2.0.32",
     "@nextui-org/image": "^2.0.31",
     "@nextui-org/navbar": "^2.0.36",
     "@nextui-org/system": "^2.2.5",
@@ -24,6 +26,7 @@
     "next": "^14.2.13",
     "react": "^18",
     "react-dom": "^18",
+    "react-resizable-panels": "^2.1.7",
     "swr": "^2.2.5"
   },
   "devDependencies": {
