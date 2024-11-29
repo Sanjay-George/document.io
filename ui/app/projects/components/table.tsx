@@ -5,7 +5,7 @@ import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
 import useSWR, { mutate } from 'swr';
 import { remove } from '@/data_access/api/documentations';
-import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data_access/swr/documentations';
+import { ALL_PROJECTS_KEY, useProjects } from '@/data_access/swr/projects';
 import Link from 'next/link';
 import Spinner from '@/components/icons/spinner';
 import OpenExternalIcon from '@/components/icons/open_external';
@@ -81,11 +81,11 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 		},
 	];
 
-	const { data, isLoading, error } = useDocumentations();
+	const { data, isLoading, error } = useProjects();
 
 	const handleDelete = async (id: string) => {
 		await remove(id);
-		mutate(ALL_DOCUMENTATIONS_KEY);
+		mutate(ALL_PROJECTS_KEY);
 	}
 
 	const handleEdit = (id: string) => {

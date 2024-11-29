@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { add, edit } from "@/data_access/api/documentations";
 import { mutate } from "swr";
-import { ALL_DOCUMENTATIONS_KEY, SINGLE_DOCUMENT_KEY, useDocumentation } from "@/data_access/swr/documentations";
+import { ALL_PROJECTS_KEY, SINGLE_PROJECT_KEY, useProject } from "@/data_access/swr/projects";
 import { Documentation } from "@/data_access/models/documentation";
 
 export default function Form({ docId, postSubmit }: { docId: string | null, postSubmit: (data?: any) => void }) {
@@ -12,7 +12,7 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
         description: '',
         status: 'Active'
     });
-    const documentation: Documentation = useDocumentation(docId as any)?.data;
+    const documentation: Documentation = useProject(docId as any)?.data;
 
     useEffect(() => {
         if (documentation) {
@@ -63,7 +63,7 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
             }
             else {
                 await edit(docId, { title, description, status });
-                mutate(SINGLE_DOCUMENT_KEY(docId));
+                mutate(SINGLE_PROJECT_KEY(docId));
             }
         }
         catch (error) {
@@ -72,7 +72,7 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
         }
 
         // Refetch data with useSWR
-        mutate(ALL_DOCUMENTATIONS_KEY);
+        mutate(ALL_PROJECTS_KEY);
         resetForm();
         postSubmit();
     }

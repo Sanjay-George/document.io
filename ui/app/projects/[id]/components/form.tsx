@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
 import { Page } from "@/data_access/models/page";
-import { ALL_PAGES_KEY, SINGLE_PAGE_KEY, usePage } from "@/data_access/swr/pages";
+import { ALL_DOCUMENTATIONS_KEY, SINGLE_DOCUMENTATION_KEY, useDocumentation } from "@/data_access/swr/documentations";
 import { add, edit } from "@/data_access/api/pages";
 
 
 export default function Form({ documentationId, pageId, postSubmit }: { documentationId: string, pageId: string | null, postSubmit: (data?: any) => void }) {
     const [formData, setFormData] = useState({ title: '', url: '' } as Page);
-    const page: Page = usePage(pageId as any)?.data;
+    const page: Page = useDocumentation(pageId as any)?.data;
 
     useEffect(() => {
         if (page) {
@@ -44,7 +44,7 @@ export default function Form({ documentationId, pageId, postSubmit }: { document
             }
             else {
                 await edit(pageId, { title, url, documentationId });
-                mutate(SINGLE_PAGE_KEY(pageId));
+                mutate(SINGLE_DOCUMENTATION_KEY(pageId));
             }
         }
         catch (error) {
@@ -52,7 +52,7 @@ export default function Form({ documentationId, pageId, postSubmit }: { document
             return;
         }
 
-        mutate(ALL_PAGES_KEY(documentationId));
+        mutate(ALL_DOCUMENTATIONS_KEY(documentationId));
         setFormData({ title: '', url: '' } as Page);
         postSubmit();
     };

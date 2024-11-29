@@ -1,15 +1,15 @@
 "use client";
 
-import Table from "./components/table";
+import Table from "./components/Table";
 import H2 from "@/components/H2";
-import Form from "./components/form";
+import Form from "./components/Form";
 import { useState } from "react";
 import { Modal } from "antd";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import RightArrowIcon from "@/components/icons/right_arrow";
 
 
-export default function Page() {
+export default function ProjectList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [activeDocumentation, setActiveDocumentation] = useState<null | string>(null);
 
@@ -51,9 +51,6 @@ export default function Page() {
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
                 <Form docId={activeDocumentation} postSubmit={() => setIsModalOpen(false)} />
             </Modal>
-
-
-
         </>
     );
 

@@ -1,25 +1,25 @@
 "use client";
 
 import { Button } from "@nextui-org/button";
-import Table from "./components/table";
+import Table from "./components/Table";
 import H2 from "@/components/H2";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import Form from "./components/Form";
 import { Modal } from "antd";
-import { useDocumentation } from "@/data_access/swr/documentations";
+import { useProject } from "@/data_access/swr/projects";
 import Spinner from "@/components/icons/spinner";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import { useState } from "react";
-import { usePages } from "@/data_access/swr/pages";
-import CopyIcon from "@/components/icons/copy_icon";
+import { useDocumentations } from "@/data_access/swr/documentations";
 import { Tooltip } from "@nextui-org/tooltip"
 import ImportForm from "./components/ImportForm";
 import ImportIcon from "@/components/icons/import_icon";
 
-export default function Page({ params }: { params: { id: string } }) {
-    const documentationId = params.id;
-    const { data: documentationData } = useDocumentation(documentationId as any);
-    const { data: pagesData, isLoading } = usePages(documentationId as any);
+// ProjectDetails or DocumentationList page
+export default function ProjectDetails({ params }: { params: { id: string } }) {
+    const projectId = params.id;
+    const { data: projectData } = useProject(projectId as any);
+    const { data: pagesData, isLoading } = useDocumentations(projectId as any);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isImportModalOpen, setImportModalOpen] = useState(false);
@@ -58,7 +58,7 @@ export default function Page({ params }: { params: { id: string } }) {
         <>
             <div className="flex justify-between items-center pb-5">
                 <div className="inline-flex space-x-1 items-center">
-                    <H2>{documentationData?.title}</H2>
+                    <H2>{projectData?.title}</H2>
                 </div>
                 <div className="inline-flex space-x-1">
                     <Tooltip content="Import data" placement="left" offset={-10}>
@@ -76,18 +76,18 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
 
             <div>
-                <p className="mb-10 text-slate-400 font-light dark:text-gray-400">{documentationData?.description}</p>
+                <p className="mb-10 text-slate-400 font-light dark:text-gray-400">{projectData?.description}</p>
             </div>
 
-            <Table documentationId={documentationId} onRowEdit={handleEditClick} />
+            <Table projectId={projectId} onRowEdit={handleEditClick} />
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
-                <Form documentationId={documentationId}
+                <Form documentationId={projectId}
                     pageId={activePage}
                     postSubmit={() => setIsModalOpen(false)} />
             </Modal>
 
             <Modal open={isImportModalOpen} footer={null} onCancel={handleImportModalCancel}>
-                <ImportForm documentationId={documentationId} postSubmit={() => setImportModalOpen(false)} />
+                <ImportForm documentationId={projectId} postSubmit={() => setImportModalOpen(false)} />
             </Modal>
         </>
     );

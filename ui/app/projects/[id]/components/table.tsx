@@ -4,15 +4,15 @@ import useSWR, { mutate } from 'swr';
 import { exportData, remove } from '@/data_access/api/pages';
 import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
-import { ALL_PAGES_KEY, usePages } from '@/data_access/swr/pages';
+import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data_access/swr/documentations';
 import OpenExternalIcon from '@/components/icons/open_external';
 import { Page } from '@/data_access/models/page';
 import CopyIcon from '@/components/icons/copy_icon';
 import { Tooltip } from '@nextui-org/tooltip';
 
 
-export default function Table({ documentationId, onRowEdit }:
-    { documentationId: string, onRowEdit: (id: string) => void }) {
+export default function Table({ projectId, onRowEdit }:
+    { projectId: string, onRowEdit: (id: string) => void }) {
 
     const columns = [
         {
@@ -67,12 +67,12 @@ export default function Table({ documentationId, onRowEdit }:
         },
     ];
 
-    const { data, isLoading, error } = usePages(documentationId);
+    const { data, isLoading, error } = useDocumentations(projectId);
 
     const handleDelete = async (id: string) => {
         console.log(`Delete page ${id}`);
         await remove(id);
-        mutate(ALL_PAGES_KEY(documentationId));
+        mutate(ALL_DOCUMENTATIONS_KEY(projectId));
     }
 
     const handleEdit = (id: string) => {
