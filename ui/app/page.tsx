@@ -1,8 +1,5 @@
 import H1 from "@/components/H1";
 import Navbar from "@/components/Navbar";
-import ButtonAccent from "@/components/ButtonAccent";
-import { Button } from "@nextui-org/button";
-import Link from "next/link";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import ButtonPrimary from "@/components/ButtonPrimary";
 
@@ -25,6 +22,12 @@ export default function Home() {
                     </div>
                 </div>
             </div>
+
+            {/* TODO: pass url here */}
+            <iframe src={`http://localhost:5000/proxy?url=${encodeURIComponent("")}`}
+                width="100%" height="800px"></iframe >
+
+
         </>
 
 
