@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { add, edit, importData } from "@/data_access/api/documentations";
 import { mutate } from "swr";
-import { ALL_PAGES_KEY } from "@/data_access/swr/documentations";
+import { ALL_DOCUMENTATIONS_KEY } from "@/data_access/swr/documentations";
 
 export default function ImportForm({ documentationId, postSubmit }: { documentationId: string, postSubmit: () => void }) {
     const [pageData, setPageData] = useState(null) as any;
@@ -11,7 +11,7 @@ export default function ImportForm({ documentationId, postSubmit }: { documentat
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         await importData(documentationId, JSON.parse(pageData));
-        mutate(ALL_PAGES_KEY(documentationId));
+        mutate(ALL_DOCUMENTATIONS_KEY(documentationId));
         setPageData(null);
         postSubmit();
     }

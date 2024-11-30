@@ -14,11 +14,12 @@ import ButtonPrimary from '@/components/ButtonPrimary';
 import { useDocumentation } from '@/data_access/swr/documentations';
 import Spinner from '@/components/icons/spinner';
 import RightArrowIcon from '@/components/icons/right_arrow';
+import { useEffect, useRef, useState } from 'react';
 
 export default function DocumentationDetails({ params }: { params: { id: string } }) {
     const documentationId = params.id;
-
     const { data: documentation, isLoading } = useDocumentation(documentationId as any);
+    const iframeRef = useRef<HTMLIFrameElement>(null);
 
     if (isLoading) {
         return <Spinner />;
@@ -96,7 +97,7 @@ export default function DocumentationDetails({ params }: { params: { id: string 
                 <PanelResizeHandle className="w-1.5 h-full bg-slate-200 hover:bg-slate-300 transition-background duration-150" />
 
                 <Panel className='px-2 py-2 w-full h-full bg-slate-50'>
-                    <iframe src={documentation.url} style={{ width: '100%', height: '100%' }}></iframe>
+                    <iframe ref={iframeRef} src={documentation.url} style={{ width: '100%', height: '100%' }}></iframe>
                 </Panel>
             </PanelGroup>
 
