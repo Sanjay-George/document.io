@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { add, edit, importData } from "@/data_access/api/documentations";
+import { add, edit, importData } from "@/data_access/api/projects";
 import { mutate } from "swr";
 import { ALL_DOCUMENTATIONS_KEY } from "@/data_access/swr/documentations";
 

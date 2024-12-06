@@ -1,67 +1,27 @@
-import express from 'express';
-import DocumentationDB from '../database/documentation';
-import PageDB from '../database/page';
-import AnnotationDB from '../database/annotation';
-import { Documentation } from '../models/documentation';
-import { whitelistOrigin } from './pages';
+import express from "express";
+import OriginDB from "../database/origin";
+import AnnotationDB from "../database/annotation";
+import { AnnotationFilters } from "../entities/annotation_filters";
+import DocumentationDB from "../database/documentation";
+import { Documentation } from "../models/documentation";
 
 const documentationDB = new DocumentationDB();
-const pagesDB = new PageDB();
 const annotationDB = new AnnotationDB();
+const originDB = new OriginDB();
 const router = express.Router();
-
-/**
- * Gets all documentations by project Id
- * @param {string} req.query.projectId - Project ID to retrieve documents for (optional)
- * @returns {Document[]} A list of all documentations
- * @throws {Error} Throws an error if the documents could not be retrieved
- */
-router.get("/", async (req, res) => {
-    try {
-        const projectId = req.query.projectId as string;
-        const documents = await documentationDB.getAll(projectId);
-        res.send(JSON.stringify(documents));
-    }
-    catch (ex) {
-        console.error(ex);
-        res.sendStatus(500);
-    }
-});
-
-/**
- * Gets all pages by documentation
- * @param {string} req.query.documentationId - documentationId ID to retrieve pages for (optional)
- * @returns {Page[]} A list of all pages
- * @throws {Error} Throws an error if the documents could not be retrieved
- */
-router.get("/:id/pages", async (req, res) => {
-    try {
-        const documentationId = req.params.id as string;
-        if (!documentationId) {
-            res.sendStatus(400);
-            return;
-        }
-        const pages = await pagesDB.getAll(documentationId);
-        res.send(JSON.stringify(pages));
-    }
-    catch (ex) {
-        console.error(ex);
-        res.sendStatus(500);
-    }
-});
 
 
 /**
  * Gets a documentation by ID
- * @param {string} req.params.id - The ID of the document to retrieve
- * @returns {Document} The document with the specified ID
- * @throws {Error} Throws an error if the document could not be retrieved
-*/
+ * @param {string} req.params.id - The ID of the documentation to retrieve
+ * @returns {Documentation} The documentation with the specified ID
+ * @throws {Error} Throws an error if the documentation could not be retrieved
+ */
 router.get("/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        const document = await documentationDB.get(id);
-        res.send(JSON.stringify(document));
+        const doc = await documentationDB.get(id);
+        res.send(JSON.stringify(doc));
     }
     catch (ex) {
         console.error(ex);
@@ -70,14 +30,77 @@ router.get("/:id", async (req, res) => {
 });
 
 /**
+ * Gets all annotations for a documentation
+ * @param {string} req.params.id - The ID of the documentation to retrieve
+ * @returns {Annotation[]} Annotations with the specified ID
+ * @throws {Error} Throws an error if annotations could not be retrieved
+ */
+router.get("/:id/annotations", async (req, res) => {
+    try {
+        const docId = req.params.id;
+        const filters = req.query as AnnotationFilters;
+        if (filters.url) {
+            filters.url = decodeURIComponent(filters.url);
+        }
+        const annotations = await annotationDB.getAll(docId, filters);
+        res.send(JSON.stringify(annotations));
+    }
+    catch (ex) {
+        console.error(ex);
+        res.sendStatus(500);
+    }
+});
+
+/**
+ * Exports a documentation. Returns all data to recreate the documentation.
+ */
+router.get("/:id/export", async (req, res) => {
+    try {
+        const docId = req.params.id;
+        let doc = await documentationDB.get(docId);
+        doc = cleanData(doc);
+        let annotations = await annotationDB.getAll(docId);
+        annotations = annotations.map(i => cleanData(i));
+
+        const data = {
+            documentation: doc,
+            annotations
+        }
+        res.send(JSON.stringify(data));
+    }
+    catch (ex) {
+        console.error(ex);
+        res.sendStatus(500);
+    }
+
+    function cleanData(data: any) {
+        // Remove sensitive data
+        delete data._id;
+        delete data.projectId;
+        delete data.documentationId;
+        return data;
+    }
+});
+
+
+
+/**
  * Inserts a new documentation
- * @param {Document} req.body - The document to insert
- * @returns {string} The ID of the inserted document
+ * Whitelists the origin of the documentation URL
+ * @param {Documentation} req.body - The documentation to insert
+ * @returns {string} The ID of the inserted documentation
  */
 router.post("/", async (req, res) => {
     try {
-        const document = req.body as Documentation;
-        const id = await documentationDB.insert(document);
+        const doc = req.body as Documentation;
+        const { projectId } = doc;
+        if (!projectId) {
+            res.sendStatus(400);
+            return;
+        }
+
+        const id = await documentationDB.insert(doc);
+        await whitelistOrigin(doc.url);
         res.send(id);
     }
     catch (ex) {
@@ -86,43 +109,24 @@ router.post("/", async (req, res) => {
     }
 });
 
-/**
- * Imports a page. Creates a new page with the provided data.
- * @param {string} req.params.id - The ID of the document to import the page to
- */
-router.post("/:id/import", async (req, res) => {
-    try {
-        const { page, annotations } = req.body;
-
-        page.documentationId = req.params.id;
-        const pageId = (await pagesDB.insert(page)).toString();
-        await whitelistOrigin(page.url);
-
-        for (const annotation of annotations) {
-            annotation.pageId = pageId;
-            await annotationDB.insert(annotation);
-        }
-        res.send(pageId);
-    }
-    catch (ex) {
-        console.error(ex);
-        res.sendStatus(500);
-    }
-});
+export async function whitelistOrigin(url: string) {
+    const urlOrigin = (new URL(url)).origin;
+    await originDB.insert(urlOrigin);
+}
 
 
 /**
  * Updates a documentation
- * @param {string} req.params.id - The ID of the document to update
- * @param {Document} req.body - The updated document
- * @returns {boolean} True if the document was updated, false otherwise
- * @throws {Error} Throws an error if the document could not be updated
-*/
+ * @param {string} req.params.id - The ID of the documentation to update
+ * @param {Documentation} req.body - The updated documentation
+ * @returns {boolean} True if the documentation was updated, false otherwise
+ */
 router.put("/:id", async (req, res) => {
     try {
         const id = req.params.id;
-        const document = req.body;
-        const result = await documentationDB.update(id, document);
+        const doc = req.body as Documentation;
+        const result = await documentationDB.update(id, doc);
+        await whitelistOrigin(doc.url);
         res.send(result);
     }
     catch (ex) {
@@ -133,13 +137,13 @@ router.put("/:id", async (req, res) => {
 
 /**
  * Deletes a documentation
- * @param {string} req.params.id - The ID of the document to delete
- * @returns {boolean} True if the document was deleted, false otherwise
- * @throws {Error} Throws an error if the document could not be deleted
+ * @param {string} req.params.id - The ID of the documentation to delete
+ * @returns {boolean} True if the documentation was deleted, false otherwise
  */
 router.delete("/:id", async (req, res) => {
     try {
         const id = req.params.id;
+        await annotationDB.deleteByDocumentationId(id);
         const result = await documentationDB.delete(id);
         res.send(result);
     }
@@ -148,5 +152,6 @@ router.delete("/:id", async (req, res) => {
         res.sendStatus(500);
     }
 });
+
 
 export default router;

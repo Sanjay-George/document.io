@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import GithubIcon from "./icons/gh_icon";
 import ButtonPrimary from "./ButtonPrimary";
 import RightArrowIcon from "./icons/right_arrow";
+import DocumentIcon from "./icons/DocumentIcon";
 
 
 const links = [
@@ -17,9 +18,11 @@ export default function Nav() {
     const pathname = usePathname();
     return (
         <Navbar className="border-b-1 border-b-slate-50 py-1">
-            <NavbarBrand>
-                {/* <Logo /> */}
-                <Link href='/'><p className="font-bold text-slate-500 hover:text-primary">DOCUMENT.<span className="text-accent">IO</span></p></Link>
+            <NavbarBrand className=" text-slate-500  hover:text-primary">
+                <Link href='/' className="flex items-center">
+                    {/* <div className="me-1"><DocumentIcon /></div> */}
+                    <p className="font-bold ">DOCUMENT.<span className="text-accent">IO</span></p>
+                </Link>
             </NavbarBrand>
 
             <NavbarContent className="hidden sm:flex gap-6" justify="center">

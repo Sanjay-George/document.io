@@ -4,7 +4,7 @@ import { Chip } from '@nextui-org/chip';
 import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
 import useSWR, { mutate } from 'swr';
-import { remove } from '@/data_access/api/documentations';
+import { remove } from '@/data_access/api/projects';
 import { ALL_PROJECTS_KEY, useProjects } from '@/data_access/swr/projects';
 import Link from 'next/link';
 import Spinner from '@/components/icons/spinner';

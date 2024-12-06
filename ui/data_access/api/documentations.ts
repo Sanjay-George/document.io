@@ -1,7 +1,8 @@
+import { Documentation } from "../models/documentation";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-// Add a new documentation
-export const add = async (data: any) => {
+export const add = async (data: Documentation) => {
     const res = await fetch(`${API_URL}/documentations/`, {
         method: 'POST',
         headers: {
@@ -15,7 +16,7 @@ export const add = async (data: any) => {
     return res.json();
 };
 
-export const edit = async (id: string, data: any) => {
+export const edit = async (id: string, data: Documentation) => {
     const res = await fetch(`${API_URL}/documentations/${id}`, {
         method: 'PUT',
         headers: {
@@ -29,7 +30,6 @@ export const edit = async (id: string, data: any) => {
     return res.json();
 }
 
-// Remove a documentation
 export const remove = async (id: string) => {
     const res = await fetch(`${API_URL}/documentations/${id}`, {
         method: 'DELETE',
@@ -38,18 +38,14 @@ export const remove = async (id: string) => {
         throw new Error('Failed to delete documentation');
     }
     return res.json();
-}
+};
 
-export const importData = async (id: string, data: any) => {
-    const res = await fetch(`${API_URL}/documentations/${id}/import`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+export const exportData = async (id: string) => {
+    const res = await fetch(`${API_URL}/documentations/${id}/export`, {
+        method: 'GET',
     });
     if (!res.ok) {
-        throw new Error('Failed to import documentation');
+        throw new Error('Failed to export documentation');
     }
-    return res.text();
+    return res.json();
 }

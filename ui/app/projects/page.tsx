@@ -11,25 +11,25 @@ import RightArrowIcon from "@/components/icons/right_arrow";
 
 export default function ProjectList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeDocumentation, setActiveDocumentation] = useState<null | string>(null);
+    const [selectedProject, setSelectedProject] = useState<null | string>(null);
 
     const showModal = () => {
         setIsModalOpen(true);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
-        setActiveDocumentation(null);
+        setSelectedProject(null);
     };
 
     const handleAddClick = () => {
-        console.log('Add documentation');
-        setActiveDocumentation(null);
+        console.log('Add project');
+        setSelectedProject(null);
         showModal();
     }
 
     const handleEditClick = (id: string) => {
-        console.log('Edit documentation', id);
-        setActiveDocumentation(id);
+        console.log('Edit project', id);
+        setSelectedProject(id);
         showModal();
     };
 
@@ -49,7 +49,7 @@ export default function ProjectList() {
             <Table onRowEdit={handleEditClick} />
 
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
-                <Form docId={activeDocumentation} postSubmit={() => setIsModalOpen(false)} />
+                <Form projectId={selectedProject} postSubmit={() => setIsModalOpen(false)} />
             </Modal>
         </>
     );

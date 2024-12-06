@@ -19,27 +19,27 @@ import ImportIcon from "@/components/icons/import_icon";
 export default function ProjectDetails({ params }: { params: { id: string } }) {
     const projectId = params.id;
     const { data: projectData } = useProject(projectId as any);
-    const { data: pagesData, isLoading } = useDocumentations(projectId as any);
+    const { data: documentations, isLoading } = useDocumentations(projectId as any);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isImportModalOpen, setImportModalOpen] = useState(false);
-    const [activePage, setActivePage] = useState<null | string>(null);
+    const [selectedDocumentation, setSelectedDocumentation] = useState<null | string>(null);
 
     const showModal = () => {
         setIsModalOpen(true);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
-        setActivePage(null);
+        setSelectedDocumentation(null);
     };
     const handleAddClick = () => {
-        console.log('Add a page');
-        setActivePage(null);
+        console.log('Add documentation');
+        setSelectedDocumentation(null);
         showModal();
     };
     const handleEditClick = (id: string) => {
         console.log('Edit documentation', id);
-        setActivePage(id);
+        setSelectedDocumentation(id);
         showModal();
     };
 
@@ -81,8 +81,8 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
 
             <Table projectId={projectId} onRowEdit={handleEditClick} />
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
-                <Form documentationId={projectId}
-                    pageId={activePage}
+                <Form projectId={projectId}
+                    documentationId={selectedDocumentation}
                     postSubmit={() => setIsModalOpen(false)} />
             </Modal>
 

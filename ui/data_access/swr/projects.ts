@@ -2,8 +2,8 @@ import useSWR from "swr";
 import { fetcher } from "./fetcher-get";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-export const ALL_PROJECTS_KEY = `${API_URL}/documentations/`;
-export const SINGLE_PROJECT_KEY = (id: string) => `${API_URL}/documentations/${id}`;
+export const ALL_PROJECTS_KEY = `${API_URL}/projects/`;
+export const SINGLE_PROJECT_KEY = (id: string) => `${API_URL}/projects/${id}`;
 
 // Fetch all projects
 export const useProjects = (): { data: any[], isLoading: boolean, error: any } =>

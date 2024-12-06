@@ -1,29 +1,29 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { add, edit } from "@/data_access/api/documentations";
+import { add, edit } from "@/data_access/api/projects";
 import { mutate } from "swr";
 import { ALL_PROJECTS_KEY, SINGLE_PROJECT_KEY, useProject } from "@/data_access/swr/projects";
-import { Documentation } from "@/data_access/models/documentation";
+import { Project } from "@/data_access/models/project";
 
-export default function Form({ docId, postSubmit }: { docId: string | null, postSubmit: (data?: any) => void }) {
+export default function Form({ projectId, postSubmit }: { projectId: string | null, postSubmit: (data?: any) => void }) {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         status: 'Active'
     });
-    const documentation: Documentation = useProject(docId as any)?.data;
+    const project: Project = useProject(projectId as any)?.data;
 
     useEffect(() => {
-        if (documentation) {
+        if (project) {
             setFormData({
-                ...documentation
+                ...project
             })
         }
         else {
             resetForm();
         }
-    }, [documentation]);
+    }, [project]);
 
     const handleTextChange = (e: any) => {
         setFormData({
@@ -58,12 +58,12 @@ export default function Form({ docId, postSubmit }: { docId: string | null, post
         }
 
         try {
-            if (!docId) {
+            if (!projectId) {
                 await add({ title, description, status });
             }
             else {
-                await edit(docId, { title, description, status });
-                mutate(SINGLE_PROJECT_KEY(docId));
+                await edit(projectId, { title, description, status });
+                mutate(SINGLE_PROJECT_KEY(projectId));
             }
         }
         catch (error) {

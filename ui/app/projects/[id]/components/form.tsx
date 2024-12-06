@@ -2,25 +2,25 @@
 
 import { useEffect, useState } from "react";
 import { mutate } from "swr";
-import { Page } from "@/data_access/models/page";
 import { ALL_DOCUMENTATIONS_KEY, SINGLE_DOCUMENTATION_KEY, useDocumentation } from "@/data_access/swr/documentations";
-import { add, edit } from "@/data_access/api/pages";
+import { add, edit } from "@/data_access/api/documentations";
+import { Documentation } from "@/data_access/models/documentation";
 
 
-export default function Form({ documentationId, pageId, postSubmit }: { documentationId: string, pageId: string | null, postSubmit: (data?: any) => void }) {
-    const [formData, setFormData] = useState({ title: '', url: '' } as Page);
-    const page: Page = useDocumentation(pageId as any)?.data;
+export default function Form({ projectId, documentationId, postSubmit }: { projectId: string, documentationId: string | null, postSubmit: (data?: any) => void }) {
+    const [formData, setFormData] = useState({ title: '', url: '' } as Documentation);
+    const documentation: Documentation = useDocumentation(documentationId as any)?.data;
 
     useEffect(() => {
-        if (page) {
+        if (documentation) {
             setFormData({
-                ...page
+                ...documentation
             })
         }
         else {
-            setFormData({ title: '', url: '' } as Page);
+            setFormData({ title: '', url: '' } as Documentation);
         }
-    }, [page]);
+    }, [documentation]);
 
     const handleTextChange = (e: any) => {
         setFormData({
@@ -39,12 +39,12 @@ export default function Form({ documentationId, pageId, postSubmit }: { document
         }
 
         try {
-            if (!pageId) {
-                await add({ title, url, documentationId });
+            if (!documentationId) {
+                await add({ title, url, projectId });
             }
             else {
-                await edit(pageId, { title, url, documentationId });
-                mutate(SINGLE_DOCUMENTATION_KEY(pageId));
+                await edit(documentationId, { title, url, projectId });
+                mutate(SINGLE_DOCUMENTATION_KEY(documentationId));
             }
         }
         catch (error) {
@@ -52,8 +52,8 @@ export default function Form({ documentationId, pageId, postSubmit }: { document
             return;
         }
 
-        mutate(ALL_DOCUMENTATIONS_KEY(documentationId));
-        setFormData({ title: '', url: '' } as Page);
+        mutate(ALL_DOCUMENTATIONS_KEY(projectId));
+        setFormData({ title: '', url: '' } as Documentation);
         postSubmit();
     };
 

@@ -1,9 +1,8 @@
 export interface Project {
-    id?: string;
+    id: string;
     title: string;
     description: string;
     status: "Active" | "Inactive";
-    created?: Date;
-    updated?: Date;
+    created: Date;
+    updated: Date;
 }
-

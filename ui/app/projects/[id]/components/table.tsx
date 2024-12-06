@@ -1,15 +1,15 @@
 import React, { useEffect } from 'react';
 import { Space, Table as Tbl, Tag } from 'antd';
 import useSWR, { mutate } from 'swr';
-import { exportData, remove } from '@/data_access/api/pages';
+import { exportData, remove } from '@/data_access/api/documentations';
 import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
 import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data_access/swr/documentations';
 import OpenExternalIcon from '@/components/icons/open_external';
-import { Page } from '@/data_access/models/page';
 import CopyIcon from '@/components/icons/copy_icon';
 import { Tooltip } from '@nextui-org/tooltip';
 import Link from 'next/link';
+import { Documentation } from '@/data_access/models/documentation';
 
 
 export default function Table({ projectId, onRowEdit }:
@@ -31,7 +31,7 @@ export default function Table({ projectId, onRowEdit }:
             dataIndex: '_id',
             width: '5%',
             key: 'open',
-            render: (id: string, record: Page) => (
+            render: (id: string, record: Documentation) => (
                 <Link className='text-primary hover:text-slate-700 hover:underline' href={`/documentations/${id}`}><OpenExternalIcon /></Link>
             ),
         },
@@ -75,7 +75,7 @@ export default function Table({ projectId, onRowEdit }:
     const { data, isLoading, error } = useDocumentations(projectId);
 
     const handleDelete = async (id: string) => {
-        console.log(`Delete page ${id}`);
+        console.log(`Delete documentation ${id}`);
         await remove(id);
         mutate(ALL_DOCUMENTATIONS_KEY(projectId));
     }
@@ -99,7 +99,7 @@ export default function Table({ projectId, onRowEdit }:
     };
 
 
-    const handleConfigure = (id: string, record: Page) => {
+    const handleConfigure = (id: string, record: Documentation) => {
         const { title, url } = record;
         let newUrl = url.includes('?')
             ? `${url}&pageId=${id}` : `${url}?pageId=${id}`;
