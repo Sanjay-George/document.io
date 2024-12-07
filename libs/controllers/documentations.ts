@@ -39,9 +39,12 @@ router.get("/:id/annotations", async (req, res) => {
     try {
         const docId = req.params.id;
         const filters = req.query as AnnotationFilters;
-        if (filters.url) {
-            filters.url = decodeURIComponent(filters.url);
-        }
+
+        // TODO: Add middleware to decode all query parameters
+        Object.keys(filters).forEach(key => {
+            filters[key] = decodeURIComponent(filters[key]);
+        });
+
         const annotations = await annotationDB.getAll(docId, filters);
         res.send(JSON.stringify(annotations));
     }
