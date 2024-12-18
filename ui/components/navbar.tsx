@@ -28,14 +28,14 @@ export default function Nav() {
             <NavbarContent className="hidden sm:flex gap-6" justify="center">
                 {links.map((link) => (
                     <NavbarItem key={link.name} isActive={link.href === pathname}>
-                        <Link className="text-slate-500 hover:text-primary font-light text-sm" href={link.href}>{link.name}</Link>
+                        <Link className="text-slate-500 hover:text-primary text-sm" href={link.href}>{link.name}</Link>
                     </NavbarItem>
                 ))}
             </NavbarContent>
 
             <NavbarContent justify="end">
                 <NavbarItem className="hidden lg:flex">
-                    <a href="https://github.com/Sanjay-George/document.io" target="_blank" className="hover:text-primary"><GithubIcon /></a>
+                    <a href="https://github.com/Sanjay-George/document.io" target="_blank" className="text-slate-500 hover:text-primary"><GithubIcon /></a>
                 </NavbarItem>
                 <NavbarItem>
 

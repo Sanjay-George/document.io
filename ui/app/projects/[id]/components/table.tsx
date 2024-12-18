@@ -23,7 +23,14 @@ export default function Table({ projectId, onRowEdit }:
             key: 'title',
             render: (title: string, record: any) => {
                 const id = record._id;
-                return <Link className='text-slate-600 hover:text-black w-full flex flex-wrap space-x-2' href={`/documentations/${id}`}><OpenExternalIcon /> <div>{title}</div></Link>
+                return (
+                    <Link
+                        className='text-slate-600 hover:text-black w-full flex flex-wrap space-x-2'
+                        href={`/documentations/${id}`}>
+                        <OpenExternalIcon />
+                        <div className='flex-wrap'>{title}</div>
+                    </Link>
+                )
             }
         },
         {
@@ -37,6 +44,7 @@ export default function Table({ projectId, onRowEdit }:
             title: 'Updated At',
             dataIndex: 'updated',
             key: 'updated',
+            ellipsis: true,
             render: (item: string) => <p>{
                 new Date(item).toLocaleDateString('en-US',
                     {

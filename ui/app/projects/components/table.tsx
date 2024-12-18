@@ -47,6 +47,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			title: 'Updated At',
 			dataIndex: 'updated',
 			key: 'updated',
+			ellipsis: true,
 			render: (item: string) => <p>{
 				new Date(item).toLocaleDateString('en-US',
 					{
