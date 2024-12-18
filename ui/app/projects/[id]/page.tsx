@@ -56,11 +56,11 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
     }
     return (
         <>
-            <div className="flex justify-between items-center pb-5">
-                <div className="inline-flex space-x-1 items-center">
+            <div className="flex justify-between">
+                <div>
                     <H2>{projectData?.title}</H2>
                 </div>
-                <div className="inline-flex space-x-1">
+                <div className="inline-flex space-x-1 items-center">
                     <Tooltip content="Import data" placement="left" offset={-10}>
                         <button className=" text-slate-400 px-3 py-2 hover:text-slate-700"
                             onClick={handleImportClick}>
@@ -76,7 +76,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
             </div>
 
             <div>
-                <p className="mb-10 text-slate-400 font-light dark:text-gray-400">{projectData?.description}</p>
+                <p className="mb-4 pb-2 text-slate-400 font-light dark:text-gray-400">{projectData?.description}</p>
             </div>
 
             <Table projectId={projectId} onRowEdit={handleEditClick} />

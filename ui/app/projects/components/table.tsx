@@ -20,17 +20,8 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			key: 'title',
 			render: (title: string, record: any) => {
 				const id = record._id;
-				return <Link className='text-black hover:text-black hover:underline' href={`projects/${id}`}>{title}</Link>
+				return <Link className='text-slate-600 hover:text-black w-full flex flex-wrap space-x-2' href={`projects/${id}`}><OpenExternalIcon /> <div>{title}</div></Link>
 			}
-		},
-		{
-			title: '',
-			dataIndex: '_id',
-			width: '5%',
-			key: 'open',
-			render: (id: string, record: any) => (
-				<Link className='text-primary hover:text-slate-700 hover:underline' href={`projects/${id}`}><OpenExternalIcon /></Link>
-			),
 		},
 		{
 			title: 'Description',
@@ -75,7 +66,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			render: (id: string) => (
 				<Space size="middle">
 					<a onClick={() => handleEdit(id)} className='text-primary'><EditIcon /></a>
-					<a onClick={() => handleDelete(id)} className='text-accent'><DeleteIcon /></a>
+					<a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
 				</Space>
 			),
 		},
@@ -96,6 +87,6 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 		return <Spinner />;
 	}
 	return (
-		data && <Tbl columns={columns} dataSource={[...data]} />
+		data && <Tbl size='middle' columns={columns} dataSource={[...data]} pagination={false} />
 	);
 }

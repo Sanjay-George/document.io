@@ -13,7 +13,7 @@ export default function Home() {
                         <H1>
                             <span className="text-transparent bg-clip-text bg-gradient-to-r to-primary from-slate-700 font-semibold">Your Web Documentation Hub </span>
                         </H1>
-                        <p className="mb-14 text-lg font-light text-slate-400 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
+                        <p className="mb-8 text-lg font-light text-slate-400 lg:text-xl sm:px-16 xl:px-48 dark:text-gray-400">
                             Document.io lets you easily capture and annotate web pages with notes and voice memos. Simplify collaboration and keep your team aligned with clear, accessible documentation.
                         </p>
 

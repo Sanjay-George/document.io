@@ -23,17 +23,8 @@ export default function Table({ projectId, onRowEdit }:
             key: 'title',
             render: (title: string, record: any) => {
                 const id = record._id;
-                return <Link className='text-black hover:text-black hover:underline' href={`/documentations/${id}`}>{title}</Link>
+                return <Link className='text-slate-600 hover:text-black w-full flex flex-wrap space-x-2' href={`/documentations/${id}`}><OpenExternalIcon /> <div>{title}</div></Link>
             }
-        },
-        {
-            title: '',
-            dataIndex: '_id',
-            width: '5%',
-            key: 'open',
-            render: (id: string, record: Documentation) => (
-                <Link className='text-primary hover:text-slate-700 hover:underline' href={`/documentations/${id}`}><OpenExternalIcon /></Link>
-            ),
         },
         {
             title: 'Base URL',
@@ -62,11 +53,11 @@ export default function Table({ projectId, onRowEdit }:
             title: 'Actions',
             key: 'action',
             dataIndex: '_id',
-            render: (id: string, record: Page) => (
+            render: (id: string, record: Documentation) => (
                 <Space size="middle">
                     <a onClick={() => handleEdit(id)} className='text-emerald-600'><EditIcon /></a>
                     <a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
-                    <Tooltip content="Copy data" placement="top" offset={10}><a onClick={() => handleCopyClick(id)} className='text-slate-400 hover:text-slate-700'>  <CopyIcon /></a></Tooltip>
+                    <Tooltip content="Copy data" placement="top" offset={10}><a onClick={() => handleCopyClick(id)} className='text-slate-600 hover:text-black'>  <CopyIcon /></a></Tooltip>
                 </Space>
             ),
         },
@@ -110,6 +101,6 @@ export default function Table({ projectId, onRowEdit }:
     }
 
     return (
-        data && <Tbl columns={columns} dataSource={[...data]} />
+        data && <Tbl size='middle' columns={columns} dataSource={[...data]} pagination={false} />
     );
 }

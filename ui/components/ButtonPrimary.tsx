@@ -6,7 +6,8 @@ export default function ButtonPrimary({ text, icon, onClick, href, target }: { t
 
     if (href) {
         return (
-            <Button as={Link} href={href} target={target || '_self'} className="text-primary border-primary border-1 bg-transparent hover:bg-primary hover:text-white" variant="flat" radius="sm" size="md">
+            <Button as={Link}
+                href={href} target={target || '_self'} className="bg-primary text-white border-none py-3 px-4 text-sm rounded-md" variant="solid" size="sm">
                 {text}
                 {icon}
             </Button>
@@ -14,7 +15,7 @@ export default function ButtonPrimary({ text, icon, onClick, href, target }: { t
     }
     else if (onClick) {
         return (
-            <Button onClick={onClick} className="text-primary border-primary border-1 bg-transparent hover:bg-primary hover:text-white" variant="flat" radius="sm" size="md">
+            <Button onClick={onClick} className="bg-primary text-white border-none py-3 px-4 text-sm rounded-md" variant="solid" size="sm">
                 {text}
                 {icon}
             </Button>
@@ -23,7 +24,7 @@ export default function ButtonPrimary({ text, icon, onClick, href, target }: { t
 
     else {
         return (
-            <Button className="text-primary border-primary border-1 bg-transparent hover:bg-primary hover:text-white" variant="flat" radius="sm" size="md">
+            <Button type="submit" className="bg-primary text-white border-none py-3 px-4 text-sm rounded-md" variant="solid" size="sm">
                 {text}
                 {icon}
             </Button>

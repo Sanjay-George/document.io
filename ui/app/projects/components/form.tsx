@@ -5,6 +5,7 @@ import { add, edit } from "@/data_access/api/projects";
 import { mutate } from "swr";
 import { ALL_PROJECTS_KEY, SINGLE_PROJECT_KEY, useProject } from "@/data_access/swr/projects";
 import { Project } from "@/data_access/models/project";
+import ButtonPrimary from "@/components/ButtonPrimary";
 
 export default function Form({ projectId, postSubmit }: { projectId: string | null, postSubmit: (data?: any) => void }) {
     const [formData, setFormData] = useState({
@@ -95,16 +96,16 @@ export default function Form({ projectId, postSubmit }: { projectId: string | nu
                           dark:focus:border-emerald-500" placeholder="Project description..."></textarea>
             </div>
 
-            <div className="mb-5">
-                <label className="inline-flex items-center mb-5 cursor-pointer">
+            <div className="mb-8 ms-0.5">
+                <label className="inline-flex items-center cursor-pointer">
                     <input name='status' type="checkbox" className="sr-only peer" checked={isProjectActive} onChange={handleStatusChange} />
-                    <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-500 dark:peer-focus:ring-emerald-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-5 after:h-5 after:transition-all dark:border-gray-600 peer-checked:bg-emerald-600"></div>
-                    <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">
+                    <div className="relative w-7 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-3 after:h-3 after:transition-all peer-checked:bg-primary"></div>
+                    <span className="ms-3 text-sm font-sm text-gray-900">
                         {isProjectActive ? 'Active' : 'Inactive'}</span>
                 </label>
             </div>
 
-            <button type="submit" className="text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800">Save</button>
+            <ButtonPrimary text="Save" icon />
         </form>
     )
 }

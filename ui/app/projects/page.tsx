@@ -36,7 +36,7 @@ export default function ProjectList() {
 
     return (
         <>
-            <div className="flex justify-between items-center pb-5">
+            <div className="flex justify-between items-center pb-2">
                 <H2>Projects</H2>
 
                 <div className="inline-flex space-x-1">
