@@ -75,7 +75,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
             </div>
 
             <div>
-                <p className="mb-4 pb-2 text-slate-400 font-light dark:text-gray-400">{projectData?.description}</p>
+                <p className="mb-4 pb-2 text-slate-400 font-light ">{projectData?.description}</p>
             </div>
 
             <Table projectId={projectId} onRowEdit={handleEditClick} />
