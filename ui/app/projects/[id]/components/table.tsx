@@ -74,6 +74,11 @@ export default function Table({ projectId, onRowEdit }:
     const { data, isLoading, error } = useDocumentations(projectId);
 
     const handleDelete = async (id: string) => {
+        // show confirmation dialog
+        if (!window.confirm('Are you sure you want to delete this annotation?')) {
+            return;
+        }
+
         console.log(`Delete documentation ${id}`);
         await remove(id);
         mutate(ALL_DOCUMENTATIONS_KEY(projectId));

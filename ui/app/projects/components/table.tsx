@@ -78,6 +78,10 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 	const { data, isLoading, error } = useProjects();
 
 	const handleDelete = async (id: string) => {
+		// show confirmation dialog
+		if (!window.confirm('Are you sure you want to delete this annotation?')) {
+			return;
+		}
 		await remove(id);
 		mutate(ALL_PROJECTS_KEY);
 	}
