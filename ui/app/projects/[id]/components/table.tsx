@@ -26,7 +26,7 @@ export default function Table({ projectId, onRowEdit }:
                 return (
                     <Link
                         className='text-slate-600 hover:text-primary w-full flex space-x-2 items-start'
-                        href={`/documentations/${id}`}>
+                        href={`document-io://documentations/${id}/`}>
                         <div className='w-fit pt-0.5'><OpenExternalIcon /></div>
                         <div className=''>{title}</div>
                     </Link>
