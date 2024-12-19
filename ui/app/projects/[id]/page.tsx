@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
 import Table from "./components/Table";
 import H2 from "@/components/H2";
 import PrimaryBtn from "@/components/ButtonPrimary";
@@ -18,8 +17,8 @@ import ImportIcon from "@/components/icons/import_icon";
 // ProjectDetails or DocumentationList page
 export default function ProjectDetails({ params }: { params: { id: string } }) {
     const projectId = params.id;
-    const { data: projectData } = useProject(projectId as any);
-    const { data: documentations, isLoading } = useDocumentations(projectId as any);
+    const { data: projectData, isLoading: isProjectLoading } = useProject(projectId as any);
+    const { data: documentations, isLoading: isDocumentationLoading } = useDocumentations(projectId as any);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isImportModalOpen, setImportModalOpen] = useState(false);
@@ -51,7 +50,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
     }
 
 
-    if (isLoading) {
+    if (isProjectLoading || isDocumentationLoading) {
         return <Spinner />;
     }
     return (

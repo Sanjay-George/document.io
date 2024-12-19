@@ -19,16 +19,16 @@ export default function Table({ projectId, onRowEdit }:
         {
             title: 'Title',
             dataIndex: 'title',
-            width: '20%',
+            width: '30%',
             key: 'title',
             render: (title: string, record: any) => {
                 const id = record._id;
                 return (
                     <Link
-                        className='text-slate-600 hover:text-black w-full flex flex-wrap space-x-2'
+                        className='text-slate-600 hover:text-primary w-full flex space-x-2 items-start'
                         href={`/documentations/${id}`}>
-                        <OpenExternalIcon />
-                        <div className='flex-wrap'>{title}</div>
+                        <div className='w-fit pt-0.5'><OpenExternalIcon /></div>
+                        <div className=''>{title}</div>
                     </Link>
                 )
             }

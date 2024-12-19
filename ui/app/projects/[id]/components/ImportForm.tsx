@@ -6,13 +6,13 @@ import { mutate } from "swr";
 import { ALL_DOCUMENTATIONS_KEY } from "@/data_access/swr/documentations";
 
 export default function ImportForm({ documentationId, postSubmit }: { documentationId: string, postSubmit: () => void }) {
-    const [pageData, setPageData] = useState(null) as any;
+    const [docData, setDocData] = useState(null) as any;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await importData(documentationId, JSON.parse(pageData));
+        await importData(documentationId, JSON.parse(docData));
         mutate(ALL_DOCUMENTATIONS_KEY(documentationId));
-        setPageData(null);
+        setDocData('');
         postSubmit();
     }
 
@@ -21,10 +21,10 @@ export default function ImportForm({ documentationId, postSubmit }: { documentat
             <div className="mb-5">
                 <label htmlFor="description"
                     className="block mb-2 text-sm font-medium 
-                        text-gray-900 dark:text-white">Page Config</label>
+                        text-gray-900 dark:text-white">Documentation Config</label>
                 <textarea id="description" name="description"
-                    value={pageData}
-                    onChange={(e) => setPageData(e.target.value)}
+                    value={docData}
+                    onChange={(e) => setDocData(e.target.value)}
                     rows={20}
                     className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 
                         rounded-lg border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500

@@ -1,6 +1,6 @@
 "use client";
 
-import Table from "./components/Table";
+import Table from "./components/table";
 import H2 from "@/components/H2";
 import Form from "./components/Form";
 import { useState } from "react";
