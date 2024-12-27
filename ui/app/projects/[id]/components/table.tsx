@@ -11,6 +11,9 @@ import { Tooltip } from '@nextui-org/tooltip';
 import Link from 'next/link';
 import { Documentation } from '@/data_access/models/documentation';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+
 
 export default function Table({ projectId, onRowEdit }:
     { projectId: string, onRowEdit: (id: string) => void }) {
@@ -26,7 +29,7 @@ export default function Table({ projectId, onRowEdit }:
                 return (
                     <Link
                         className='text-slate-600 hover:text-primary w-full flex space-x-2 items-start'
-                        href={`document-io://documentations/${id}/`}>
+                        href={`document-io://documentations/${id}/?api-host=${encodeURI(API_URL as string)}`}>
                         <div className='w-fit pt-0.5'><OpenExternalIcon /></div>
                         <div className=''>{title}</div>
                     </Link>
