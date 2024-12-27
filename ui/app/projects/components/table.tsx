@@ -4,8 +4,8 @@ import { Chip } from '@nextui-org/chip';
 import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
 import useSWR, { mutate } from 'swr';
-import { remove } from '@/data_access/api/documentations';
-import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data_access/swr/documentations';
+import { remove } from '@/data_access/api/projects';
+import { ALL_PROJECTS_KEY, useProjects } from '@/data_access/swr/projects';
 import Link from 'next/link';
 import Spinner from '@/components/icons/spinner';
 import OpenExternalIcon from '@/components/icons/open_external';
@@ -20,17 +20,10 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			key: 'title',
 			render: (title: string, record: any) => {
 				const id = record._id;
-				return <Link className='text-black hover:text-black hover:underline' href={`projects/${id}`}>{title}</Link>
+				return <Link className='text-slate-600 hover:text-primary w-full flex space-x-2 items-start' href={`projects/${id}`}>
+					<div className='w-fit pt-0.5'><OpenExternalIcon /></div>
+					<div>{title}</div></Link>
 			}
-		},
-		{
-			title: '',
-			dataIndex: '_id',
-			width: '5%',
-			key: 'open',
-			render: (id: string, record: any) => (
-				<Link className='text-primary hover:text-slate-700 hover:underline' href={`projects/${id}`}><OpenExternalIcon /></Link>
-			),
 		},
 		{
 			title: 'Description',
@@ -56,6 +49,7 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			title: 'Updated At',
 			dataIndex: 'updated',
 			key: 'updated',
+			ellipsis: true,
 			render: (item: string) => <p>{
 				new Date(item).toLocaleDateString('en-US',
 					{
@@ -75,17 +69,21 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 			render: (id: string) => (
 				<Space size="middle">
 					<a onClick={() => handleEdit(id)} className='text-primary'><EditIcon /></a>
-					<a onClick={() => handleDelete(id)} className='text-accent'><DeleteIcon /></a>
+					<a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
 				</Space>
 			),
 		},
 	];
 
-	const { data, isLoading, error } = useDocumentations();
+	const { data, isLoading, error } = useProjects();
 
 	const handleDelete = async (id: string) => {
+		// show confirmation dialog
+		if (!window.confirm('Are you sure you want to delete this annotation?')) {
+			return;
+		}
 		await remove(id);
-		mutate(ALL_DOCUMENTATIONS_KEY);
+		mutate(ALL_PROJECTS_KEY);
 	}
 
 	const handleEdit = (id: string) => {
@@ -96,6 +94,6 @@ export default function Table({ onRowEdit }: { onRowEdit: (id: string) => void }
 		return <Spinner />;
 	}
 	return (
-		data && <Tbl columns={columns} dataSource={[...data]} />
+		data && <Tbl size='middle' columns={columns} dataSource={[...data]} pagination={false} />
 	);
 }

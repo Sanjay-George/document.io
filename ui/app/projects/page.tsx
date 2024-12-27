@@ -2,41 +2,41 @@
 
 import Table from "./components/table";
 import H2 from "@/components/H2";
-import Form from "./components/form";
+import Form from "./components/Form";
 import { useState } from "react";
 import { Modal } from "antd";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import RightArrowIcon from "@/components/icons/right_arrow";
 
 
-export default function Page() {
+export default function ProjectList() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeDocumentation, setActiveDocumentation] = useState<null | string>(null);
+    const [selectedProject, setSelectedProject] = useState<null | string>(null);
 
     const showModal = () => {
         setIsModalOpen(true);
     };
     const handleCancel = () => {
         setIsModalOpen(false);
-        setActiveDocumentation(null);
+        setSelectedProject(null);
     };
 
     const handleAddClick = () => {
-        console.log('Add documentation');
-        setActiveDocumentation(null);
+        console.log('Add project');
+        setSelectedProject(null);
         showModal();
     }
 
     const handleEditClick = (id: string) => {
-        console.log('Edit documentation', id);
-        setActiveDocumentation(id);
+        console.log('Edit project', id);
+        setSelectedProject(id);
         showModal();
     };
 
 
     return (
         <>
-            <div className="flex justify-between items-center pb-5">
+            <div className="flex justify-between items-center pb-2">
                 <H2>Projects</H2>
 
                 <div className="inline-flex space-x-1">
@@ -49,11 +49,8 @@ export default function Page() {
             <Table onRowEdit={handleEditClick} />
 
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
-                <Form docId={activeDocumentation} postSubmit={() => setIsModalOpen(false)} />
+                <Form projectId={selectedProject} postSubmit={() => setIsModalOpen(false)} />
             </Modal>
-
-
-
         </>
     );
 

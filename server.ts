@@ -2,8 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import projectRouter from "./libs/controllers/projects";
-import documentRouter from "./libs/controllers/documentations";
-import pageRouter from "./libs/controllers/pages";
+import documentationRouter from "./libs/controllers/documentations";
 import annotationRouter from "./libs/controllers/annotations";
 import originRouter from "./libs/controllers/origins";
 import Origin from "./libs/database/origin";
@@ -39,8 +38,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 // Routes
 app.use('/projects', projectRouter);
-app.use('/documentations', documentRouter);
-app.use('/pages', pageRouter);
+app.use('/documentations', documentationRouter);
 app.use('/annotations', annotationRouter);
 app.use('/origins', originRouter);
 

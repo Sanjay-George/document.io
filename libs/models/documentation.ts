@@ -1,9 +1,8 @@
 export interface Documentation {
     id: string;
     title: string;
-    description: string;
-    project: string;
-    status: "Active" | "Inactive";
-    created: Date;
-    updated: Date;
+    url: string;
+    projectId: string;
+    created?: Date;
+    updated?: Date;
 }

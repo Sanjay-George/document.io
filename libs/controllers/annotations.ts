@@ -47,7 +47,7 @@ router.post("/", async (req, res) => {
 });
 
 const validateData = (data: Annotation) => {
-    if (!data.value || !data.target || !data.url || !data.pageId) {
+    if (!data.value || !data.target || !data.url || !data.documentationId) {
         return false;
     }
     return true;

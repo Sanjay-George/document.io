@@ -3,7 +3,7 @@ export interface Annotation {
     value: string;
     target: string;
     url: string;
-    pageId: string;
+    documentationId: string;
     created: Date;
     updated: Date;
     type: 'page' | 'component';

@@ -1,34 +1,40 @@
 import React, { useEffect } from 'react';
 import { Space, Table as Tbl, Tag } from 'antd';
 import useSWR, { mutate } from 'swr';
-import { exportData, remove } from '@/data_access/api/pages';
+import { exportData, remove } from '@/data_access/api/documentations';
 import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
-import { ALL_PAGES_KEY, usePages } from '@/data_access/swr/pages';
+import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data_access/swr/documentations';
 import OpenExternalIcon from '@/components/icons/open_external';
-import { Page } from '@/data_access/models/page';
 import CopyIcon from '@/components/icons/copy_icon';
 import { Tooltip } from '@nextui-org/tooltip';
+import Link from 'next/link';
+import { Documentation } from '@/data_access/models/documentation';
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 
-export default function Table({ documentationId, onRowEdit }:
-    { documentationId: string, onRowEdit: (id: string) => void }) {
+
+export default function Table({ projectId, onRowEdit }:
+    { projectId: string, onRowEdit: (id: string) => void }) {
 
     const columns = [
         {
             title: 'Title',
             dataIndex: 'title',
-            width: '20%',
+            width: '30%',
             key: 'title',
-        },
-        {
-            title: '',
-            dataIndex: '_id',
-            width: '5%',
-            key: 'open',
-            render: (id: string, record: Page) => (
-                <a onClick={() => handleConfigure(id, record)} className='text-slate-400 hover:text-slate-700'><OpenExternalIcon /></a>
-            ),
+            render: (title: string, record: any) => {
+                const id = record._id;
+                return (
+                    <Link
+                        className='text-slate-600 hover:text-primary w-full flex space-x-2 items-start'
+                        href={`document-io://documentations/${id}/?api-host=${encodeURI(API_URL as string)}`}>
+                        <div className='w-fit pt-0.5'><OpenExternalIcon /></div>
+                        <div className=''>{title}</div>
+                    </Link>
+                )
+            }
         },
         {
             title: 'Base URL',
@@ -41,6 +47,7 @@ export default function Table({ documentationId, onRowEdit }:
             title: 'Updated At',
             dataIndex: 'updated',
             key: 'updated',
+            ellipsis: true,
             render: (item: string) => <p>{
                 new Date(item).toLocaleDateString('en-US',
                     {
@@ -57,22 +64,27 @@ export default function Table({ documentationId, onRowEdit }:
             title: 'Actions',
             key: 'action',
             dataIndex: '_id',
-            render: (id: string, record: Page) => (
+            render: (id: string, record: Documentation) => (
                 <Space size="middle">
                     <a onClick={() => handleEdit(id)} className='text-emerald-600'><EditIcon /></a>
                     <a onClick={() => handleDelete(id)} className='text-red-600'><DeleteIcon /></a>
-                    <Tooltip content="Copy data" placement="top" offset={10}><a onClick={() => handleCopyClick(id)} className='text-slate-400 hover:text-slate-700'>  <CopyIcon /></a></Tooltip>
+                    <Tooltip content="Copy data" placement="top" offset={10}><a onClick={() => handleCopyClick(id)} className='text-slate-600 hover:text-black'>  <CopyIcon /></a></Tooltip>
                 </Space>
             ),
         },
     ];
 
-    const { data, isLoading, error } = usePages(documentationId);
+    const { data, isLoading, error } = useDocumentations(projectId);
 
     const handleDelete = async (id: string) => {
-        console.log(`Delete page ${id}`);
+        // show confirmation dialog
+        if (!window.confirm('Are you sure you want to delete this annotation?')) {
+            return;
+        }
+
+        console.log(`Delete documentation ${id}`);
         await remove(id);
-        mutate(ALL_PAGES_KEY(documentationId));
+        mutate(ALL_DOCUMENTATIONS_KEY(projectId));
     }
 
     const handleEdit = (id: string) => {
@@ -94,7 +106,7 @@ export default function Table({ documentationId, onRowEdit }:
     };
 
 
-    const handleConfigure = (id: string, record: Page) => {
+    const handleConfigure = (id: string, record: Documentation) => {
         const { title, url } = record;
         let newUrl = url.includes('?')
             ? `${url}&pageId=${id}` : `${url}?pageId=${id}`;
@@ -105,6 +117,6 @@ export default function Table({ documentationId, onRowEdit }:
     }
 
     return (
-        data && <Tbl columns={columns} dataSource={[...data]} />
+        data && <Tbl size='middle' columns={columns} dataSource={[...data]} pagination={false} />
     );
 }

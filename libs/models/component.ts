@@ -1,7 +1,7 @@
-interface Component {
-    id: string;
-    querySelector: string;
-    pageId: string;
-    created: Date;
-    updated: Date;
-}
+// interface Component {
+//     id: string;
+//     querySelector: string;
+//     documentationId: string;
+//     created: Date;
+//     updated: Date;
+// }
