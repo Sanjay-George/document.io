@@ -17,20 +17,25 @@ app.use(express.json());
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(',');
 const corsOptions = {
     origin: function (origin, callback) {
-        if (!origin) {
-            callback(null, true);
-            return;
-        }
-        if (allowedOrigins.indexOf(origin) !== -1) {
-            return callback(null, true);
-        }
-        originDB.getAll().then((whitelistedOrigins) => {
-            if (whitelistedOrigins.includes(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error('Not allowed by CORS'));
-            }
-        });
+        // TODO: Revert this later
+        callback(null, true);
+        return;
+
+
+        // if (!origin) {
+        //     callback(null, true);
+        //     return;
+        // }
+        // if (allowedOrigins.indexOf(origin) !== -1) {
+        //     return callback(null, true);
+        // }
+        // originDB.getAll().then((whitelistedOrigins) => {
+        //     if (whitelistedOrigins.includes(origin)) {
+        //         callback(null, true);
+        //     } else {
+        //         callback(new Error('Not allowed by CORS'));
+        //     }
+        // });
     }
 }
 
