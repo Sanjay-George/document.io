@@ -1,10 +1,9 @@
 # Document.io
 
-( ⚠️ _Under development_ ☕️ + 🧑‍💻 )
-
 **Document.io** is a streamlined tool for capturing, annotating, and documenting websites directly from your browser. Whether you’re building tutorials, managing workflows, or documenting app interfaces, Document.io makes the process easy and collaborative.
 
-_Companion chrome extension repo:_ https://github.com/Sanjay-George/document.io-chrome-extension
+![screely-1736026302681](https://github.com/user-attachments/assets/9391e071-c759-479b-940e-3f2414e3b5c0)
+
 
 ## 🎯 Motivation
 
@@ -81,9 +80,6 @@ Before getting started, make sure you have the following installed:
    
    - Visit `http://localhost:3000` to use the application
   
-
-8. **Setup Companion Chrome Extension**
-   - Follow the instructions [in the repo](https://github.com/Sanjay-George/document.io-chrome-extension) to setup the companion extension, which is crucial to interact with anntoations on webpages.
 
 
  Enjoy documenting 🎉
