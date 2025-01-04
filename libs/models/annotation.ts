@@ -8,4 +8,5 @@ export interface Annotation {
     updated: Date;
     type: 'page' | 'component';
     comments?: string[];
+    index: number;
 }

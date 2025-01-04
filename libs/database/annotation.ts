@@ -37,16 +37,16 @@ export default class AnnotationDB {
     async get(id: string): Promise<Annotation> {
         const annotation = await this.collection
             .findOne({ _id: new ObjectId(id) });
-        return annotation as any as Annotation;
+        return this.mapToAnnotation(annotation);
     }
 
     async getAll(documentationId: string, filters?: AnnotationFilters): Promise<Annotation[]> {
         const query = { documentationId: new ObjectId(documentationId), ...filters };
         const annotatations = await this.collection.find(query).toArray();
-        return annotatations as any as Annotation[];
+        return annotatations.map(this.mapToAnnotation);
     }
 
-    async update(id: string, data: any) {
+    async update(id: string, data: Annotation) {
         if (!this.validateData(data)) {
             throw new Error("Invalid data");
         }
@@ -58,6 +58,7 @@ export default class AnnotationDB {
                     target: data.target,
                     url: data.url,
                     type: data.type,
+                    index: data.index,
                     updated: new Date(),
                 }
             }
@@ -75,4 +76,11 @@ export default class AnnotationDB {
         return result.deletedCount > 0;
     }
 
+
+    mapToAnnotation(data: any): Annotation {
+        return {
+            id: data._id.toString(),
+            ...data,
+        }
+    }
 }

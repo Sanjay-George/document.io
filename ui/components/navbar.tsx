@@ -39,7 +39,7 @@ export default function Nav() {
                 </NavbarItem>
                 <NavbarItem>
 
-                    <Button as={Link} href="https://github.com/Sanjay-George/document.io-chrome-extension"
+                    <Button as={Link} href="https://github.com/Sanjay-George/document.io-companion"
                         target="_blank" variant="flat" size="sm" className="text-slate-500 bg-transparent hover:text-primary text-sm py-3 ml-0 px-0">Get Companion App <RightArrowIcon /></Button>
                 </NavbarItem>
             </NavbarContent>

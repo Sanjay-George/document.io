@@ -57,7 +57,7 @@ const validateData = (data: Annotation) => {
 /**
  * Updates an annotation
  * @param {string} req.params.id - The ID of the annotation to update
- * @param {Page} req.body - The updated annotation
+ * @param {Annotation} req.body - The updated annotation
  * @returns {boolean} True if the annotation was updated, false otherwise
  */
 router.put("/:id", async (req, res) => {
@@ -70,6 +70,35 @@ router.put("/:id", async (req, res) => {
         }
         const result = await annotationDB.update(id, annotation);
         res.send(result);
+    }
+    catch (ex) {
+        console.error(ex);
+        res.sendStatus(500);
+    }
+});
+
+
+/**
+ * Updates multiple annotations
+ * @param {Annotation[]} req.body - The annotations to update
+ * @returns {boolean[]} An array of booleans indicating whether each annotation was updated
+ */
+router.put("/", async (req, res) => {
+    try {
+        const annotations = req.body as Annotation[];
+        if (!annotations || annotations.length === 0) {
+            res.sendStatus(400);
+            return;
+        }
+        const resultArr = []
+        for (const annotation of annotations) {
+            if (!validateData(annotation)) {
+                res.sendStatus(400);
+                continue;
+            }
+            resultArr.push(await annotationDB.update(annotation.id, annotation));
+        }
+        res.send(resultArr);
     }
     catch (ex) {
         console.error(ex);
