@@ -1,4 +1,4 @@
-import H1 from "@/components/h1";
+import H1 from "@/components/H1";
 import Navbar from "@/components/Navbar";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import ButtonPrimary from "@/components/ButtonPrimary";
