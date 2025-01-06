@@ -1,7 +1,7 @@
 import express from "express";
 import OriginDB from "../database/origin";
 import AnnotationDB from "../database/annotation";
-import { AnnotationFilters } from "../entities/annotation_filters";
+import { AnnotationFilters } from "../filters/annotation_filters";
 import DocumentationDB from "../database/documentation";
 import { Documentation } from "../models/documentation";
 

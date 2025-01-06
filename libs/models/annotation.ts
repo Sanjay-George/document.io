@@ -7,6 +7,5 @@ export interface Annotation {
     created: Date;
     updated: Date;
     type: 'page' | 'component';
-    comments?: string[];
     index: number;
 }
