@@ -1,8 +1,13 @@
 # Document.io
 
-**Document.io** is a streamlined tool for capturing, annotating, and documenting websites directly from your browser. Whether you’re building tutorials, managing workflows, or documenting app interfaces, Document.io makes the process easy and collaborative.
+**Document.io** is a streamlined tool for capturing, annotating, and documenting websites. Whether you’re building tutorials, managing workflows, or documenting app interfaces, document.io makes the process easy and collaborative.
 
 ![screely-1736026302681](https://github.com/user-attachments/assets/9391e071-c759-479b-940e-3f2414e3b5c0)
+
+Live demo: https://document-io.tech/  
+(This a read-only demo. You can view data and test out the features but cannot modify, create, or delete.)
+
+Setup Companion App: https://github.com/Sanjay-George/document.io-companion?tab=readme-ov-file#-quick-start
 
 
 ## 🎯 Motivation
