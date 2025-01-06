@@ -79,6 +79,7 @@ router.get("/:id/export", async (req, res) => {
     function cleanData(data: any) {
         // Remove sensitive data
         delete data._id;
+        delete data.id;
         delete data.projectId;
         delete data.documentationId;
         return data;

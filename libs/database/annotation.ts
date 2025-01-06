@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 import { dbName, getClient, uri } from "./db_client";
 import { Annotation } from "../models/annotation";
-import { AnnotationFilters } from "../entities/annotation_filters";
+import { AnnotationFilters } from "../filters/annotation_filters";
 
 const client = getClient();
 
@@ -22,7 +22,7 @@ export default class AnnotationDB {
             ...data,
             documentationId: new ObjectId(data.documentationId),
             created: new Date(),
-            updated: new Date()
+            updated: new Date(),
         });
         return result.insertedId;
     }
@@ -76,8 +76,7 @@ export default class AnnotationDB {
         return result.deletedCount > 0;
     }
 
-
-    mapToAnnotation(data: any): Annotation {
+    private mapToAnnotation(data: any): Annotation {
         return {
             id: data._id.toString(),
             ...data,
