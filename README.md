@@ -4,10 +4,12 @@
 
 ![screely-1736026302681](https://github.com/user-attachments/assets/9391e071-c759-479b-940e-3f2414e3b5c0)
 
-Live demo: https://document-io.tech/  
-(This a read-only demo. You can view data and test out the features but cannot modify, create, or delete.)
-
 Setup Companion App: https://github.com/Sanjay-George/document.io-companion?tab=readme-ov-file#-quick-start
+
+Live demo: https://document-io.tech/
+
+(The demo is restricted to 'GET' requests. You can't add, update, or delete any documentations)
+
 
 
 ## 🎯 Motivation
