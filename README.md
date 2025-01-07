@@ -4,7 +4,7 @@
 
 ![screely-1736026302681](https://github.com/user-attachments/assets/9391e071-c759-479b-940e-3f2414e3b5c0)
 
-Setup Companion App: https://github.com/Sanjay-George/document.io-companion?tab=readme-ov-file#-quick-start
+A companion app is required to add and view annotations on websites. [You can find set it up from here.](https://github.com/Sanjay-George/document.io-companion?tab=readme-ov-file#-quick-start)
 
 Live demo: https://document-io.tech/
 
