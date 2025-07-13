@@ -2,10 +2,12 @@ import H1 from "@/components/H1";
 import Navbar from "@/components/Navbar";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import ButtonPrimary from "@/components/ButtonPrimary";
+import Background from "@/components/Background";
 
 export default function Home() {
     return (
         <>
+            <Background />
             <Navbar></Navbar>
             <div className="container center mx-auto my-28 pt-5">
                 <div className="flex items-center justify-center">
