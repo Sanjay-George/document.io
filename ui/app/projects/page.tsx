@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Modal } from "antd";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import RightArrowIcon from "@/components/icons/right_arrow";
+import List from "./components/List";
 
 
 export default function ProjectList() {
@@ -46,7 +47,7 @@ export default function ProjectList() {
                 </div>
             </div>
 
-            <Table onRowEdit={handleEditClick} />
+            <List onRowEdit={handleEditClick} />
 
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
                 <Form projectId={selectedProject} postSubmit={() => setIsModalOpen(false)} />
