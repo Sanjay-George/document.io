@@ -1,4 +1,4 @@
-import useSWR from "swr";
+import useSWR from 'swr';
 import { fetcher } from "./fetcher-get";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;

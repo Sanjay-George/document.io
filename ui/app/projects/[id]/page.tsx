@@ -8,7 +8,7 @@ import { Modal } from "antd";
 import { useProject } from "@/data_access/swr/projects";
 import Spinner from "@/components/icons/spinner";
 import RightArrowIcon from "@/components/icons/right_arrow";
-import { useState } from "react";
+import { use, useState } from "react";
 import { useDocumentations } from "@/data_access/swr/documentations";
 import { Tooltip } from "@heroui/tooltip"
 import ImportForm from "./components/ImportForm";
@@ -17,9 +17,8 @@ import List from "./components/List";
 import { Button } from "@heroui/react";
 
 
-// ProjectDetails or DocumentationList page
 export default function ProjectDetails({ params }: { params: { id: string } }) {
-    const projectId = params.id;
+    const projectId = use(params)?.id;
     const { data: projectData, isLoading: isProjectLoading } = useProject(projectId as any);
     const { data: documentations, isLoading: isDocumentationLoading } = useDocumentations(projectId as any);
 

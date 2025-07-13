@@ -162,6 +162,7 @@ export default function Background() {
         shapesRef.current = createShapes(window.innerWidth, window.innerHeight);
 
         function animate() {
+            if (!ctx || !canvasRef.current) return;
             ctx.clearRect(
                 0,
                 0,
@@ -172,7 +173,7 @@ export default function Background() {
                 sh.y -= sh.v;
                 sh.a += sh.spin;
                 if (sh.y < -40) sh.y = window.innerHeight + 40;
-                sh.icon(ctx, sh.x, sh.y, sh.r, sh.a);
+                sh.icon(ctx!, sh.x, sh.y, sh.r, sh.a);
             }
             animationId = requestAnimationFrame(animate);
         }
