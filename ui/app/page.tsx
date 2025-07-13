@@ -9,7 +9,7 @@ export default function Home() {
         <>
             <Background />
             <Navbar></Navbar>
-            <div className="container center mx-auto my-28 pt-5">
+            <div className="container center mx-auto my-20 pt-5">
                 <div className="flex items-center justify-center">
                     <div className="container text-center mx-auto pt-5">
                         <H1>
