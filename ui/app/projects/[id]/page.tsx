@@ -1,7 +1,6 @@
 "use client";
 
-import Table from "./components/Table";
-import { Video } from 'lucide-react';
+import { Library, Video } from 'lucide-react';
 import H2 from "@/components/H2";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import Form from "./components/Form";
@@ -72,10 +71,12 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                     </Tooltip>
 
                     <PrimaryBtn text="Add documentation"
-                        icon={<RightArrowIcon />}
+                        icon={<Library size={18} />}
                         onClick={handleAddClick} />
 
-                    <PrimaryBtn text="Upload Videos" icon={<Video size={18} />} />
+                    <PrimaryBtn text="Add Video" icon={<Video size={18} />}
+                        href={`/projects/${projectId}/upload`}
+                    />
                 </div>
 
             </div>
