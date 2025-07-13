@@ -13,6 +13,7 @@ import { useDocumentations } from "@/data_access/swr/documentations";
 import { Tooltip } from "@heroui/tooltip"
 import ImportForm from "./components/ImportForm";
 import ImportIcon from "@/components/icons/import_icon";
+import List from "./components/List";
 
 // ProjectDetails or DocumentationList page
 export default function ProjectDetails({ params }: { params: { id: string } }) {
@@ -78,7 +79,8 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                 <p className="mb-4 pb-2 text-slate-400 font-light ">{projectData?.description}</p>
             </div>
 
-            <Table projectId={projectId} onRowEdit={handleEditClick} />
+            <List projectId={projectId} onRowEdit={handleEditClick} />
+
             <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
                 <Form projectId={projectId}
                     documentationId={selectedDocumentation}

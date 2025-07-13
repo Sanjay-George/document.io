@@ -33,10 +33,9 @@ export default function List({ onRowEdit }: { onRowEdit: (id: string) => void })
             {data.map((project: any) => (
                 <Card
                     key={project._id}
-                    className="flex flex-col justify-between shadow border rounded-lg py-5 px-4 bg-white hover:shadow-lg"
+                    className="flex flex-col justify-between shadow border rounded-lg py-5 px-4 bg-white hover:shadow-md"
                 >
                     <div>
-                        {/* Title (with link & icon) */}
                         <div className="flex items-start space-x-2 mb-2">
                             <Link
                                 href={`/projects/${project._id}`}
@@ -47,7 +46,6 @@ export default function List({ onRowEdit }: { onRowEdit: (id: string) => void })
                             </Link>
                         </div>
 
-                        {/* Status Chip */}
                         <div className="mb-3">
                             <Chip
                                 color={project.status === 'Active' ? 'success' : 'danger'}
@@ -59,14 +57,10 @@ export default function List({ onRowEdit }: { onRowEdit: (id: string) => void })
                             </Chip>
                         </div>
 
-                        {/* Description */}
                         <div className="text-slate-600 mb-4 text-sm line-clamp-3">
                             {project.description}
                         </div>
-                    </div>
 
-                    {/* Footer: Updated At & Actions */}
-                    <div className="flex justify-between items-center mt-4 pt-2 border-t">
                         <div className="text-xs text-slate-400">
                             {new Date(project.updated).toLocaleDateString('en-US', {
                                 year: 'numeric',
@@ -76,6 +70,10 @@ export default function List({ onRowEdit }: { onRowEdit: (id: string) => void })
                                 minute: 'numeric',
                             })}
                         </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mt-4 pt-2 border-t">
+
                         <div className="flex gap-3 text-gray-400">
                             <button
                                 onClick={() => onRowEdit(project._id)}
