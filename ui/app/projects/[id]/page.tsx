@@ -10,7 +10,7 @@ import Spinner from "@/components/icons/spinner";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import { useState } from "react";
 import { useDocumentations } from "@/data_access/swr/documentations";
-import { Tooltip } from "@nextui-org/tooltip"
+import { Tooltip } from "@heroui/tooltip"
 import ImportForm from "./components/ImportForm";
 import ImportIcon from "@/components/icons/import_icon";
 

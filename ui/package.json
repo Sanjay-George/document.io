@@ -11,9 +11,9 @@
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.1",
     "@mdxeditor/editor": "^3.19.3",
-    "@nextui-org/react": "^2.6.8",
-    "@nextui-org/system": "^2.4.4",
-    "@nextui-org/theme": "^2.2.9",
+    "@heroui/react": "2.7.11",
+    "@heroui/system": "2.4.18",
+    "@heroui/theme": "2.4.17",
     "antd": "^5.20.3",
     "framer-motion": "^11.3.31",
     "next": "^14.2.13",

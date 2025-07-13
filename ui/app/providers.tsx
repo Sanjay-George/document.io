@@ -1,12 +1,12 @@
-import { NextUIProvider } from "@nextui-org/system";
+import { HeroUIProvider } from "@heroui/system";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <NextUIProvider>
+    <HeroUIProvider>
       <AntdRegistry>
         {children}
       </AntdRegistry>
-    </NextUIProvider>
+    </HeroUIProvider>
   )
 }

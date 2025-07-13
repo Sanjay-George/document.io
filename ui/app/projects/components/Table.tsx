@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Space, Table as Tbl, Tag } from 'antd';
-import { Chip } from '@nextui-org/chip';
+import { Chip } from "@heroui/chip";
 import EditIcon from '@/components/icons/edit_icon';
 import DeleteIcon from '@/components/icons/delete_icon';
 import useSWR, { mutate } from 'swr';

@@ -1,6 +1,6 @@
 "use client"
-import { Button } from "@nextui-org/button";
-import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@nextui-org/navbar";
+import { Button } from "@heroui/button";
+import { Navbar, NavbarBrand, NavbarContent, NavbarItem } from "@heroui/navbar";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import GithubIcon from "./icons/gh_icon";

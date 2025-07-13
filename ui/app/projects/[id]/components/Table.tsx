@@ -7,7 +7,7 @@ import DeleteIcon from '@/components/icons/delete_icon';
 import { ALL_DOCUMENTATIONS_KEY, useDocumentations } from '@/data_access/swr/documentations';
 import OpenExternalIcon from '@/components/icons/open_external';
 import CopyIcon from '@/components/icons/copy_icon';
-import { Tooltip } from '@nextui-org/tooltip';
+import { Tooltip } from "@heroui/tooltip";
 import Link from 'next/link';
 import { Documentation } from '@/data_access/models/documentation';
 
