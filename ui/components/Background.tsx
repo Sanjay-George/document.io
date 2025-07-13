@@ -10,11 +10,11 @@ type IconDrawer = (
 ) => void;
 
 const icons: IconDrawer[] = [
-    function doc(ctx, x, y, r, a) {
+    function docTeal(ctx, x, y, r, a) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(a);
-        ctx.strokeStyle = "#007c8a44";
+        ctx.strokeStyle = "#007c8a44"; // Teal shade
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.rect(-18 * r, -22 * r, 36 * r, 44 * r); // doc outline
@@ -23,11 +23,11 @@ const icons: IconDrawer[] = [
         ctx.stroke();
         ctx.restore();
     },
-    function codeBracket(ctx, x, y, r, a) {
+    function codeBracketTeal(ctx, x, y, r, a) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(a);
-        ctx.strokeStyle = "#007c8a44";
+        ctx.strokeStyle = "#007c8a44"; // Teal shade
         ctx.lineWidth = 4;
         ctx.beginPath();
         ctx.moveTo(-14 * r, -18 * r); ctx.lineTo(-22 * r, 0); ctx.lineTo(-14 * r, 18 * r);
@@ -35,22 +35,72 @@ const icons: IconDrawer[] = [
         ctx.stroke();
         ctx.restore();
     },
-    function pencil(ctx, x, y, r, a) {
+    function pencilTeal(ctx, x, y, r, a) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(a);
-        ctx.strokeStyle = "#50539944";
+        ctx.strokeStyle = "#50539944"; // Teal shade
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.moveTo(-15 * r, 15 * r); ctx.lineTo(15 * r, -15 * r);
         ctx.stroke();
         ctx.restore();
     },
-    function bubble(ctx, x, y, r, a) {
+    function bubbleTeal(ctx, x, y, r, a) {
         ctx.save();
         ctx.translate(x, y);
         ctx.rotate(a);
-        ctx.strokeStyle = "#11998e33";
+        ctx.strokeStyle = "#11998e33"; // Teal shade
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 20 * r, 13 * r, 0, 0, 2 * Math.PI);
+        ctx.moveTo(9 * r, 9 * r); ctx.lineTo(20 * r, 18 * r);
+        ctx.stroke();
+        ctx.restore();
+    },
+
+    // Orange icons
+    function docOrange(ctx, x, y, r, a) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(a);
+        ctx.strokeStyle = "#FF7F5044"; // Orange shade
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.rect(-18 * r, -22 * r, 36 * r, 44 * r); // doc outline
+        ctx.moveTo(-8 * r, -14 * r); ctx.lineTo(8 * r, -14 * r);
+        ctx.moveTo(-8 * r, 0); ctx.lineTo(8 * r, 0);
+        ctx.stroke();
+        ctx.restore();
+    },
+    function codeBracketOrange(ctx, x, y, r, a) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(a);
+        ctx.strokeStyle = "#FF7F5044"; // Orange shade
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(-14 * r, -18 * r); ctx.lineTo(-22 * r, 0); ctx.lineTo(-14 * r, 18 * r);
+        ctx.moveTo(14 * r, -18 * r); ctx.lineTo(22 * r, 0); ctx.lineTo(14 * r, 18 * r);
+        ctx.stroke();
+        ctx.restore();
+    },
+    function pencilOrange(ctx, x, y, r, a) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(a);
+        ctx.strokeStyle = "#FF9F5044"; // Orange shade
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(-15 * r, 15 * r); ctx.lineTo(15 * r, -15 * r);
+        ctx.stroke();
+        ctx.restore();
+    },
+    function bubbleOrange(ctx, x, y, r, a) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(a);
+        ctx.strokeStyle = "#FFB34733"; // Orange shade
         ctx.lineWidth = 3;
         ctx.beginPath();
         ctx.ellipse(0, 0, 20 * r, 13 * r, 0, 0, 2 * Math.PI);
@@ -86,7 +136,7 @@ function createShapes(width: number, height: number): Shape[] {
     return arr;
 }
 
-const Background: React.FC = () => {
+export default function Background() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const shapesRef = useRef<Shape[]>([]);
 
@@ -150,5 +200,3 @@ const Background: React.FC = () => {
         />
     );
 };
-
-export default Background;

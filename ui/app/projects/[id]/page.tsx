@@ -1,6 +1,7 @@
 "use client";
 
 import Table from "./components/Table";
+import { Video } from 'lucide-react';
 import H2 from "@/components/H2";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import Form from "./components/Form";
@@ -14,6 +15,8 @@ import { Tooltip } from "@heroui/tooltip"
 import ImportForm from "./components/ImportForm";
 import ImportIcon from "@/components/icons/import_icon";
 import List from "./components/List";
+import { Button } from "@heroui/react";
+
 
 // ProjectDetails or DocumentationList page
 export default function ProjectDetails({ params }: { params: { id: string } }) {
@@ -71,6 +74,8 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                     <PrimaryBtn text="Add documentation"
                         icon={<RightArrowIcon />}
                         onClick={handleAddClick} />
+
+                    <PrimaryBtn text="Upload Videos" icon={<Video size={18} />} />
                 </div>
 
             </div>
