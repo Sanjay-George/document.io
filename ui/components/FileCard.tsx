@@ -14,7 +14,6 @@ export default function FileCard({ file }: FileCardProps) {
     const [imgSrc, setImgSrc] = useState<string | null>(null);
 
     useEffect(() => {
-        console.log(file);
         if (isImage(file)) {
             const url = URL.createObjectURL(file);
             setImgSrc(url);

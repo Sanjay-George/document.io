@@ -1,6 +1,6 @@
 "use client";
 
-import { Library, Video } from 'lucide-react';
+import { Library, Search, Video } from 'lucide-react';
 import H2 from "@/components/H2";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import Form from "./components/Form";
@@ -15,6 +15,9 @@ import ImportForm from "./components/ImportForm";
 import ImportIcon from "@/components/icons/import_icon";
 import List from "./components/List";
 import { Button } from "@heroui/react";
+import ButtonAccent from '@/components/ButtonAccent';
+import ButtonSecondary from '@/components/ButtonSecondary';
+import ButtonPrimary from '@/components/ButtonPrimary';
 
 
 export default function ProjectDetails({ params }: { params: { id: string } }) {
@@ -69,13 +72,17 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                         </button>
                     </Tooltip>
 
-                    <PrimaryBtn text="Add documentation"
+                    <ButtonSecondary text="Add documentation"
                         icon={<Library size={18} />}
                         onClick={handleAddClick} />
 
-                    <PrimaryBtn text="Add Video" icon={<Video size={18} />}
+                    <ButtonSecondary text="Upload Media" icon={<Video size={18} />}
                         href={`/projects/${projectId}/upload`}
                     />
+
+                    <ButtonPrimary text="AI Search" icon={<Search size={18} />}
+                        href="#" />
+
                 </div>
 
             </div>

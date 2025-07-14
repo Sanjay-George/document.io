@@ -8,6 +8,8 @@ import { Modal } from "antd";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import List from "./components/List";
+import ButtonSecondary from "@/components/ButtonSecondary";
+import { Plus } from "lucide-react";
 
 
 export default function ProjectList() {
@@ -41,8 +43,8 @@ export default function ProjectList() {
                 <H2>Projects</H2>
 
                 <div className="inline-flex space-x-1">
-                    <PrimaryBtn text="Add project"
-                        icon={<RightArrowIcon />}
+                    <ButtonSecondary text="New project"
+                        icon={<Plus size={18} />}
                         onClick={handleAddClick} />
                 </div>
             </div>

@@ -52,7 +52,6 @@ export default function UploadMediaPage({ params }: { params: { id: string } }) 
                     <ButtonPrimary text="Process Files"
                         icon={<Upload size={18} />}
                         onClick={() => {
-                            // Handle file processing logic here
                             console.log("Processing files:", files);
                         }}
                     />

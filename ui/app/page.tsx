@@ -19,7 +19,7 @@ export default function Home() {
                             Document.io lets you easily capture and annotate web pages with notes and voice memos. Simplify collaboration and keep your team aligned with clear, accessible documentation.
                         </p>
 
-                        <ButtonPrimary href="/projects" text="Manage Projects" icon={<RightArrowIcon />} />
+                        <ButtonPrimary href="/projects" text="Get Started" icon={<RightArrowIcon />} />
 
                     </div>
                 </div>
