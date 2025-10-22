@@ -7,7 +7,7 @@ import Background from "@/components/Background";
 export default function Home() {
     return (
         <>
-            <Background />
+            {/* <Background /> */}
             <Navbar></Navbar>
             <div className="container center mx-auto my-20 pt-5">
                 <div className="flex items-center justify-center">
