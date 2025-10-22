@@ -7,7 +7,7 @@ export default function ButtonSecondary({ text, icon, onClick, href, target }: {
     if (href) {
         return (
             <Button as={Link}
-                href={href} target={target || '_self'} className="bg-secondary text-primary border border-primary/50 py-3 px-4 text-sm rounded-md" variant="solid" size="sm">
+                href={href} target={target || '_self'} className="bg-primary/5 text-primary border border-primary/50 py-3 px-4 text-sm rounded-md" variant="solid" size="sm">
                 {text}
                 {icon}
             </Button>
@@ -15,7 +15,7 @@ export default function ButtonSecondary({ text, icon, onClick, href, target }: {
     }
     else if (onClick) {
         return (
-            <Button onClick={onClick} className="bg-secondary text-primary border border-primary/50 py-3 px-4 text-sm rounded-md" variant="solid" size="sm">
+            <Button onClick={onClick} className="bg-primary/5 text-primary border border-primary/50 py-3 px-4 text-sm rounded-md" variant="solid" size="sm">
                 {text}
                 {icon}
             </Button>
@@ -24,7 +24,7 @@ export default function ButtonSecondary({ text, icon, onClick, href, target }: {
 
     else {
         return (
-            <Button type="submit" className="bg-secondary text-primary border border-primary/50 py-3 px-4 text-sm rounded-md" variant="solid" size="sm">
+            <Button type="submit" className="bg-primary/5 text-primary border border-primary/50 py-3 px-4 text-sm rounded-md" variant="solid" size="sm">
                 {text}
                 {icon}
             </Button>

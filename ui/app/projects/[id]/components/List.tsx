@@ -73,7 +73,8 @@ export default function List({
                     <div>
                         <Link
                             className="flex items-start space-x-2 text-lg font-semibold text-slate-800 hover:text-primary mb-2"
-                            href={`document-io://documentations/${doc._id}/?api-host=${encodeURI(API_URL || '')}`}
+                            // href={`document-io://documentations/${doc._id}/?api-host=${encodeURI(API_URL || '')}`}
+                            href={`${doc.url}?documentation-id=${doc._id}&api-host=${encodeURI(API_URL || '')}`}
                             target="_blank"
                             rel="noopener noreferrer"
                         >

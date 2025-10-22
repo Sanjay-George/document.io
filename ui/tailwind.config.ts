@@ -16,8 +16,8 @@ const config: Config = {
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
       },
       colors: {
-        'primary': '#007d7e',
-        // 'secondary': '#00c9d0',
+        'primary': '#0075A0',
+        'danger': "#CE291A",
         'secondary': '#e6f4f1',
         'accent': '#ff8749',
       }
@@ -29,15 +29,15 @@ const config: Config = {
   },
   plugins: [heroui({
     themes: {
-      light: {
-        colors: {
-          primary: "#047858",
-          secondary: "#000",
-          success: "#22C55E",
-          warning: "#B77206",
-          danger: "#B74606",
-        },
-      },
+      // light: {
+      //   colors: {
+      //     primary: "#0075A0",
+      //     secondary: "#000",
+      //     success: "#22C55E",
+      //     warning: "#B77206",
+      //     danger: "#CE291A",
+      //   },
+      // },
     }
   })],
 };
