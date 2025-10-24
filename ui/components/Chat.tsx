@@ -16,12 +16,9 @@ const BOT = "assistant";
 const USER = "user";
 const MESSAGE_LIMIT = 16;
 
-const initialMessages = [
-    {
-        role: BOT,
-        content: "Hi! How can I help you today?",
-    },
-];
+const AI_PY_API_URL = process.env.NEXT_PUBLIC_AI_PY_API_URL || "http://localhost:8000";
+
+
 
 type Message = {
     role: string;
@@ -30,12 +27,24 @@ type Message = {
     smartReplies?: string[];
 };
 
-export default function Chat() {
+export default function Chat({ projectName }: { projectName?: string }) {
+    const initialMessages = [
+        {
+            role: BOT,
+            content: projectName
+                ? `Hello, how can I assist you with **${projectName}**? Ask me anything about the documentation or user flows.`
+                : "Hello! How can I assist you today?",
+            sources: [],
+            smartReplies: [],
+        },
+    ];
+
     const [messages, setMessages] = useState<Message[]>(initialMessages);
     const [input, setInput] = useState("");
     const scrollBottomRef = useRef<HTMLDivElement | null>(null); // create the ref
     const [isLoading, setIsLoading] = useState(false);
     const [smartReplies, setSmartReplies] = useState<string[]>([]);
+
 
     useEffect(() => {
         // Whenever messages change, scroll to the bottom.
@@ -163,7 +172,7 @@ export default function Chat() {
 
     return (
         <Card className="w-full mx-auto shadow-none md:shadow-xs border-0 md:border py-2 md:py-6">
-            <CardContent className="h-[calc(100dvh-80px)] md:h-[calc(100dvh-130px)] relative px-0 md:px-6">
+            <CardContent className="h-[calc(100dvh-80px)] md:h-[calc(100dvh-170px)] relative px-0 md:px-6">
                 <ScrollArea className="h-full md:pr-4">
                     <div className="flex flex-col gap-4">
                         {/* if messages has any content */}
@@ -261,11 +270,11 @@ export default function Chat() {
                         />
                         {
                             messages.length > MESSAGE_LIMIT ? (
-                                <Button className="bg-[#10069f] hover:bg-[#10069f]/80 hover:cursor-pointer" onClick={() => window.location.reload()} type="button">
+                                <Button className="bg-primary hover:bg-primary/80 hover:cursor-pointer" onClick={() => window.location.reload()} type="button">
                                     <RefreshCcw />
                                 </Button>
                             ) : (
-                                <Button className="bg-[#10069f] hover:bg-[#10069f]/80 hover:cursor-pointer" type="submit" disabled={!input.trim() || isLoading}>
+                                <Button className="bg-primary hover:bg-primary/80 hover:cursor-pointer" type="submit" disabled={!input.trim() || isLoading}>
                                     <Send />
                                 </Button>
                             )

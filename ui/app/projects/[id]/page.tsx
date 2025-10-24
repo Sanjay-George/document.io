@@ -24,6 +24,7 @@ import {
     ModalBody,
     ModalFooter
 } from "@heroui/modal";
+import AISearch from './components/AISearch';
 
 
 export default function ProjectDetails({ params }: { params: { id: string } }) {
@@ -78,16 +79,13 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                         </button>
                     </Tooltip>
 
-                    <ButtonSecondary text="Add documentation"
-                        icon={<Library size={18} />}
-                        onClick={handleAddClick} />
-
                     <ButtonSecondary text="Upload Media" icon={<Video size={18} />}
                         href={`/projects/${projectId}/upload`}
                     />
 
-                    <ButtonPrimary text="AI Search" icon={<Search size={18} />}
-                        href="#" />
+                    <ButtonPrimary text="Add documentation"
+                        icon={<Library size={18} />}
+                        onClick={handleAddClick} />
 
                 </div>
 
@@ -98,17 +96,6 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
             </div>
 
             <List projectId={projectId} onRowEdit={handleEditClick} />
-
-            {/* <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
-                <Form projectId={projectId}
-                    documentationId={selectedDocumentation}
-                    postSubmit={() => setIsModalOpen(false)} />
-            </Modal>
-            
-
-            <Modal open={isImportModalOpen} footer={null} onCancel={handleImportModalCancel}>
-                <ImportForm documentationId={projectId} postSubmit={() => setImportModalOpen(false)} />
-            </Modal> */}
 
             <Modal isOpen={isModalOpen} onClose={handleCancel} size="xl">
                 <ModalContent>
@@ -127,6 +114,8 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                     </ModalBody>
                 </ModalContent>
             </Modal>
+
+            <AISearch projectName={projectData?.title} />
         </>
     );
 }
