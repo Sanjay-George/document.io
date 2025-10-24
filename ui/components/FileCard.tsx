@@ -1,4 +1,4 @@
-import { Card } from "@heroui/react";
+import { Card } from "@heroui/card";
 import { useState, useEffect } from "react";
 
 // Helper to check for image type

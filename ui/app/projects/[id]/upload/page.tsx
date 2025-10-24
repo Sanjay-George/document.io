@@ -5,7 +5,7 @@ import Dropzone from "@/components/Dropzone";
 import FileCard from "@/components/FileCard";
 import H2 from "@/components/H2";
 import { useProject } from "@/data_access/swr/projects";
-import { Spinner } from "@heroui/react";
+import { Spinner } from "@heroui/spinner";
 import { Upload } from "lucide-react";
 import { use, useState } from "react";
 

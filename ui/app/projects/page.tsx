@@ -1,10 +1,8 @@
 "use client";
 
-import Table from "./components/Table";
 import H2 from "@/components/H2";
 import Form from "./components/Form";
 import { useState } from "react";
-import { Modal } from "antd";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import RightArrowIcon from "@/components/icons/right_arrow";
 import List from "./components/List";
@@ -51,9 +49,9 @@ export default function ProjectList() {
 
             <List onRowEdit={handleEditClick} />
 
-            <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
+            {/* <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
                 <Form projectId={selectedProject} postSubmit={() => setIsModalOpen(false)} />
-            </Modal>
+            </Modal> */}
         </>
     );
 

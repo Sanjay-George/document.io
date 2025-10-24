@@ -4,7 +4,6 @@ import { Library, Search, Video } from 'lucide-react';
 import H2 from "@/components/H2";
 import PrimaryBtn from "@/components/ButtonPrimary";
 import Form from "./components/Form";
-import { Modal } from "antd";
 import { useProject } from "@/data_access/swr/projects";
 import Spinner from "@/components/icons/spinner";
 import RightArrowIcon from "@/components/icons/right_arrow";
@@ -14,7 +13,7 @@ import { Tooltip } from "@heroui/tooltip"
 import ImportForm from "./components/ImportForm";
 import ImportIcon from "@/components/icons/import_icon";
 import List from "./components/List";
-import { Button } from "@heroui/react";
+import { Button } from "@heroui/button";
 import ButtonAccent from '@/components/ButtonAccent';
 import ButtonSecondary from '@/components/ButtonSecondary';
 import ButtonPrimary from '@/components/ButtonPrimary';
@@ -93,7 +92,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
 
             <List projectId={projectId} onRowEdit={handleEditClick} />
 
-            <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
+            {/* <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
                 <Form projectId={projectId}
                     documentationId={selectedDocumentation}
                     postSubmit={() => setIsModalOpen(false)} />
@@ -101,7 +100,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
 
             <Modal open={isImportModalOpen} footer={null} onCancel={handleImportModalCancel}>
                 <ImportForm documentationId={projectId} postSubmit={() => setImportModalOpen(false)} />
-            </Modal>
+            </Modal> */}
         </>
     );
 }
