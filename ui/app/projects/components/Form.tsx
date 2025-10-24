@@ -81,7 +81,7 @@ export default function Form({ projectId, postSubmit }: { projectId: string | nu
     const isProjectActive = formData.status === 'Active';
 
     return (
-        <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
+        <form className="w-full mx-auto my-2" onSubmit={handleSubmit}>
             <div className="mb-5">
                 <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 ">Title</label>
                 <input value={formData.title} type="text" id="title" name="title" onChange={handleTextChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5       " placeholder="eg: Lead Form - User Flow" required />
@@ -96,7 +96,7 @@ export default function Form({ projectId, postSubmit }: { projectId: string | nu
                           " placeholder="Project description..."></textarea>
             </div>
 
-            <div className="mb-8 ms-0.5">
+            <div className="mb-5 ms-0.5">
                 <label className="inline-flex items-center cursor-pointer">
                     <input name='status' type="checkbox" className="sr-only peer" checked={isProjectActive} onChange={handleStatusChange} />
                     <div className="relative w-7 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-3 after:h-3 after:transition-all peer-checked:bg-primary"></div>

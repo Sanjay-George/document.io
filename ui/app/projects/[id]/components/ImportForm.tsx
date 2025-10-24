@@ -17,7 +17,7 @@ export default function ImportForm({ documentationId, postSubmit }: { documentat
     }
 
     return (
-        <form className="max-w-sm mx-auto" onSubmit={handleSubmit}>
+        <form className="w-full mx-auto my-2" onSubmit={handleSubmit}>
             <div className="mb-5">
                 <label htmlFor="description"
                     className="block mb-2 text-sm font-medium 
@@ -35,7 +35,7 @@ export default function ImportForm({ documentationId, postSubmit }: { documentat
 
 
             <button type="submit"
-                className="text-white bg-emerald-700 hover:bg-emerald-800 
+                className="text-white bg-primary hover:bg-primary/90 
                 focus:ring-4 focus:outline-none focus:ring-emerald-300 
                 font-medium rounded-lg text-sm px-5 py-2.5 text-center 
                   

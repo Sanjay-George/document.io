@@ -8,6 +8,13 @@ import RightArrowIcon from "@/components/icons/right_arrow";
 import List from "./components/List";
 import ButtonSecondary from "@/components/ButtonSecondary";
 import { Plus } from "lucide-react";
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter
+} from "@heroui/modal";
 
 
 export default function ProjectList() {
@@ -52,6 +59,14 @@ export default function ProjectList() {
             {/* <Modal open={isModalOpen} footer={null} onCancel={handleCancel}>
                 <Form projectId={selectedProject} postSubmit={() => setIsModalOpen(false)} />
             </Modal> */}
+
+            <Modal isOpen={isModalOpen} onClose={handleCancel} size="xl">
+                <ModalContent>
+                    <ModalBody>
+                        <Form projectId={selectedProject} postSubmit={() => setIsModalOpen(false)} />
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
         </>
     );
 

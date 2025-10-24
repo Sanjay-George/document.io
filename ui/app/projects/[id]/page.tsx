@@ -17,6 +17,13 @@ import { Button } from "@heroui/button";
 import ButtonAccent from '@/components/ButtonAccent';
 import ButtonSecondary from '@/components/ButtonSecondary';
 import ButtonPrimary from '@/components/ButtonPrimary';
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter
+} from "@heroui/modal";
 
 
 export default function ProjectDetails({ params }: { params: { id: string } }) {
@@ -97,10 +104,29 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                     documentationId={selectedDocumentation}
                     postSubmit={() => setIsModalOpen(false)} />
             </Modal>
+            
 
             <Modal open={isImportModalOpen} footer={null} onCancel={handleImportModalCancel}>
                 <ImportForm documentationId={projectId} postSubmit={() => setImportModalOpen(false)} />
             </Modal> */}
+
+            <Modal isOpen={isModalOpen} onClose={handleCancel} size="xl">
+                <ModalContent>
+                    <ModalBody>
+                        <Form projectId={projectId}
+                            documentationId={selectedDocumentation}
+                            postSubmit={() => setIsModalOpen(false)} />
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
+
+            <Modal isOpen={isImportModalOpen} onClose={handleImportModalCancel} size="xl">
+                <ModalContent>
+                    <ModalBody>
+                        <ImportForm documentationId={projectId} postSubmit={() => setImportModalOpen(false)} />
+                    </ModalBody>
+                </ModalContent>
+            </Modal>
         </>
     );
 }
