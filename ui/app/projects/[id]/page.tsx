@@ -79,7 +79,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                         </button>
                     </Tooltip>
 
-                    <ButtonSecondary text="Upload Media" icon={<Video size={18} />}
+                    <ButtonSecondary text="Upload Assets" icon={<Video size={18} />}
                         href={`/projects/${projectId}/upload`}
                     />
 
