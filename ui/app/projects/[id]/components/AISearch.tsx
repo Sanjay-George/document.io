@@ -36,8 +36,8 @@ export default function AISearch({ projectName }: { projectName?: string }) {
                     {(onClose) => (
                         <>
                             <DrawerHeader className="flex flex-col mb-4 pb-0">
-                                <p className="font-bold text-sm uppercase text-primary mb-1">AI Search</p>
-                                <p className=" text-slate-400 font-light">Search this project with AI and create custom userflow documentations.</p>
+                                <p className="font-bold text-xs uppercase text-primary mb-1">AI Search</p>
+                                <p className="text-slate-400 font-light text-sm">Search this project with AI and create custom userflow documentations.</p>
                             </DrawerHeader>
                             <DrawerBody className="pt-0">
                                 <Chat projectName={projectName} />

@@ -6,10 +6,11 @@ import { mutate } from "swr";
 import { ALL_DOCUMENTATIONS_KEY } from "@/data_access/swr/documentations";
 
 export default function ImportForm({ documentationId, postSubmit }: { documentationId: string, postSubmit: () => void }) {
-    const [docData, setDocData] = useState(null) as any;
+    const [docData, setDocData] = useState('') as any;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!docData) return;
         await importData(documentationId, JSON.parse(docData));
         mutate(ALL_DOCUMENTATIONS_KEY(documentationId));
         setDocData('');
