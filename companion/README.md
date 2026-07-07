@@ -13,9 +13,11 @@ More functionalities are [showcased here...](https://github.com/Sanjay-George/do
 
 #### 1. Clone the repository
 
+The companion lives inside the [document.io](https://github.com/Sanjay-George/document.io) repo under `companion/`.
+
 ```bash
-git clone https://github.com/Sanjay-George/document.io-companion.git
-cd document.io-companion
+git clone https://github.com/Sanjay-George/document.io.git
+cd document.io/companion
 ```
 
 #### 2. Install dependencies
