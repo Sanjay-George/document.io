@@ -1,0 +1,49 @@
+{
+    "manifest_version": 3,
+    "name": "Document.io Companion",
+    "version": "1.0",
+    "description": "The companion extension for Document.io which allows you to manage annotations on a page",
+    "permissions": [
+        "contextMenus",
+        "tabs",
+        "activeTab",
+        "scripting",
+        "storage",
+        "webNavigation"
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'"
+    },
+    "action": {
+        "default_popup": "popup/popup.html"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [],
+            "run_at": "document_end"
+        }
+    ],
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "dist/assets/*",
+                "scripts/bridge.js"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}

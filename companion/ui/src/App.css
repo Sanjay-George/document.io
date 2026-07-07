@@ -1,0 +1,257 @@
+/* 
+----------------------
+ANNOTATION HIGHLIGHTING
+---------------------- 
+*/
+.document-io-annotated-element {
+  outline: 1px solid rgba(0, 150, 255, 0.5) !important;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.document-io-annotated-element-shadow {
+  box-shadow: 0 10px 15px -3px rgba(0, 150, 255, 0.5),
+    0 4px 6px -4px rgb(0, 150, 255, 0.5) !important;
+}
+
+.document-io-annotated-element:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 150, 255, 0.5),
+    0 4px 6px -4px rgb(0, 150, 255, 0.5) !important;
+}
+
+.document-io-hovered-element {
+  outline: 1px solid rgba(255, 0, 0, 0.5) !important;
+  transition: box-shadow 0.3s ease-in-out;
+
+}
+
+.document-io-hovered-element:hover {
+  box-shadow: 0 10px 15px -3px rgba(255, 0, 0, 0.5),
+    0 4px 6px -4px rgba(255, 0, 0, 0.5) !important;
+}
+
+.document-io-annotated-element-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: rgba(0, 150, 255, 0.5);
+  color: white;
+  padding: 0px;
+  cursor: pointer;
+}
+
+.document-io-edit-annotated-element {
+  outline: 2px dashed rgba(255, 135, 73, 0.95) !important;
+  outline-offset: 2px;
+  transition: box-shadow 0.3s ease-in-out;
+}
+
+.document-io-edit-annotated-element:hover {
+  box-shadow: 0 10px 15px -3px rgba(255, 135, 73, 0.35),
+    0 4px 6px -4px rgba(255, 135, 73, 0.35) !important;
+}
+
+.document-io-edit-annotated-icon {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background-color: #ffffff;
+  border: 1px solid rgba(255, 135, 73, 0.9);
+  border-radius: 4px;
+  color: #ff8749;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+  padding: 0px;
+  cursor: pointer;
+}
+
+
+/* 
+  ----------------------
+  MARKDOWN EDITOR STYLES
+  ---------------------- 
+  */
+div.w-md-editor-preview {
+  * {
+    color: var(--var-slate-900);
+    font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  }
+
+  & ul {
+    /* margin-left: 0 !important; */
+    list-style-type: disc !important;
+
+    ul {
+      list-style-type: circle !important;
+
+      ul {
+        list-style-type: square !important;
+
+        ul {
+          list-style-type: disc !important;
+
+          ul {
+            list-style-type: circle !important;
+
+            ul {
+              list-style-type: square !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  & ol {
+    /* margin-left: 0 !important; */
+    list-style-type: decimal !important;
+
+    ol {
+      list-style-type: lower-alpha !important;
+
+      ol {
+        list-style-type: lower-roman !important;
+
+        ol {
+          list-style-type: upper-alpha !important;
+
+          ol {
+            list-style-type: upper-roman !important;
+          }
+        }
+      }
+    }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+  }
+
+  th,
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+
+  ul,
+  ol {
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 5px;
+  }
+
+  li p {
+    margin-bottom: 0;
+  }
+
+  input[type="checkbox"] {
+    margin-right: 5px;
+    transform: scale(1.2);
+  }
+
+  blockquote {
+    border-left: 4px solid #ccc;
+    padding-left: 10px;
+    color: #666;
+    font-style: italic;
+    margin: 2rem 0;
+  }
+
+  pre {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1rem 0;
+  }
+
+  code {
+    font-family: 'Courier New', monospace;
+    padding: 2px 4px;
+    border-radius: 3px;
+  }
+
+  a {
+    color: #007bff;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  p {
+    margin-bottom: 1rem;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  h1:first-child {
+    margin-top: 0;
+  }
+
+}
+
+div.w-md-editor-area.w-md-editor-input {
+  * {
+    color: var(--var-slate-900);
+    font-size: var(--var-text-base) !important;
+  }
+
+  .w-md-editor-text,
+  .w-md-editor-text pre,
+  .w-md-editor-text code {
+    min-height: 100% !important;
+  }
+
+  & textarea {
+    background: transparent !important;
+    border: 0px none rgb(36, 41, 47) !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* 
+  ----------------------
+  MARKDOWN RENDERER STYLES
+  ---------------------- 
+  */
+.md-renderer {
+  p {
+    margin-bottom: 0.5rem;
+  }
+}
+
+
+@keyframes pulsing {
+
+  0%,
+  100% {
+    background-color: var(--var-slate-400)
+  }
+
+  50% {
+    background-color: var(--var-slate-300);
+  }
+}
+
+.pulsing-animation {
+  animation: pulsing 1.5s infinite;
+}
