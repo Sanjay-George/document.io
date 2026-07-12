@@ -101,3 +101,21 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+
+/* ===== Landing page (Landing.dc.html port) animations ===== */
+@keyframes lp-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes lp-rise { 0% { opacity: 0; transform: translateY(16px) } 100% { opacity: 1; transform: none } }
+@keyframes lp-ring { 0%, 18% { opacity: 0; transform: scale(.7) } 28% { opacity: 1; transform: scale(1.06) } 36%, 100% { opacity: 1; transform: scale(1) } }
+@keyframes lp-badge { 0%, 20% { opacity: 0; transform: scale(.4) } 30% { opacity: 1; transform: scale(1.18) } 38% { transform: scale(1) } 88% { opacity: 1; transform: scale(1) } 96%, 100% { opacity: 0; transform: scale(.9) } }
+@keyframes lp-badge-pulse { 0%, 55%, 100% { box-shadow: 0 3px 10px rgba(221,98,52,.4) } 62% { box-shadow: 0 0 0 7px rgba(221,98,52,0) } }
+@keyframes lp-pop { 0%, 34% { opacity: 0; transform: translateY(10px) scale(.96) } 46% { opacity: 1; transform: none } 86% { opacity: 1; transform: none } 94%, 100% { opacity: 0; transform: translateY(6px) scale(.98) } }
+@keyframes lp-cursor { 0% { opacity: 0; top: 64%; left: 20% } 10% { opacity: 1 } 22% { top: 52%; left: 34% } 30% { transform: scale(.82) } 34% { transform: scale(1) } 70% { opacity: 1; top: 52%; left: 34% } 92%, 100% { opacity: 0; top: 52%; left: 34% } }
+@keyframes lp-type { 0%, 44% { width: 0 } 56% { width: 100% } 100% { width: 100% } }
+
+/* ===== Hub screens (Hub v2.dc.html port) animations ===== */
+@keyframes dio-pop { 0% { opacity: 0; transform: translateY(6px) scale(.985) } 100% { opacity: 1; transform: none } }
+@keyframes dio-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes dio-toast { 0% { opacity: 0; transform: translate(-50%, 8px) } 100% { opacity: 1; transform: translate(-50%, 0) } }
+@keyframes dio-spin { to { transform: rotate(360deg) } }
+@keyframes dio-rise { 0% { opacity: 0; transform: translateY(14px) scale(.96) } 100% { opacity: 1; transform: none } }

@@ -270,11 +270,11 @@ export default function Chat({ projectName }: { projectName?: string }) {
                         />
                         {
                             messages.length > MESSAGE_LIMIT ? (
-                                <Button className="bg-primary hover:bg-primary/80 hover:cursor-pointer" onClick={() => window.location.reload()} type="button">
+                                <Button className="bg-[#DD6234] hover:bg-[#C9542A] text-white hover:cursor-pointer" onClick={() => window.location.reload()} type="button">
                                     <RefreshCcw />
                                 </Button>
                             ) : (
-                                <Button className="bg-primary hover:bg-primary/80 hover:cursor-pointer" type="submit" disabled={!input.trim() || isLoading}>
+                                <Button className="bg-[#DD6234] hover:bg-[#C9542A] text-white hover:cursor-pointer" type="submit" disabled={!input.trim() || isLoading}>
                                     <Send />
                                 </Button>
                             )

@@ -1,121 +1,136 @@
 "use client";
 
-import { Library, Search, Video } from 'lucide-react';
-import H2 from "@/components/H2";
-import PrimaryBtn from "@/components/ButtonPrimary";
-import Form from "./components/Form";
-import { useProject } from "@/data_access/swr/projects";
-import Spinner from "@/components/icons/spinner";
-import RightArrowIcon from "@/components/icons/right_arrow";
 import { use, useState } from "react";
+import { mutate } from "swr";
+import { Plus, Upload, Download } from "lucide-react";
+import { useProject, SINGLE_PROJECT_KEY, ALL_PROJECTS_KEY } from "@/data_access/swr/projects";
+import { edit } from "@/data_access/api/projects";
 import { useDocumentations } from "@/data_access/swr/documentations";
-import { Tooltip } from "@heroui/tooltip"
-import ImportForm from "./components/ImportForm";
-import ImportIcon from "@/components/icons/import_icon";
 import List from "./components/List";
-import { Button } from "@heroui/button";
-import ButtonAccent from '@/components/ButtonAccent';
-import ButtonSecondary from '@/components/ButtonSecondary';
-import ButtonPrimary from '@/components/ButtonPrimary';
+import Form from "./components/Form";
+import ImportForm from "./components/ImportForm";
+import AISearch from "./components/AISearch";
 import {
-    Modal,
-    ModalContent,
+    HubModal,
     ModalHeader,
-    ModalBody,
-    ModalFooter
-} from "@heroui/modal";
-import AISearch from './components/AISearch';
+    Breadcrumb,
+    StatusPill,
+    Button,
+    SectionHeader,
+    EmptyState,
+    Spinner,
+    useHubToast,
+} from "@/components/hub";
 
+const slugify = (n?: string) =>
+    (n || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 export default function ProjectDetails({ params }: { params: { id: string } }) {
-    const projectId = use(params)?.id;
-    const { data: projectData, isLoading: isProjectLoading } = useProject(projectId as any);
-    const { data: documentations, isLoading: isDocumentationLoading } = useDocumentations(projectId as any);
+    const projectId = use(params as any)?.id as string;
+    const { data: project, isLoading: projectLoading } = useProject(projectId as any);
+    const { data: docs, isLoading: docsLoading } = useDocumentations(projectId as any);
+    const { toast } = useHubToast();
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isImportModalOpen, setImportModalOpen] = useState(false);
-    const [selectedDocumentation, setSelectedDocumentation] = useState<null | string>(null);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editDocId, setEditDocId] = useState<string | null>(null);
+    const [importOpen, setImportOpen] = useState(false);
 
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-    const handleCancel = () => {
-        setIsModalOpen(false);
-        setSelectedDocumentation(null);
-    };
-    const handleAddClick = () => {
-        console.log('Add documentation');
-        setSelectedDocumentation(null);
-        showModal();
-    };
-    const handleEditClick = (id: string) => {
-        console.log('Edit documentation', id);
-        setSelectedDocumentation(id);
-        showModal();
+    const active = project?.status === "Active";
+
+    const toggleActive = async () => {
+        if (!project) return;
+        const status = active ? "Inactive" : "Active";
+        await edit(projectId, { title: project.title, description: project.description, status });
+        mutate(SINGLE_PROJECT_KEY(projectId));
+        mutate(ALL_PROJECTS_KEY);
+        toast(status === "Active" ? "Project set active" : "Project set inactive");
     };
 
-    const handleImportModalCancel = () => {
-        setImportModalOpen(false);
+    const openNewDoc = () => {
+        setEditDocId(null);
+        setModalOpen(true);
+    };
+    const openEditDoc = (id: string) => {
+        setEditDocId(id);
+        setModalOpen(true);
+    };
+    const closeModal = () => setModalOpen(false);
+
+    if (projectLoading) {
+        return (
+            <div className="hub-container hub-container--detail">
+                <Spinner />
+            </div>
+        );
     }
-    const handleImportClick = () => {
-        setImportModalOpen(true);
-    }
 
+    const list: any[] = docs || [];
 
-    if (isProjectLoading || isDocumentationLoading) {
-        return <Spinner />;
-    }
     return (
-        <>
-            <div className="flex justify-between">
-                <div>
-                    <H2>{projectData?.title}</H2>
+        <div className="hub-container hub-container--detail">
+            <Breadcrumb
+                items={[
+                    { label: "projects", href: "/projects" },
+                    { label: slugify(project?.title), current: true },
+                ]}
+            />
+
+            {/* header */}
+            <div className="hub-detail-head">
+                <div style={{ minWidth: 0 }}>
+                    <div className="hub-detail-title-row">
+                        <h1 className="hub-detail-h1">{project?.title}</h1>
+                        <StatusPill active={active} onClick={toggleActive} />
+                    </div>
+                    {project?.description && <p className="hub-detail-lead">{project.description}</p>}
                 </div>
-                <div className="inline-flex space-x-1 items-center">
-                    <Tooltip content="Import data" placement="left" offset={-10}>
-                        <button className=" text-slate-400 px-3 py-2 hover:text-slate-700"
-                            onClick={handleImportClick}>
-                            <ImportIcon />
-                        </button>
-                    </Tooltip>
-
-                    <ButtonSecondary text="Upload Assets" icon={<Video size={18} />}
-                        href={`/projects/${projectId}/upload`}
-                    />
-
-                    <ButtonPrimary text="Add documentation"
-                        icon={<Library size={18} />}
-                        onClick={handleAddClick} />
-
+                <div className="hub-detail-actions">
+                    <Button variant="ghost" icon={<Download size={15} />} onClick={() => setImportOpen(true)}>
+                        Import
+                    </Button>
+                    <Button variant="ghost" icon={<Upload size={15} />} href={`/projects/${projectId}/upload`}>
+                        Upload assets
+                    </Button>
+                    <Button variant="primary" icon={<Plus size={16} strokeWidth={2.2} />} onClick={openNewDoc}>
+                        Add documentation
+                    </Button>
                 </div>
-
             </div>
 
-            <div>
-                <p className="mb-4 pb-2 text-slate-400 font-light ">{projectData?.description}</p>
-            </div>
+            {/* guides section */}
+            <SectionHeader label="Guides" meta={`${list.length} ${list.length === 1 ? "guide" : "guides"}`} />
 
-            <List projectId={projectId} onRowEdit={handleEditClick} />
+            {docsLoading ? (
+                <Spinner />
+            ) : list.length === 0 ? (
+                <EmptyState
+                    variant="detail"
+                    title="No guides yet"
+                    body="Each guide points at a real URL. Add one, then open it to annotate the live page."
+                    action={
+                        <Button variant="dark" onClick={openNewDoc}>
+                            Add documentation
+                        </Button>
+                    }
+                />
+            ) : (
+                <List projectId={projectId} documentations={list} onEdit={openEditDoc} />
+            )}
 
-            <Modal isOpen={isModalOpen} onClose={handleCancel} size="xl">
-                <ModalContent>
-                    <ModalBody>
-                        <Form projectId={projectId}
-                            documentationId={selectedDocumentation}
-                            postSubmit={() => setIsModalOpen(false)} />
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+            {/* composer */}
+            <HubModal open={modalOpen} onClose={closeModal}>
+                <Form projectId={projectId} documentationId={editDocId} onClose={closeModal} />
+            </HubModal>
 
-            <Modal isOpen={isImportModalOpen} onClose={handleImportModalCancel} size="xl">
-                <ModalContent>
-                    <ModalBody>
-                        <ImportForm documentationId={projectId} postSubmit={() => setImportModalOpen(false)} />
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+            {/* import */}
+            <HubModal open={importOpen} onClose={() => setImportOpen(false)}>
+                <ModalHeader title="Import data" onClose={() => setImportOpen(false)} />
+                <div className="hub-modal-body">
+                    <ImportForm documentationId={projectId} postSubmit={() => setImportOpen(false)} />
+                </div>
+            </HubModal>
 
-            <AISearch projectName={projectData?.title} />
-        </>
+            <AISearch projectName={project?.title} />
+        </div>
     );
 }
