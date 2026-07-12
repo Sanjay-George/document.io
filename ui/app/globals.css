@@ -1,96 +1,14 @@
+@import "./tokens.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
-
-body {
-  /* background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb)); */
-}
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
-
-
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 196, 100%, 31%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 20, 100%, 64%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
-}
-
-
 
 @layer base {
   * {
@@ -108,7 +26,7 @@ body {
 @keyframes lp-rise { 0% { opacity: 0; transform: translateY(16px) } 100% { opacity: 1; transform: none } }
 @keyframes lp-ring { 0%, 18% { opacity: 0; transform: scale(.7) } 28% { opacity: 1; transform: scale(1.06) } 36%, 100% { opacity: 1; transform: scale(1) } }
 @keyframes lp-badge { 0%, 20% { opacity: 0; transform: scale(.4) } 30% { opacity: 1; transform: scale(1.18) } 38% { transform: scale(1) } 88% { opacity: 1; transform: scale(1) } 96%, 100% { opacity: 0; transform: scale(.9) } }
-@keyframes lp-badge-pulse { 0%, 55%, 100% { box-shadow: 0 3px 10px rgba(221,98,52,.4) } 62% { box-shadow: 0 0 0 7px rgba(221,98,52,0) } }
+@keyframes lp-badge-pulse { 0%, 55%, 100% { box-shadow: 0 3px 10px hsl(var(--brand) / .4) } 62% { box-shadow: 0 0 0 7px hsl(var(--brand) / 0) } }
 @keyframes lp-pop { 0%, 34% { opacity: 0; transform: translateY(10px) scale(.96) } 46% { opacity: 1; transform: none } 86% { opacity: 1; transform: none } 94%, 100% { opacity: 0; transform: translateY(6px) scale(.98) } }
 @keyframes lp-cursor { 0% { opacity: 0; top: 64%; left: 20% } 10% { opacity: 1 } 22% { top: 52%; left: 34% } 30% { transform: scale(.82) } 34% { transform: scale(1) } 70% { opacity: 1; top: 52%; left: 34% } 92%, 100% { opacity: 0; top: 52%; left: 34% } }
 @keyframes lp-type { 0%, 44% { width: 0 } 56% { width: 100% } 100% { width: 100% } }

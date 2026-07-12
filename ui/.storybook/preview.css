@@ -1,5 +1,7 @@
 /* Storybook-only styling: font-var fallbacks + the keyframes hub.css relies on.
    (globals.css isn't imported here because it uses @tailwind directives.) */
+@import "../app/tokens.css";
+
 :root {
     --font-instrument: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
     --font-jetbrains: "JetBrains Mono", ui-monospace, monospace;

@@ -22,8 +22,8 @@ export default function AISearch({ projectName }: { projectName?: string }) {
             <Button
                 onPress={() => setIsOpen(true)}
                 isIconOnly
-                className="fixed bottom-6 right-6 z-50 shadow-xl bg-[#DD6234] hover:bg-[#C9542A]
-                text-white border-none rounded-full" variant="solid" size="lg">
+                className="fixed bottom-6 right-6 z-50 shadow-xl bg-primary hover:bg-primary-hover
+                text-primary-foreground border-none rounded-full" variant="solid" size="lg">
                 <Bot size={20} />
             </Button>
 
@@ -36,8 +36,8 @@ export default function AISearch({ projectName }: { projectName?: string }) {
                     {(onClose) => (
                         <>
                             <DrawerHeader className="flex flex-col mb-4 pb-0">
-                                <p className="font-bold text-xs uppercase text-[#DD6234] mb-1">AI Search</p>
-                                <p className="text-slate-400 font-light text-sm">Search this project with AI and create custom userflow documentations.</p>
+                                <p className="font-bold text-xs uppercase text-primary mb-1">AI Search</p>
+                                <p className="text-muted-foreground font-light text-sm">Search this project with AI and create custom userflow documentations.</p>
                             </DrawerHeader>
                             <DrawerBody className="pt-0">
                                 <Chat projectName={projectName} />
