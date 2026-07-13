@@ -56,7 +56,7 @@ export default function List({ projects, onEdit }: { projects: any[]; onEdit: (i
                                 <div style={{ flex: 1 }} />
                                 <KebabMenu
                                     items={[
-                                        { label: "Rename", icon: <Pencil size={ICON} />, onClick: () => onEdit(p._id) },
+                                        { label: "Edit", icon: <Pencil size={ICON} />, onClick: () => onEdit(p._id) },
                                         {
                                             label: active ? "Set inactive" : "Set active",
                                             icon: <Power size={ICON} />,

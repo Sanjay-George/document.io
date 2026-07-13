@@ -71,8 +71,8 @@ export default function List({
                         </button>
                         <KebabMenu
                             items={[
-                                { label: "Rename", icon: <Pencil size={ICON} />, onClick: () => onEdit(doc._id) },
-                                { label: "Copy data", icon: <Copy size={ICON} />, onClick: () => handleCopy(doc._id) },
+                                { label: "Edit", icon: <Pencil size={ICON} />, onClick: () => onEdit(doc._id) },
+                                { label: "Copy config (JSON)", icon: <Copy size={ICON} />, onClick: () => handleCopy(doc._id) },
                                 {
                                     label: "Delete",
                                     icon: <Trash2 size={ICON} />,
