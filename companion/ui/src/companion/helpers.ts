@@ -9,6 +9,23 @@ export function contextLabel(note: Pick<Note, 'type' | 'selector' | 'url'>): str
     return note.selector || 'element';
 }
 
+/**
+ * Reduce any URL (absolute or already-relative) to its origin-independent part:
+ * pathname + search + hash. Absolute URLs have their origin stripped; relative
+ * URLs resolve against `base` (defaults to the current page). This is what makes
+ * annotations portable across origins and keeps legacy full-URL annotations
+ * matching alongside new relative ones.
+ */
+export function toRelativeUrl(url: string, base?: string): string {
+    const resolvedBase = base ?? (typeof window !== 'undefined' ? window.location.href : undefined);
+    try {
+        const parsed = new URL(url, resolvedBase);
+        return parsed.pathname + parsed.search + parsed.hash;
+    } catch {
+        return url; // unparseable — compare as-is
+    }
+}
+
 const DEFAULT_SAFE_PROTOCOLS = ['http:', 'https:', 'mailto:'];
 
 /**

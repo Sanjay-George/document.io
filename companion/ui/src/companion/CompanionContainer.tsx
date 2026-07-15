@@ -22,7 +22,7 @@ import Toast from '@/companion/Toast';
 import ConfirmDialog from '@/companion/ConfirmDialog';
 import HostOverlay from '@/companion/HostOverlay';
 import { debounce } from '@/utils';
-import { safeUrl } from '@/companion/helpers';
+import { safeUrl, toRelativeUrl } from '@/companion/helpers';
 
 /** A freshly picked anchor target, captured from a click on the host page. */
 export type PickedTarget = {
@@ -100,10 +100,13 @@ export default function CompanionContainer() {
 
     // ---- Notes derived from annotations + live-DOM flags ----
     const notes: Note[] = useMemo(() => {
+        // Match on the origin-independent path so notes stay attached when a
+        // documentation moves between domains (localhost → dev-server, etc.).
+        const here = toRelativeUrl(window.location.href);
         const resolves = (a: Annotation): boolean => {
             try {
                 if (a.type === 'page') {
-                    return a.url === window.location.href && document.querySelector(a.target) !== null;
+                    return toRelativeUrl(a.url) === here && document.querySelector(a.target) !== null;
                 }
                 return document.querySelector(a.target) !== null;
             } catch {
@@ -112,7 +115,7 @@ export default function CompanionContainer() {
         };
         const flagsFor = (a: Annotation): NoteFlags => {
             if (resolves(a)) return { onPage: true, broken: false };
-            if (a.url === window.location.href) return { onPage: true, broken: true };
+            if (toRelativeUrl(a.url) === here) return { onPage: true, broken: true };
             return { onPage: false, broken: false };
         };
         return toNotes(annotations, flagsFor);

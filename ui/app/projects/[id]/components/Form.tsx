@@ -81,6 +81,8 @@ export default function Form({
                 </div>
                 <div className="hub-field-hint">
                     Opening this guide launches the target in your browser with the companion active.
+                    Notes attach to the path only, so you can change the domain (e.g. localhost → a
+                    dev server) here and your annotations move with it.
                 </div>
 
                 <div className="hub-modal-foot">

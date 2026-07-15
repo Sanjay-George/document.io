@@ -139,7 +139,9 @@ export default function HostOverlay({
             e.preventDefault();
             e.stopPropagation();
             el.classList.remove(HOVERED_ELEMENT_CLASS);
-            onPickTarget({ selector: getQuerySelector(el), url: window.location.href, type: 'component' });
+            // Store the origin-independent path so the note survives an origin change.
+            const relativeUrl = window.location.pathname + window.location.search + window.location.hash;
+            onPickTarget({ selector: getQuerySelector(el), url: relativeUrl, type: 'component' });
         };
 
         document.addEventListener('mouseover', onOver, { passive: true });
