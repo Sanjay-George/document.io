@@ -22,11 +22,13 @@ import Toast from '@/companion/Toast';
 import ConfirmDialog from '@/companion/ConfirmDialog';
 import HostOverlay from '@/companion/HostOverlay';
 import { debounce } from '@/utils';
+import { AnchorMeta, resolveAnchoredElement } from '@/utils/anchor';
 import { safeUrl, toRelativeUrl } from '@/companion/helpers';
 
 /** A freshly picked anchor target, captured from a click on the host page. */
 export type PickedTarget = {
     selector: string;
+    anchor: AnchorMeta;
     url: string;
     type: NoteType;
 };
@@ -106,9 +108,9 @@ export default function CompanionContainer() {
         const resolves = (a: Annotation): boolean => {
             try {
                 if (a.type === 'page') {
-                    return toRelativeUrl(a.url) === here && document.querySelector(a.target) !== null;
+                    return toRelativeUrl(a.url) === here && resolveAnchoredElement(a.target, a.anchor) !== null;
                 }
-                return document.querySelector(a.target) !== null;
+                return resolveAnchoredElement(a.target, a.anchor) !== null;
             } catch {
                 return false;
             }
@@ -139,7 +141,7 @@ export default function CompanionContainer() {
         const allResolved = () =>
             annotations.every((a) => {
                 try {
-                    return document.querySelector(a.target) !== null;
+                    return resolveAnchoredElement(a.target, a.anchor) !== null;
                 } catch {
                     return true; // invalid selector — stop watching
                 }
@@ -286,6 +288,7 @@ export default function CompanionContainer() {
                 title: noteTitle,
                 value: input.value,
                 target: input.target,
+                anchor: input.anchor,
                 url: input.url,
                 type: input.type,
                 created: new Date(),
@@ -308,6 +311,7 @@ export default function CompanionContainer() {
                 await updateAnnotation(reanchorId, {
                     ...existing,
                     target: target.selector,
+                    anchor: target.anchor,
                     url: target.url,
                     type: target.type,
                     updated: new Date(),
@@ -323,7 +327,7 @@ export default function CompanionContainer() {
         }
         setComposer({
             editingId: null,
-            draft: { type: target.type, selector: target.selector, url: target.url, title: '', body: '' },
+            draft: { type: target.type, selector: target.selector, anchor: target.anchor, url: target.url, title: '', body: '' },
         });
     };
 
@@ -413,7 +417,6 @@ export default function CompanionContainer() {
 
             {minimized && (
                 <MinimizedPill
-                    count={onPageHealthy.length}
                     mode={mode}
                     onModeChange={setMode}
                     onRestore={() => setMinimized(false)}
@@ -428,6 +431,7 @@ export default function CompanionContainer() {
                 onSelectNote={selectNote}
                 onCloseSelected={() => setSelectedId(null)}
                 onEditNote={editNote}
+                onReanchorNote={startReanchor}
                 onDeleteNote={deleteNote}
                 onPickTarget={handlePickTarget}
             />
