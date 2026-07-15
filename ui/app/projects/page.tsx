@@ -11,7 +11,7 @@ type Filter = "all" | "active" | "inactive";
 
 export default function ProjectsHub() {
     const { data, isLoading } = useProjects();
-    const [filter, setFilter] = useState<Filter>("all");
+    const [filter, setFilter] = useState<Filter>("active");
     const [search, setSearch] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
     const [editId, setEditId] = useState<string | null>(null);
@@ -63,14 +63,14 @@ export default function ProjectsHub() {
             {/* controls */}
             <div className="hub-controls">
                 <div className="hub-filters">
-                    <button className={`hub-filter${filter === "all" ? " active" : ""}`} onClick={() => setFilter("all")}>
-                        all · {countAll}
-                    </button>
                     <button className={`hub-filter${filter === "active" ? " active" : ""}`} onClick={() => setFilter("active")}>
                         active · {countActive}
                     </button>
                     <button className={`hub-filter${filter === "inactive" ? " active" : ""}`} onClick={() => setFilter("inactive")}>
                         inactive · {countInactive}
+                    </button>
+                     <button className={`hub-filter${filter === "all" ? " active" : ""}`} onClick={() => setFilter("all")}>
+                        all · {countAll}
                     </button>
                 </div>
                 <div className="hub-search-wrap">
