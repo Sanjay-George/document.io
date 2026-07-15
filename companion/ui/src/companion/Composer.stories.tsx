@@ -56,11 +56,19 @@ export const EditNote: Story = {
     ),
 };
 
-export const WholePageNote: Story = {
+/** Scope generalised with a wildcard so the note covers a page across ids. */
+export const WildcardPageScope: Story = {
     render: () => (
         <ComposerHarness
-            mode="new"
-            initial={{ type: 'page', selector: '', url: 'halyard.app/deployments', title: '', body: '' }}
+            mode="edit"
+            initial={{
+                type: 'component',
+                selector: 'div.col-md-6:nth-of-type(2) > div.card',
+                url: '/en/test-page/abcdef123456',
+                urlPattern: '/en/commonality/report/commonality/*',
+                title: 'Commonality Matrix',
+                body: 'For each product selected, it shows the commonality rate with each other.',
+            }}
         />
     ),
 };

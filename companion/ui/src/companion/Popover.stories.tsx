@@ -7,7 +7,7 @@ const noop = () => {};
 const meta = {
     title: 'Companion/Components/Popover',
     component: Popover,
-    args: { onClose: noop, onEdit: noop, onDelete: noop },
+    args: { onClose: noop, onEdit: noop, onReanchor: noop, onDelete: noop },
     // Popover is position:fixed; render it relative to the story frame instead.
     decorators: [(Story) => <div className="relative h-[320px] w-[340px]">{Story()}</div>],
 } satisfies Meta<typeof Popover>;

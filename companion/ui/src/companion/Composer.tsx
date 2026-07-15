@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Draft } from '@/companion/types';
 import { contextLabel } from '@/companion/helpers';
-import Checkbox from '@/companion/Checkbox';
 import FormatToolbar, { type FormatToken } from '@/companion/FormatToolbar';
+import PageScopeEditor from '@/companion/PageScopeEditor';
 import { CloseIcon, ComponentIcon, FormatIcon, PageIcon } from '@/companion/icons';
 
 type Props = {
@@ -24,8 +24,8 @@ const SNIPPETS = new Map<FormatToken, string>([
 ]);
 
 /**
- * New / Edit note composer (README §7). Surfaces the real anchor target, a
- * title + body, an optional Markdown toolbar, and the "Whole page" scope toggle.
+ * New / Edit note composer (README §7). Surfaces the real anchor target, the
+ * page-scope editor, a title + body, and an optional Markdown toolbar.
  */
 export default function Composer({ mode, draft, onChange, onSave, onClose }: Props) {
     const [showFmt, setShowFmt] = useState(false);
@@ -72,6 +72,15 @@ export default function Composer({ mode, draft, onChange, onSave, onClose }: Pro
                         </code>
                     </div>
 
+                    {/* page scope — click segments to wildcard which URL(s) apply */}
+                    <div className="mt-3">
+                        <PageScopeEditor
+                            url={draft.url}
+                            value={draft.urlPattern}
+                            onChange={(urlPattern) => onChange({ urlPattern })}
+                        />
+                    </div>
+
                     <input
                         value={draft.title}
                         onChange={(e) => onChange({ title: e.target.value })}
@@ -89,21 +98,14 @@ export default function Composer({ mode, draft, onChange, onSave, onClose }: Pro
                     {showFmt && <FormatToolbar onInsert={insert} />}
 
                     <div className="mt-4 flex items-center justify-between">
-                        <div className="flex items-center gap-[14px]">
-                            <button
-                                type="button"
-                                onClick={() => setShowFmt((v) => !v)}
-                                className="inline-flex cursor-pointer items-center gap-[5px] border-none bg-transparent p-0 font-dio-ui text-[12.5px] font-semibold text-dio-muted hover:text-dio-secondary"
-                            >
-                                <FormatIcon size={15} />
-                                Format
-                            </button>
-                            <Checkbox
-                                checked={isPage}
-                                onChange={(checked) => onChange({ type: checked ? 'page' : 'component' })}
-                                label="Whole page"
-                            />
-                        </div>
+                        <button
+                            type="button"
+                            onClick={() => setShowFmt((v) => !v)}
+                            className="inline-flex cursor-pointer items-center gap-[5px] border-none bg-transparent p-0 font-dio-ui text-[12.5px] font-semibold text-dio-muted hover:text-dio-secondary"
+                        >
+                            <FormatIcon size={15} />
+                            Format
+                        </button>
                         <button
                             type="button"
                             onClick={onSave}

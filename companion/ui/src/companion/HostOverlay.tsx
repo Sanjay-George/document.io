@@ -3,7 +3,7 @@ import { Mode, Note, Placement } from '@/companion/types';
 import Badge from '@/companion/Badge';
 import HighlightRing from '@/companion/HighlightRing';
 import Popover from '@/companion/Popover';
-import { getQuerySelector } from '@/utils';
+import { buildAnchor, resolveAnchoredElement } from '@/utils/anchor';
 import { isHighlightable } from '@/utils/annotations';
 import { HOVERED_ELEMENT_CLASS, MODAL_ROOT_ID } from '@/utils/constants';
 import type { PickedTarget } from '@/companion/CompanionContainer';
@@ -21,24 +21,21 @@ type Props = {
     onSelectNote: (id: string) => void;
     onCloseSelected: () => void;
     onEditNote: (id: string) => void;
+    onReanchorNote: (id: string) => void;
     onDeleteNote: (id: string) => void;
     onPickTarget: (target: PickedTarget) => void;
 };
 
 type RectInfo = { top: number; left: number; width: number; height: number; radius: string };
 
-/** Measure a selector against the live DOM in viewport (fixed) coordinates. */
-function measure(selector: string): RectInfo | null {
-    try {
-        const el = document.querySelector<HTMLElement>(selector);
-        if (!el) return null;
-        const r = el.getBoundingClientRect();
-        if (r.width === 0 && r.height === 0) return null;
-        const radius = window.getComputedStyle(el).borderRadius || '8px';
-        return { top: r.top, left: r.left, width: r.width, height: r.height, radius };
-    } catch {
-        return null;
-    }
+/** Measure a note's anchor against the live DOM in viewport (fixed) coordinates. */
+function measure(note: Note): RectInfo | null {
+    const el = resolveAnchoredElement(note.selector, note.anchor);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) return null;
+    const radius = window.getComputedStyle(el).borderRadius || '8px';
+    return { top: r.top, left: r.left, width: r.width, height: r.height, radius };
 }
 
 /** Place the popover next to the target, flipping above when there's no room below. */
@@ -71,6 +68,7 @@ export default function HostOverlay({
     onSelectNote,
     onCloseSelected,
     onEditNote,
+    onReanchorNote,
     onDeleteNote,
     onPickTarget,
 }: Props) {
@@ -78,7 +76,7 @@ export default function HostOverlay({
 
     const recompute = useCallback(() => {
         const next = new Map<string, RectInfo | null>();
-        for (const n of notes) next.set(n.id, measure(n.selector));
+        for (const n of notes) next.set(n.id, measure(n));
         setRects(next);
     }, [notes]);
 
@@ -110,11 +108,7 @@ export default function HostOverlay({
         if (mode !== 'view' || !selectedId) return;
         const note = notes.find((n) => n.id === selectedId);
         if (!note) return;
-        try {
-            document.querySelector(note.selector)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } catch {
-            /* invalid selector — ignore */
-        }
+        resolveAnchoredElement(note.selector, note.anchor)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, [selectedId, mode, notes]);
 
     // Annotate mode: hover-highlight pickable elements + click to pick a target.
@@ -141,7 +135,9 @@ export default function HostOverlay({
             el.classList.remove(HOVERED_ELEMENT_CLASS);
             // Store the origin-independent path so the note survives an origin change.
             const relativeUrl = window.location.pathname + window.location.search + window.location.hash;
-            onPickTarget({ selector: getQuerySelector(el), url: relativeUrl, type: 'component' });
+            // Capture selector + identity signals so the note re-resolves robustly.
+            const anchor = buildAnchor(el);
+            onPickTarget({ selector: anchor.selector, anchor, url: relativeUrl, type: 'component' });
         };
 
         document.addEventListener('mouseover', onOver, { passive: true });
@@ -206,6 +202,7 @@ export default function HostOverlay({
                     style={{ left: popover.left, top: popover.top, zIndex: Z_OVERLAY + 1 }}
                     onClose={onCloseSelected}
                     onEdit={() => onEditNote(selectedNote.id)}
+                    onReanchor={() => onReanchorNote(selectedNote.id)}
                     onDelete={() => onDeleteNote(selectedNote.id)}
                 />
             )}

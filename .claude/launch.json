@@ -14,6 +14,13 @@
       "runtimeArgs": ["--prefix", "ui", "run", "storybook", "--", "--ci"],
       "port": 6006,
       "autoPort": true
+    },
+    {
+      "name": "companion-storybook",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "companion/ui", "run", "storybook", "--", "--ci"],
+      "port": 6007,
+      "autoPort": true
     }
   ]
 }

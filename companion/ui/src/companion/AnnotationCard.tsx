@@ -11,6 +11,7 @@ import {
     ChevronUpIcon,
     EditIcon,
     LinkIcon,
+    TargetIcon,
 } from '@/companion/icons';
 
 type Props = {
@@ -96,6 +97,12 @@ export default function AnnotationCard({
                             label="Edit"
                             onClick={stop(onEdit)}
                             icon={<EditIcon size={13} />}
+                            className="text-dio-tertiary hover:text-dio-primary"
+                        />
+                        <TextButton
+                            label="Re-anchor"
+                            onClick={stop(onReanchor)}
+                            icon={<TargetIcon size={13} />}
                             className="text-dio-tertiary hover:text-dio-primary"
                         />
                         <TextButton label="Delete" onClick={stop(onDelete)} className="text-[#B79A93] hover:text-dio-danger" />

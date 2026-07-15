@@ -3,13 +3,15 @@ import { Note, Placement } from '@/companion/types';
 import NumberCircle from '@/companion/NumberCircle';
 import NoteBody from '@/companion/NoteBody';
 import TextButton from '@/companion/TextButton';
-import { CloseIcon, EditIcon } from '@/companion/icons';
+import { CloseIcon, EditIcon, TargetIcon } from '@/companion/icons';
 
 type Props = {
     note: Note;
     onClose: () => void;
     onEdit: () => void;
     onDelete: () => void;
+    /** Start re-anchoring this note to a different element. */
+    onReanchor: () => void;
     /** Which side of the target the popover sits on; flips its anchor origin. */
     placement?: Placement;
     /** Fixed-position offsets supplied by the host integration. */
@@ -20,7 +22,7 @@ type Props = {
  * In-context popover shown next to the selected element in Read mode (README §6).
  * Positioning (x/y/placement) is owned by the host; this renders the card.
  */
-export default function Popover({ note, onClose, onEdit, onDelete, placement = 'below', style }: Props) {
+export default function Popover({ note, onClose, onEdit, onDelete, onReanchor, placement = 'below', style }: Props) {
     return (
         <div
             className="fixed z-[55] w-[308px]"
@@ -45,6 +47,12 @@ export default function Popover({ note, onClose, onEdit, onDelete, placement = '
                             label="Edit"
                             onClick={onEdit}
                             icon={<EditIcon size={13} />}
+                            className="text-dio-tertiary hover:text-dio-primary"
+                        />
+                        <TextButton
+                            label="Re-anchor"
+                            onClick={onReanchor}
+                            icon={<TargetIcon size={13} />}
                             className="text-dio-tertiary hover:text-dio-primary"
                         />
                         <TextButton label="Delete" onClick={onDelete} className="text-[#B79A93] hover:text-dio-danger" />

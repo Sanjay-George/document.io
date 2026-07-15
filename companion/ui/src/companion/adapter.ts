@@ -28,6 +28,7 @@ export function toNote(annotation: Annotation, n: number, flags: NoteFlags = {})
         n,
         type: annotation.type,
         selector: annotation.target,
+        anchor: annotation.anchor,
         url: annotation.url,
         title: annotation.title || renderTitleFromValue(annotation.value, TITLE_MAX) || 'Untitled note',
         body: annotation.value,
@@ -51,14 +52,16 @@ export function draftFromAnnotation(annotation: Annotation): Draft {
     return {
         type: annotation.type,
         selector: annotation.target,
+        anchor: annotation.anchor,
         url: annotation.url,
+        urlPattern: annotation.urlPattern,
         title: annotation.title ?? renderTitleFromValue(annotation.value, TITLE_MAX),
         body: annotation.value,
     };
 }
 
 /** Persisted fields produced from a composer Draft (for add/update calls). */
-export type AnnotationInput = Pick<Annotation, 'title' | 'value' | 'target' | 'url' | 'type'>;
+export type AnnotationInput = Pick<Annotation, 'title' | 'value' | 'target' | 'anchor' | 'url' | 'urlPattern' | 'type'>;
 
 /** Map a composer Draft back to the fields the data-access layer persists. */
 export function draftToAnnotationInput(draft: Draft): AnnotationInput {
@@ -66,7 +69,9 @@ export function draftToAnnotationInput(draft: Draft): AnnotationInput {
         title: draft.title,
         value: draft.body,
         target: draft.selector,
+        anchor: draft.anchor,
         url: draft.url,
+        urlPattern: draft.urlPattern,
         type: draft.type,
     };
 }

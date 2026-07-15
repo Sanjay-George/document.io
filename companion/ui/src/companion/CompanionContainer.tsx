@@ -23,7 +23,7 @@ import ConfirmDialog from '@/companion/ConfirmDialog';
 import HostOverlay from '@/companion/HostOverlay';
 import { debounce } from '@/utils';
 import { AnchorMeta, resolveAnchoredElement } from '@/utils/anchor';
-import { safeUrl, toRelativeUrl } from '@/companion/helpers';
+import { pageMatches, safeUrl, toRelativeUrl } from '@/companion/helpers';
 
 /** A freshly picked anchor target, captured from a click on the host page. */
 export type PickedTarget = {
@@ -105,20 +105,18 @@ export default function CompanionContainer() {
         // Match on the origin-independent path so notes stay attached when a
         // documentation moves between domains (localhost → dev-server, etc.).
         const here = toRelativeUrl(window.location.href);
-        const resolves = (a: Annotation): boolean => {
-            try {
-                if (a.type === 'page') {
-                    return toRelativeUrl(a.url) === here && resolveAnchoredElement(a.target, a.anchor) !== null;
-                }
-                return resolveAnchoredElement(a.target, a.anchor) !== null;
-            } catch {
-                return false;
-            }
-        };
         const flagsFor = (a: Annotation): NoteFlags => {
-            if (resolves(a)) return { onPage: true, broken: false };
-            if (toRelativeUrl(a.url) === here) return { onPage: true, broken: true };
-            return { onPage: false, broken: false };
+            // A note belongs to the page(s) it was captured on. By default that's
+            // the exact path; an optional `urlPattern` with `*` wildcards lets one
+            // note cover a family of pages (e.g. the same report across document
+            // ids) without blindly matching any page that shares a selector.
+            if (!pageMatches(here, a.url, a.urlPattern)) return { onPage: false, broken: false };
+            try {
+                const found = resolveAnchoredElement(a.target, a.anchor) !== null;
+                return { onPage: true, broken: !found };
+            } catch {
+                return { onPage: true, broken: true };
+            }
         };
         return toNotes(annotations, flagsFor);
         // eslint-disable-next-line
@@ -275,6 +273,7 @@ export default function CompanionContainer() {
                 title: noteTitle,
                 value: input.value,
                 type: input.type,
+                urlPattern: input.urlPattern,
                 updated: new Date(),
             });
             await mutate(ALL_ANNOTATIONS_KEY(documentationId));
@@ -290,6 +289,7 @@ export default function CompanionContainer() {
                 target: input.target,
                 anchor: input.anchor,
                 url: input.url,
+                urlPattern: input.urlPattern,
                 type: input.type,
                 created: new Date(),
                 updated: new Date(),
@@ -438,6 +438,7 @@ export default function CompanionContainer() {
 
             {composer && (
                 <Composer
+                    key={composer.editingId ?? 'new'}
                     mode={composer.editingId ? 'edit' : 'new'}
                     draft={composer.draft}
                     onChange={(patch) =>

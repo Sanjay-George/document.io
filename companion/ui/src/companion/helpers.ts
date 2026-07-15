@@ -26,6 +26,43 @@ export function toRelativeUrl(url: string, base?: string): string {
     }
 }
 
+const REGEX_META = /[.+?^${}()|[\]\\]/g;
+const DOUBLE_STAR = '\x00'; // sentinel for `**` — cannot occur in a URL path
+
+/**
+ * Compile a path glob to a RegExp test. `*` matches within a single path segment
+ * (no `/`); `**` matches across segments. The pattern is expected to already be
+ * origin-independent (a path, optionally with search/hash).
+ */
+export function pathMatchesPattern(pattern: string, path: string): boolean {
+    const source = pattern
+        .replace(REGEX_META, '\\$&') // escape regex metachars (leaves * and /)
+        .replace(/\*\*/g, DOUBLE_STAR) // stash cross-segment wildcard
+        .replace(/\*/g, '[^/]*') // single-segment wildcard
+        .replace(new RegExp(DOUBLE_STAR, 'g'), '.*'); // restore cross-segment wildcard
+    try {
+        return new RegExp(`^${source}$`).test(path);
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Does the current page (`here`, an origin-independent path) belong to a note
+ * captured at `url`, optionally generalised by `urlPattern`?
+ *
+ * Without a pattern this is an exact path match — a note stays on the one page it
+ * was made on. With a pattern, `*`/`**` wildcards let one note cover a family of
+ * pages (e.g. `/en/commonality/report/commonality/*` matches that report for any
+ * document id) while still excluding unrelated pages like `/…/financials/…`.
+ */
+export function pageMatches(here: string, url: string, urlPattern?: string): boolean {
+    if (urlPattern && urlPattern.trim()) {
+        return pathMatchesPattern(toRelativeUrl(urlPattern), here);
+    }
+    return toRelativeUrl(url) === here;
+}
+
 const DEFAULT_SAFE_PROTOCOLS = ['http:', 'https:', 'mailto:'];
 
 /**
