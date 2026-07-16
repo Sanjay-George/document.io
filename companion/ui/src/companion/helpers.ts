@@ -40,7 +40,7 @@ export function toRelativeUrl(url: string, base?: string): string {
     const resolvedBase = base ?? (typeof window !== 'undefined' ? window.location.href : undefined);
     try {
         const parsed = new URL(url, resolvedBase);
-        return parsed.pathname + parsed.hash;
+        return parsed.pathname;
     } catch {
         return url; // unparseable — compare as-is
     }

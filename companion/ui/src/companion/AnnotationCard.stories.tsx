@@ -37,6 +37,7 @@ export const OtherPageExpanded: Story = {
     args: { note: sampleNotes[4], selected: true, onOpen: noop },
 };
 
+/** Broken (off-anchor) note — shows the body snippet so it's identifiable before re-anchoring. */
 export const Broken: Story = {
     args: { note: sampleNotes[5], selected: false },
 };

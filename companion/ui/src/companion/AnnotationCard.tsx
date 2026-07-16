@@ -155,6 +155,12 @@ export default function AnnotationCard({
                 </div>
             )}
 
+            {broken && note.body && (
+                <div className="ml-9 mt-1.5 line-clamp-2 text-[12.5px] leading-[1.45] text-dio-muted">
+                    {snippet(note.body)}
+                </div>
+            )}
+
             {broken && (
                 <div className="ml-9 mt-[9px] flex items-start gap-2">
                     <AlertTriangleIcon size={14} className="mt-px flex-none text-dio-danger-2" />

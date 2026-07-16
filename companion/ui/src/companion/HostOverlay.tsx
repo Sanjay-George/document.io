@@ -41,6 +41,10 @@ function measure(note: Note): RectInfo | null {
 const POPOVER_W = 308;
 const VIEWPORT_MARGIN = 12;
 const ANCHOR_GAP = 8;
+const BADGE_SIZE = 22;
+/** Default pin offset — overlaps the anchor's top-left corner. */
+const BADGE_OFFSET = -11;
+const BADGE_MARGIN = 4;
 /** Height estimate used before the popover has been measured, to avoid a first-paint jump. */
 const POPOVER_EST_H = 240;
 
@@ -75,6 +79,20 @@ function computePopover(rect: RectInfo, popH: number): { left: number; top: numb
     }
     top = Math.max(VIEWPORT_MARGIN, Math.min(top, maxTop));
     return { left, top, placement };
+}
+
+/**
+ * Pin offset (relative to the anchor) that keeps the badge inside the viewport.
+ * Falls back to the default corner overlap; slides along an edge when the anchor
+ * sits against it, so the top-left-most element's pin stays on screen.
+ */
+function computeBadgeOffset(rect: RectInfo): { top: number; left: number } {
+    const clamp = (pos: number, extent: number) =>
+        Math.max(BADGE_MARGIN, Math.min(pos, extent - BADGE_SIZE - BADGE_MARGIN));
+    return {
+        top: clamp(rect.top + BADGE_OFFSET, window.innerHeight) - rect.top,
+        left: clamp(rect.left + BADGE_OFFSET, window.innerWidth) - rect.left,
+    };
 }
 
 /**
@@ -204,6 +222,7 @@ export default function HostOverlay({
                 const rect = rects.get(note.id);
                 if (!rect) return null;
                 const selected = note.id === selectedId;
+                const badge = computeBadgeOffset(rect);
                 return (
                     <div
                         key={note.id}
@@ -223,8 +242,8 @@ export default function HostOverlay({
                             state={selected ? 'selected' : 'idle'}
                             onClick={() => onSelectNote(note.id)}
                             style={{
-                                top: -11,
-                                left: -11,
+                                top: badge.top,
+                                left: badge.left,
                                 // In Annotate mode let clicks fall through to pick the element.
                                 pointerEvents: mode === 'edit' ? 'none' : 'auto',
                             }}
