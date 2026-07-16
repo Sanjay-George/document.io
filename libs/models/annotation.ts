@@ -25,6 +25,7 @@ export interface AncestorRef {
 
 export interface Annotation {
     id: string;
+    title?: string;
     value: string;
     target: string;
     anchor?: AnchorMeta;

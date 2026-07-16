@@ -51,11 +51,10 @@ export default class AnnotationDB {
             throw new Error("Invalid data");
         }
         const changes: Record<string, unknown> = {
+            title: data.title ?? null,
             value: data.value,
             target: data.target,
             url: data.url,
-            // Always write so clearing a pattern (undefined) actually removes it;
-            // callers that aren't touching scope round-trip the existing value.
             urlPattern: data.urlPattern ?? null,
             type: data.type,
             index: data.index,
