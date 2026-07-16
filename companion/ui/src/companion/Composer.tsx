@@ -67,7 +67,10 @@ export default function Composer({ mode, draft, onChange, onSave, onClose }: Pro
                         ) : (
                             <ComponentIcon size={15} className="flex-none text-dio-accent" />
                         )}
-                        <code className="flex-1 break-all font-dio-mono text-[11.5px] leading-[1.5] text-dio-accent-ink-mono">
+                        <code
+                            title={contextLabel(draft)}
+                            className="min-w-0 flex-1 truncate font-dio-mono text-[11.5px] leading-[1.5] text-dio-accent-ink-mono"
+                        >
                             {contextLabel(draft)}
                         </code>
                     </div>

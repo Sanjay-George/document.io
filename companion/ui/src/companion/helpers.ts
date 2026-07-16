@@ -1,12 +1,30 @@
 import { Note } from '@/companion/types';
 
 /**
- * Context line shown on expanded cards and popovers: the element's CSS selector,
- * or the page URL for whole-page notes.
+ * Context line shown on expanded cards and popovers: a human-friendly handle for
+ * the anchored element, or the page URL for whole-page notes.
+ *
+ * Auto-generated CSS-module selectors are unreadable and often hundreds of chars
+ * long, so for element notes we prefer the anchor's identity signals (visible
+ * text, accessible name, id) and fall back to the target tag — never the raw
+ * selector chain.
  */
-export function contextLabel(note: Pick<Note, 'type' | 'selector' | 'url'>): string {
+export function contextLabel(note: Pick<Note, 'type' | 'selector' | 'url' | 'anchor'>): string {
     if (note.type === 'page') return note.url || 'this page';
-    return note.selector || 'element';
+
+    const a = note.anchor;
+    if (a) {
+        const testid = a.attributes?.['data-testid'];
+        const name = a.text || a.ariaLabel || (a.id ? `#${a.id}` : '') || testid;
+        return name ? `${a.tag} · ${name}` : a.tag;
+    }
+    return lastSelectorTag(note.selector) || 'element';
+}
+
+/** Tag of the deepest selector in a descendant chain (drops the class soup). */
+function lastSelectorTag(selector: string): string {
+    const token = selector.split(/[>+~\s]+/).filter(Boolean).pop() ?? '';
+    return token.split(/[.#:[]/)[0] || token;
 }
 
 /**
