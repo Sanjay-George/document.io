@@ -17,7 +17,7 @@ export default function TextButton({ label, onClick, icon, className = '' }: Pro
         <button
             type="button"
             onClick={onClick}
-            className={`inline-flex cursor-pointer items-center gap-[5px] border-none bg-transparent p-0 font-dio-ui text-[12.5px] font-semibold transition-colors ${className}`}
+            className={`inline-flex cursor-pointer items-center gap-[5px] whitespace-nowrap border-none bg-transparent p-0 font-dio-ui text-[12.5px] font-semibold transition-colors ${className}`}
         >
             {icon}
             {label}

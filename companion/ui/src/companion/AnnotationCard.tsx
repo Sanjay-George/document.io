@@ -10,7 +10,7 @@ import {
     ChevronRightIcon,
     ChevronUpIcon,
     EditIcon,
-    LinkIcon,
+    ExternalLinkIcon,
     TargetIcon,
 } from '@/companion/icons';
 
@@ -31,8 +31,9 @@ type Props = {
 };
 
 /**
- * A note in the docked list (README §5). Renders one of four states: collapsed,
- * expanded (selected), broken/stale, or off-page ("not on this page").
+ * A note in the docked list (README §5). Collapses/expands on click and renders
+ * a broken/stale state. Off-page notes stay expandable and editable, gaining a
+ * "Go to page" action in place of the reorder controls.
  */
 export default function AnnotationCard({
     note,
@@ -49,15 +50,15 @@ export default function AnnotationCard({
 }: Props) {
     const broken = !!note.broken;
     const otherPage = !broken && note.onPage === false;
-    const expanded = selected && !broken && !otherPage;
-    const collapsed = !selected && !broken && !otherPage;
+    const expanded = selected && !broken;
+    const collapsed = !selected && !broken;
 
     const numVariant = broken ? 'broken' : otherPage ? 'other' : selected ? 'selected' : 'idle';
 
     const container = broken
         ? 'border border-dashed border-dio-broken-border bg-dio-broken-bg'
         : otherPage
-            ? 'border border-dio-border-field bg-dio-subtle-2'
+            ? `border border-dio-border-field bg-dio-subtle-2${selected ? ' shadow-dio-card' : ''}`
             : selected
                 ? 'border border-dio-border-field bg-white shadow-dio-card'
                 : 'border border-transparent bg-transparent';
@@ -70,12 +71,19 @@ export default function AnnotationCard({
     const moveBtn =
         'flex h-[26px] w-[26px] items-center justify-center rounded-dio-tab border-none bg-transparent text-dio-tertiary hover:bg-dio-subtle disabled:cursor-not-allowed disabled:opacity-30';
 
+    const goToPage = otherPage && onOpen && (
+        <TextButton
+            label="Go to page"
+            onClick={stop(onOpen)}
+            icon={<ExternalLinkIcon size={13} />}
+            className="text-dio-tertiary hover:text-dio-primary"
+        />
+    );
+
     return (
         <div
-            onClick={otherPage ? undefined : onSelect}
-            className={`rounded-dio-card p-3 transition-[background-color,border-color] duration-150 ${
-                otherPage ? '' : 'cursor-pointer'
-            } ${container}`}
+            onClick={onSelect}
+            className={`cursor-pointer rounded-dio-card p-3 transition-[background-color,border-color] duration-150 ${container}`}
         >
             <div className="flex items-center gap-3">
                 <NumberCircle number={note.n} variant={numVariant} />
@@ -88,6 +96,8 @@ export default function AnnotationCard({
                     {snippet(note.body)}
                 </div>
             )}
+
+            {collapsed && goToPage && <div className="ml-9 mt-2">{goToPage}</div>}
 
             {expanded && (
                 <div className="ml-9 mt-[11px]">
@@ -106,50 +116,42 @@ export default function AnnotationCard({
                             className="text-dio-tertiary hover:text-dio-primary"
                         />
                         <TextButton label="Delete" onClick={stop(onDelete)} className="text-[#B79A93] hover:text-dio-danger" />
-                        {(onMoveUp || onMoveDown) && (
-                            <div className="ml-auto flex items-center gap-0.5">
+                        {otherPage ? (
+                            onOpen && (
                                 <button
                                     type="button"
-                                    title="Move up"
-                                    disabled={!canMoveUp}
-                                    onClick={stop(onMoveUp)}
-                                    className={moveBtn}
+                                    title="Go to page"
+                                    onClick={stop(onOpen)}
+                                    className={`ml-auto ${moveBtn}`}
                                 >
-                                    <ChevronUpIcon size={15} />
+                                    <ExternalLinkIcon size={15} />
                                 </button>
-                                <button
-                                    type="button"
-                                    title="Move down"
-                                    disabled={!canMoveDown}
-                                    onClick={stop(onMoveDown)}
-                                    className={moveBtn}
-                                >
-                                    <ChevronDownIcon size={15} />
-                                </button>
-                            </div>
+                            )
+                        ) : (
+                            (onMoveUp || onMoveDown) && (
+                                <div className="ml-auto flex items-center gap-0.5">
+                                    <button
+                                        type="button"
+                                        title="Move up"
+                                        disabled={!canMoveUp}
+                                        onClick={stop(onMoveUp)}
+                                        className={moveBtn}
+                                    >
+                                        <ChevronUpIcon size={15} />
+                                    </button>
+                                    <button
+                                        type="button"
+                                        title="Move down"
+                                        disabled={!canMoveDown}
+                                        onClick={stop(onMoveDown)}
+                                        className={moveBtn}
+                                    >
+                                        <ChevronDownIcon size={15} />
+                                    </button>
+                                </div>
+                            )
                         )}
                     </div>
-                </div>
-            )}
-
-            {otherPage && (
-                <div className="ml-9 mt-2">
-                    <div className="inline-flex items-center gap-1.5 rounded-dio-tab bg-white px-2 py-1 text-[11.5px] font-medium text-dio-tertiary">
-                        <LinkIcon size={12} className="flex-none" />
-                        Not on this page
-                    </div>
-                    <div className="mt-2 line-clamp-1 text-[12.5px] leading-[1.45] text-dio-muted">
-                        {snippet(note.body)}
-                    </div>
-                    {onOpen && (
-                        <div className="mt-2">
-                            <TextButton
-                                label="Open page"
-                                onClick={stop(onOpen)}
-                                className="!text-[12px] text-dio-tertiary hover:text-dio-primary"
-                            />
-                        </div>
-                    )}
                 </div>
             )}
 

@@ -27,9 +27,14 @@ export const Expanded: Story = {
     args: { note: sampleNotes[3], selected: true },
 };
 
-/** Off-page note — distinct "not on this page" state with an Open action. */
+/** Off-page note (collapsed) — shows a "Go to page" action alongside the snippet. */
 export const OtherPage: Story = {
     args: { note: sampleNotes[4], selected: false, onOpen: noop },
+};
+
+/** Off-page note (expanded) — editable/re-anchorable, with "Go to page" on the right. */
+export const OtherPageExpanded: Story = {
+    args: { note: sampleNotes[4], selected: true, onOpen: noop },
 };
 
 export const Broken: Story = {
