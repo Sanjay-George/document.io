@@ -37,6 +37,8 @@ type ComposerState = { editingId: string | null; draft: Draft } | null;
 
 const TOAST_TIMEOUT = 2600;
 const MAX_Z = 2147483647;
+/** How long to keep watching the DOM after each burst of activity (load/scroll). */
+const WATCH_WINDOW = 4000;
 
 /**
  * Data-connected root of the companion. Replaces the legacy routed App + views:
@@ -132,34 +134,76 @@ export default function CompanionContainer() {
     // ---- Live-DOM re-evaluation (ported from AnnotationListView) ----
     // Re-run the flag computation as host-page elements appear/disappear and on
     // SPA navigation, so "This page" scope and broken pins stay accurate.
+    //
+    // Anchored content arrives two ways: (1) hydration shortly after load, and
+    // (2) elements lazy-mounted on scroll (e.g. notes near the bottom of a long
+    // GitHub page). A short-lived MutationObserver catches the first; re-arming it
+    // whenever the user scrolls — while any on-page note is still unresolved —
+    // catches the second, without keeping a subtree observer running forever.
     useEffect(() => {
         if (!annotations.length) return;
         bump(); // quick first pass for static pages
 
-        const allResolved = () =>
-            annotations.every((a) => {
+        const hasUnresolvedOnPage = () => {
+            const here = toRelativeUrl(window.location.href);
+            return annotations.some((a) => {
+                if (!pageMatches(here, a.url, a.urlPattern)) return false;
                 try {
-                    return resolveAnchoredElement(a.target, a.anchor) !== null;
+                    return resolveAnchoredElement(a.target, a.anchor) === null;
                 } catch {
-                    return true; // invalid selector — stop watching
+                    return false; // unresolvable selector — never watch for it
                 }
             });
-        if (allResolved()) return;
+        };
 
         let debounceTimer: ReturnType<typeof setTimeout>;
+        let idleTimer: ReturnType<typeof setTimeout>;
+        let observing = false;
+
+        const stop = () => {
+            observer.disconnect();
+            observing = false;
+            clearTimeout(debounceTimer);
+            clearTimeout(idleTimer);
+        };
+
+        // Observe for a bounded window, extended by fresh DOM activity or scroll;
+        // give up once everything on-page resolves or the page goes quiet.
+        const arm = () => {
+            if (!observing) {
+                observer.observe(document.body, { childList: true, subtree: true });
+                observing = true;
+            }
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(stop, WATCH_WINDOW);
+        };
+
         const observer = new MutationObserver(() => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
                 bump();
-                if (allResolved()) observer.disconnect();
+                if (hasUnresolvedOnPage()) arm();
+                else stop();
             }, 150);
         });
-        observer.observe(document.body, { childList: true, subtree: true });
-        const safety = setTimeout(() => observer.disconnect(), 5000);
+
+        // Lazy content mounts as the user scrolls into it — re-arm to catch it.
+        let scrollRaf = 0;
+        const onScroll = () => {
+            if (scrollRaf) return;
+            scrollRaf = requestAnimationFrame(() => {
+                scrollRaf = 0;
+                if (hasUnresolvedOnPage()) arm();
+            });
+        };
+
+        if (hasUnresolvedOnPage()) arm();
+        window.addEventListener('scroll', onScroll, true);
+
         return () => {
-            observer.disconnect();
-            clearTimeout(debounceTimer);
-            clearTimeout(safety);
+            stop();
+            window.removeEventListener('scroll', onScroll, true);
+            if (scrollRaf) cancelAnimationFrame(scrollRaf);
         };
         // eslint-disable-next-line
     }, [annotations.length]);
