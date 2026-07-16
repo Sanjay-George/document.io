@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Draft } from '@/companion/types';
 import { contextLabel } from '@/companion/helpers';
 import FormatToolbar, { type FormatToken } from '@/companion/FormatToolbar';
@@ -31,6 +31,13 @@ export default function Composer({ mode, draft, onChange, onSave, onClose }: Pro
     const [showFmt, setShowFmt] = useState(false);
     const isPage = draft.type === 'page';
 
+    // Focus the title on open so stray keystrokes land here, not on host-page
+    // keyboard shortcuts (e.g. GitHub's "s"/"/" search) that would re-pick the anchor.
+    const titleRef = useRef<HTMLInputElement>(null);
+    useEffect(() => {
+        titleRef.current?.focus();
+    }, []);
+
     const insert = (token: FormatToken) => {
         const body = draft.body;
         const sep = body && !body.endsWith('\n') && !body.endsWith(' ') ? ' ' : '';
@@ -39,11 +46,9 @@ export default function Composer({ mode, draft, onChange, onSave, onClose }: Pro
 
     return (
         <div
-            onClick={onClose}
             className="fixed inset-0 z-[2147483002] flex items-center justify-center bg-[rgba(20,23,31,.25)] p-6 pr-[400px] backdrop-blur-[1.5px]"
         >
             <div
-                onClick={(e) => e.stopPropagation()}
                 className="animate-dio-pop-lg w-[436px] max-w-full overflow-hidden rounded-dio-modal bg-white font-dio-ui shadow-dio-composer"
             >
                 <div className="flex items-center justify-between px-[18px] pb-[14px] pt-4">
@@ -85,6 +90,7 @@ export default function Composer({ mode, draft, onChange, onSave, onClose }: Pro
                     </div>
 
                     <input
+                        ref={titleRef}
                         value={draft.title}
                         onChange={(e) => onChange({ title: e.target.value })}
                         placeholder="Title"
