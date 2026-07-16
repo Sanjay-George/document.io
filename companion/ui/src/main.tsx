@@ -41,11 +41,9 @@ shadowRoot.appendChild(appStyle);
 const rootContainer = document.createElement("div");
 shadowRoot.appendChild(rootContainer);
 
-// Keyboard events bubble out of the shadow tree to the host page, where the
-// target is retargeted to our host div (not an <input>). Host shortcut handlers
-// (e.g. GitHub's "s"/"/" search hotkeys) then fire and steal focus mid-typing.
-// Stop key events at the shadow boundary so the host never sees them; React's
-// own root listener on this container still runs, so our inputs keep working.
+// Prevent keyboard events from bubbling out of the shadow DOM to the host page. 
+// This is necessary because the host page has global keyboard shortcuts that can steal focus 
+// from the companion while typing in an input field.
 for (const type of ['keydown', 'keyup', 'keypress'] as const) {
   rootContainer.addEventListener(type, (e) => e.stopPropagation());
 }
