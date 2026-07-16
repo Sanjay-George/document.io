@@ -1,5 +1,4 @@
 import { Annotation } from '@/models/annotations';
-import { renderTitleFromValue } from '@/utils';
 import { Draft, Note } from '@/companion/types';
 
 /**
@@ -10,7 +9,7 @@ import { Draft, Note } from '@/companion/types';
  * Field mapping:
  *   Annotation.target       → Note.selector
  *   Annotation.value        → Note.body
- *   Annotation.title/value  → Note.title   (derived from value when title absent)
+ *   Annotation.title        → Note.title   ('No title' for legacy notes with none)
  *   Annotation.type         → Note.type    (same 'page' | 'component' union)
  * `n`, `onPage` and `broken` are presentation state resolved by the container
  * (list order + live-DOM matching), not stored on the annotation.
@@ -18,8 +17,6 @@ import { Draft, Note } from '@/companion/types';
 
 /** Runtime state the container resolves per annotation against the live page. */
 export type NoteFlags = { onPage?: boolean; broken?: boolean };
-
-const TITLE_MAX = 60;
 
 /** Map one persisted annotation to a numbered Note. */
 export function toNote(annotation: Annotation, n: number, flags: NoteFlags = {}): Note {
@@ -30,7 +27,7 @@ export function toNote(annotation: Annotation, n: number, flags: NoteFlags = {})
         selector: annotation.target,
         anchor: annotation.anchor,
         url: annotation.url,
-        title: annotation.title || renderTitleFromValue(annotation.value, TITLE_MAX) || 'Untitled note',
+        title: annotation.title || 'No title',
         body: annotation.value,
         onPage: flags.onPage,
         broken: flags.broken,
@@ -55,7 +52,7 @@ export function draftFromAnnotation(annotation: Annotation): Draft {
         anchor: annotation.anchor,
         url: annotation.url,
         urlPattern: annotation.urlPattern,
-        title: annotation.title ?? renderTitleFromValue(annotation.value, TITLE_MAX),
+        title: annotation.title ?? '',
         body: annotation.value,
     };
 }
