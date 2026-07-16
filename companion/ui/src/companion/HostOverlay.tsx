@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Mode, Note, Placement } from '@/companion/types';
 import Badge from '@/companion/Badge';
 import HighlightRing from '@/companion/HighlightRing';
@@ -38,18 +38,43 @@ function measure(note: Note): RectInfo | null {
     return { top: r.top, left: r.left, width: r.width, height: r.height, radius };
 }
 
-/** Place the popover next to the target, flipping above when there's no room below. */
-function computePopover(rect: RectInfo): { left: number; top: number; placement: Placement } {
-    const W = 308;
-    const margin = 12;
-    const estH = 200;
-    const left = Math.max(margin, Math.min(rect.left, window.innerWidth - W - margin));
-    const belowTop = rect.top + rect.height + 8;
-    const roomBelow = window.innerHeight - belowTop;
-    if (roomBelow >= estH || rect.top < estH) {
-        return { left, top: belowTop, placement: 'below' };
+const POPOVER_W = 308;
+const VIEWPORT_MARGIN = 12;
+const ANCHOR_GAP = 8;
+/** Height estimate used before the popover has been measured, to avoid a first-paint jump. */
+const POPOVER_EST_H = 240;
+
+/**
+ * Place the popover beside the target and fully inside the viewport. Prefers
+ * below the element, flips above when it doesn't fit, and for elements too tall
+ * to sit beside (taller than the viewport) pins it next to the visible anchor.
+ * The final top is always clamped so the card can't spill off either edge.
+ */
+function computePopover(rect: RectInfo, popH: number): { left: number; top: number; placement: Placement } {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const left = Math.max(VIEWPORT_MARGIN, Math.min(rect.left, vw - POPOVER_W - VIEWPORT_MARGIN));
+
+    const maxTop = vh - popH - VIEWPORT_MARGIN;
+    const below = rect.top + rect.height + ANCHOR_GAP;
+    const above = rect.top - ANCHOR_GAP - popH;
+
+    let top: number;
+    let placement: Placement;
+    if (below <= maxTop) {
+        top = below;
+        placement = 'below';
+    } else if (above >= VIEWPORT_MARGIN) {
+        top = above;
+        placement = 'above';
+    } else {
+        // No room beside the element (e.g. a table taller than the viewport): pin
+        // the card to the anchor's top edge and let the clamp keep it on screen.
+        top = rect.top;
+        placement = 'below';
     }
-    return { left, top: rect.top - 8, placement: 'above' };
+    top = Math.max(VIEWPORT_MARGIN, Math.min(top, maxTop));
+    return { left, top, placement };
 }
 
 /**
@@ -158,7 +183,15 @@ export default function HostOverlay({
         [selectedId, notes],
     );
     const selectedRect = selectedId ? rects.get(selectedId) ?? null : null;
-    const popover = selectedRect ? computePopover(selectedRect) : null;
+
+    // Measure the popover so it can be flipped/clamped against its real height.
+    const popoverRef = useRef<HTMLDivElement>(null);
+    const [popoverHeight, setPopoverHeight] = useState(POPOVER_EST_H);
+    useLayoutEffect(() => {
+        if (popoverRef.current) setPopoverHeight(popoverRef.current.offsetHeight);
+    }, [selectedNote]);
+
+    const popover = selectedRect ? computePopover(selectedRect, popoverHeight) : null;
 
     return (
         <>
@@ -197,6 +230,7 @@ export default function HostOverlay({
 
             {mode === 'view' && selectedNote && popover && (
                 <Popover
+                    ref={popoverRef}
                     note={selectedNote}
                     placement={popover.placement}
                     style={{ left: popover.left, top: popover.top, zIndex: Z_OVERLAY + 1 }}

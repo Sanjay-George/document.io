@@ -1,4 +1,4 @@
-import { CSSProperties } from 'react';
+import { CSSProperties, forwardRef } from 'react';
 import { Note, Placement } from '@/companion/types';
 import NumberCircle from '@/companion/NumberCircle';
 import NoteBody from '@/companion/NoteBody';
@@ -22,11 +22,16 @@ type Props = {
  * In-context popover shown next to the selected element in Read mode (README §6).
  * Positioning (x/y/placement) is owned by the host; this renders the card.
  */
-export default function Popover({ note, onClose, onEdit, onDelete, onReanchor, placement = 'below', style }: Props) {
+const Popover = forwardRef<HTMLDivElement, Props>(function Popover(
+    { note, onClose, onEdit, onDelete, onReanchor, placement = 'below', style },
+    ref,
+) {
     return (
         <div
+            ref={ref}
             className="fixed z-[55] w-[308px]"
-            style={{ ...style, transform: placement === 'above' ? 'translateY(-100%)' : undefined }}
+            // Positioned by its top edge; origin only steers the pop-in animation.
+            style={{ ...style, transformOrigin: placement === 'above' ? 'bottom left' : 'top left' }}
         >
             <div className="animate-dio-pop overflow-hidden rounded-dio-container border border-dio-border-panel bg-white font-dio-ui shadow-dio-popover">
                 <div className="flex items-center gap-[11px] px-[15px] pb-[11px] pt-[14px]">
@@ -61,4 +66,6 @@ export default function Popover({ note, onClose, onEdit, onDelete, onReanchor, p
             </div>
         </div>
     );
-}
+});
+
+export default Popover;
