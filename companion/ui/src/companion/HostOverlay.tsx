@@ -133,8 +133,8 @@ export default function HostOverlay({
             e.preventDefault();
             e.stopPropagation();
             el.classList.remove(HOVERED_ELEMENT_CLASS);
-            // Store the origin-independent path so the note survives an origin change.
-            const relativeUrl = window.location.pathname + window.location.search + window.location.hash;
+            // Store the origin-independent path (no query string)
+            const relativeUrl = window.location.pathname + window.location.hash;
             // Capture selector + identity signals so the note re-resolves robustly.
             const anchor = buildAnchor(el);
             onPickTarget({ selector: anchor.selector, anchor, url: relativeUrl, type: 'component' });

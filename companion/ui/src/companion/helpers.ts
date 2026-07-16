@@ -10,17 +10,19 @@ export function contextLabel(note: Pick<Note, 'type' | 'selector' | 'url'>): str
 }
 
 /**
- * Reduce any URL (absolute or already-relative) to its origin-independent part:
- * pathname + search + hash. Absolute URLs have their origin stripped; relative
- * URLs resolve against `base` (defaults to the current page). This is what makes
- * annotations portable across origins and keeps legacy full-URL annotations
- * matching alongside new relative ones.
+ * Reduce any URL (absolute or already-relative) to its origin-independent
+ * identity: pathname + hash. Absolute URLs have their origin stripped; relative
+ * URLs resolve against `base` (defaults to the current page).
+ *
+ * The query string is intentionally dropped: in this app query params are
+ * companion configuration (e.g. `?documentation-id=…&api-host=…`), not page
+ * identity.
  */
 export function toRelativeUrl(url: string, base?: string): string {
     const resolvedBase = base ?? (typeof window !== 'undefined' ? window.location.href : undefined);
     try {
         const parsed = new URL(url, resolvedBase);
-        return parsed.pathname + parsed.search + parsed.hash;
+        return parsed.pathname + parsed.hash;
     } catch {
         return url; // unparseable — compare as-is
     }
