@@ -184,6 +184,11 @@ export default function HostOverlay({
     );
     const selectedRect = selectedId ? rects.get(selectedId) ?? null : null;
 
+    // Step through the on-page notes in list order from the popover header.
+    const selectedIndex = notes.findIndex((n) => n.id === selectedId);
+    const prevId = selectedIndex > 0 ? notes[selectedIndex - 1].id : null;
+    const nextId = selectedIndex >= 0 && selectedIndex < notes.length - 1 ? notes[selectedIndex + 1].id : null;
+
     // Measure the popover so it can be flipped/clamped against its real height.
     const popoverRef = useRef<HTMLDivElement>(null);
     const [popoverHeight, setPopoverHeight] = useState(POPOVER_EST_H);
@@ -238,6 +243,8 @@ export default function HostOverlay({
                     onEdit={() => onEditNote(selectedNote.id)}
                     onReanchor={() => onReanchorNote(selectedNote.id)}
                     onDelete={() => onDeleteNote(selectedNote.id)}
+                    onPrev={prevId ? () => onSelectNote(prevId) : null}
+                    onNext={nextId ? () => onSelectNote(nextId) : null}
                 />
             )}
         </>

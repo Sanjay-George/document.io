@@ -3,7 +3,7 @@ import { Note, Placement } from '@/companion/types';
 import NumberCircle from '@/companion/NumberCircle';
 import NoteBody from '@/companion/NoteBody';
 import TextButton from '@/companion/TextButton';
-import { CloseIcon, EditIcon, TargetIcon } from '@/companion/icons';
+import { ChevronLeftIcon, ChevronRightIcon, CloseIcon, EditIcon, TargetIcon } from '@/companion/icons';
 
 type Props = {
     note: Note;
@@ -12,6 +12,9 @@ type Props = {
     onDelete: () => void;
     /** Start re-anchoring this note to a different element. */
     onReanchor: () => void;
+    /** Select the previous / next on-page note; null disables at the list ends. */
+    onPrev?: (() => void) | null;
+    onNext?: (() => void) | null;
     /** Which side of the target the popover sits on; flips its anchor origin. */
     placement?: Placement;
     /** Fixed-position offsets supplied by the host integration. */
@@ -23,9 +26,12 @@ type Props = {
  * Positioning (x/y/placement) is owned by the host; this renders the card.
  */
 const Popover = forwardRef<HTMLDivElement, Props>(function Popover(
-    { note, onClose, onEdit, onDelete, onReanchor, placement = 'below', style },
+    { note, onClose, onEdit, onDelete, onReanchor, onPrev, onNext, placement = 'below', style },
     ref,
 ) {
+    const navBtn =
+        'flex h-[26px] w-[22px] flex-none items-center justify-center rounded-dio-tab border-none bg-transparent ' +
+        'text-dio-faint enabled:cursor-pointer enabled:hover:bg-dio-subtle disabled:opacity-30';
     return (
         <div
             ref={ref}
@@ -37,6 +43,24 @@ const Popover = forwardRef<HTMLDivElement, Props>(function Popover(
                 <div className="flex items-center gap-[11px] px-[15px] pb-[11px] pt-[14px]">
                     <NumberCircle number={note.n} variant="selected" />
                     <span className="flex-1 text-[14px] font-semibold leading-[1.3] text-dio-primary">{note.title}</span>
+                    <button
+                        type="button"
+                        onClick={() => onPrev?.()}
+                        disabled={!onPrev}
+                        aria-label="Previous note"
+                        className={navBtn}
+                    >
+                        <ChevronLeftIcon size={16} />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => onNext?.()}
+                        disabled={!onNext}
+                        aria-label="Next note"
+                        className={navBtn}
+                    >
+                        <ChevronRightIcon size={16} />
+                    </button>
                     <button
                         type="button"
                         onClick={onClose}

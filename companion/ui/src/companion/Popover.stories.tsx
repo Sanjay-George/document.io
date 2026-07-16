@@ -19,6 +19,7 @@ export const Default: Story = {
     args: { note: sampleNotes[3], style: { position: 'absolute', left: 0, top: 0 } },
 };
 
-export const PageScoped: Story = {
-    args: { note: sampleNotes[0], style: { position: 'absolute', left: 0, top: 0 } },
+// Prev/next enabled — stepping through on-page notes from the header.
+export const WithNavigation: Story = {
+    args: { note: sampleNotes[3], onPrev: noop, onNext: noop, style: { position: 'absolute', left: 0, top: 0 } },
 };
