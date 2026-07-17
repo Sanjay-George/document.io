@@ -59,8 +59,11 @@
     // ---- Message Listener ----
     function setupMessageListener() {
         window.addEventListener("message", async (event) => {
-            if (event.source !== window) return;
+            // Only accept messages from this page's own context — not cross-origin
+            // frames or opener windows. The bridge runs in-page, so origin matches.
+            if (event.source !== window || event.origin !== window.location.origin) return;
             const msg = event.data;
+            if (!msg || typeof msg !== "object") return;
             if (msg.type === "DOCIO_FETCH") {
                 try {
                     const result = await apiFetch(msg.url, msg.options);
