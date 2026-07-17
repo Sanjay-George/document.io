@@ -26,8 +26,8 @@ import {
 const slugify = (n?: string) =>
     (n || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-export default function ProjectDetails({ params }: { params: { id: string } }) {
-    const projectId = use(params as any)?.id as string;
+export default function ProjectDetails({ params }: { params: Promise<{ id: string }> }) {
+    const projectId = use(params)?.id;
     const router = useRouter();
     const { data: project, isLoading: projectLoading } = useProject(projectId as any);
     const { data: docs, isLoading: docsLoading } = useDocumentations(projectId as any);

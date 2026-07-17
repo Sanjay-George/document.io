@@ -10,8 +10,8 @@ import { Breadcrumb, Button, SectionHeader, Spinner } from "@/components/hub";
 const slugify = (n?: string) =>
     (n || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-export default function UploadMediaPage({ params }: { params: { id: string } }) {
-    const projectId = use(params as any)?.id as string;
+export default function UploadMediaPage({ params }: { params: Promise<{ id: string }> }) {
+    const projectId = use(params)?.id;
     const { data: project, isLoading } = useProject(projectId as any);
     const [files, setFiles] = useState<File[]>([]);
 
