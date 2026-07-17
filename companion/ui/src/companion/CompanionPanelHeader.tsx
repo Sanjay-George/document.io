@@ -14,6 +14,8 @@ type Props = {
     tab: Tab;
     onTabChange: (tab: Tab) => void;
     countAll: number;
+    /** Read-only export view: hide the mode toggle and scope tabs. */
+    readOnly?: boolean;
     /** Current dock orientation; omit to hide the orientation toggle. */
     orientation?: PanelOrientation;
     onOrientationChange?: (orientation: PanelOrientation) => void;
@@ -31,6 +33,7 @@ export default function CompanionPanelHeader({
     tab,
     onTabChange,
     countAll,
+    readOnly = false,
     orientation,
     onOrientationChange,
 }: Props) {
@@ -93,10 +96,12 @@ export default function CompanionPanelHeader({
                 </div>
             </div>
 
-            <div className="mt-[14px] flex items-center justify-between">
-                <SegmentedControl value={mode} onChange={onModeChange} />
-                {mode === 'view' && <ScopeTabs value={tab} onChange={onTabChange} countAll={countAll} />}
-            </div>
+            {!readOnly && (
+                <div className="mt-[14px] flex items-center justify-between">
+                    <SegmentedControl value={mode} onChange={onModeChange} />
+                    {mode === 'view' && <ScopeTabs value={tab} onChange={onTabChange} countAll={countAll} />}
+                </div>
+            )}
         </div>
     );
 }

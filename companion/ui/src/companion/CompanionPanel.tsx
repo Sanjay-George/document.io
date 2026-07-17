@@ -4,6 +4,7 @@ import CompanionPanelHeader from '@/companion/CompanionPanelHeader';
 import AnnotationBanner from '@/companion/AnnotationBanner';
 import AnnotationCard from '@/companion/AnnotationCard';
 import EmptyState from '@/companion/EmptyState';
+import { DownloadIcon } from '@/companion/icons';
 
 type Props = {
     title: string;
@@ -32,6 +33,10 @@ type Props = {
     reanchoring?: boolean;
     reanchorTitle?: string;
     onCancelReanchor?: () => void;
+    /** Read-only export view: hides mode toggle and per-note editing actions. */
+    readOnly?: boolean;
+    /** Export the current page; when provided, shows the Export button. */
+    onExport?: () => void;
     /** Dock right (vertical) or bottom (horizontal). Defaults to vertical. */
     orientation?: PanelOrientation;
     onOrientationChange?: (orientation: PanelOrientation) => void;
@@ -69,6 +74,8 @@ export default function CompanionPanel({
     reanchoring = false,
     reanchorTitle,
     onCancelReanchor,
+    readOnly = false,
+    onExport,
     orientation = PanelOrientation.VERTICAL,
     onOrientationChange,
     fill = false,
@@ -90,6 +97,7 @@ export default function CompanionPanel({
                 tab={tab}
                 onTabChange={onTabChange}
                 countAll={countAll}
+                readOnly={readOnly}
                 orientation={onOrientationChange ? orientation : undefined}
                 onOrientationChange={onOrientationChange}
             />
@@ -97,7 +105,7 @@ export default function CompanionPanel({
             {/* @container drives the responsive grid below: a single column when
                 docked right (narrow) and multiple columns when docked bottom (wide). */}
             <div className="@container flex-1 overflow-y-auto px-[14px] pb-[18px] pt-1">
-                {mode === 'edit' && (
+                {mode === 'edit' && !readOnly && (
                     <AnnotationBanner
                         variant={reanchoring ? 'reanchor' : 'annotate'}
                         reanchorTitle={reanchorTitle}
@@ -106,13 +114,14 @@ export default function CompanionPanel({
                 )}
 
                 {notes.length === 0 ? (
-                    <EmptyState onAddNote={() => onModeChange('edit')} />
+                    <EmptyState onAddNote={readOnly ? undefined : () => onModeChange('edit')} />
                 ) : (
                     <div className="grid grid-cols-1 gap-1 @2xl:grid-cols-2 @4xl:grid-cols-3 @6xl:grid-cols-4">
                         {notes.map((note) => (
                             <AnnotationCard
                                 key={note.id}
                                 note={note}
+                                readOnly={readOnly}
                                 selected={selectedId === note.id}
                                 onSelect={() => onSelect(note.id)}
                                 onEdit={() => onEdit(note.id)}
@@ -128,6 +137,23 @@ export default function CompanionPanel({
                     </div>
                 )}
             </div>
+
+            {onExport && (
+                <div className="flex-none border-t border-dio-border-panel p-2">
+                    <button
+                        type="button"
+                        onClick={onExport}
+                        title="Export this page as a shareable HTML file"
+                        className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-dio-button border-none bg-transparent py-2 text-[13px] font-medium text-dio-muted hover:bg-dio-subtle hover:text-dio-primary"
+                    >
+                        <DownloadIcon size={14} />
+                        Export this page
+                        <span className="rounded-full bg-dio-subtle-2 px-1.5 py-px text-[9px] font-semibold uppercase tracking-[.06em] text-dio-tertiary">
+                            beta
+                        </span>
+                    </button>
+                </div>
+            )}
         </aside>
     );
 }

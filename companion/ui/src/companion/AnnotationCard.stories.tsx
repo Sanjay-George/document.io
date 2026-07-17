@@ -54,6 +54,16 @@ export const Reorderable: Story = {
     },
 };
 
+/** Read-only (exported file) — expanded body with all editing actions hidden. */
+export const ReadOnly: Story = {
+    args: { note: sampleNotes[3], selected: true, readOnly: true },
+};
+
+/** Read-only broken note — warning stays, but Re-anchor/Dismiss are hidden. */
+export const ReadOnlyBroken: Story = {
+    args: { note: sampleNotes[5], selected: false, readOnly: true },
+};
+
 export const Interactive: Story = {
     args: { note: sampleNotes[2] },
     render: (args) => {

@@ -23,3 +23,8 @@ export const Default: Story = {
 export const WithNavigation: Story = {
     args: { note: sampleNotes[3], onPrev: noop, onNext: noop, style: { position: 'absolute', left: 0, top: 0 } },
 };
+
+/** Read-only (exported file) — the Edit / Re-anchor / Delete action row is hidden. */
+export const ReadOnly: Story = {
+    args: { note: sampleNotes[3], readOnly: true, onPrev: noop, onNext: noop, style: { position: 'absolute', left: 0, top: 0 } },
+};

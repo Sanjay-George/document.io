@@ -84,6 +84,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true; // async response
     }
 
+    if (msg.type === "ASSET_FETCH") {
+        fetchAsset(msg.url)
+            .then((data) => sendResponse({ ok: true, data }))
+            .catch((err) => sendResponse({ ok: false, error: err.message }));
+
+        return true; // async response
+    }
+
     if (msg.type === "GET_API_HOST") {
         getApiHost().then((host) => sendResponse({ host }));
         return true;
@@ -94,6 +102,23 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true;
     }
 });
+
+// ---- Asset Fetch (arbitrary bytes → base64, bypasses page CORS) ----
+async function fetchAsset(url) {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const buf = await res.arrayBuffer();
+    const bytes = new Uint8Array(buf);
+    let binary = "";
+    const CHUNK = 0x8000; // avoid arg-count limits on String.fromCharCode
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+        binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+    }
+    return {
+        contentType: res.headers.get("content-type") || "application/octet-stream",
+        base64: btoa(binary),
+    };
+}
 
 // ---- Fetch Helper ----
 async function doFetch(url, options) {

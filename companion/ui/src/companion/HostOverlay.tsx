@@ -16,6 +16,8 @@ type Props = {
     notes: Note[];
     selectedId: string | null;
     mode: Mode;
+    /** Export/read-only: hide editing actions on the popover. */
+    readOnly?: boolean;
     /** A re-anchor pick is in progress — the next element click completes it. */
     reanchoring: boolean;
     onSelectNote: (id: string) => void;
@@ -107,6 +109,7 @@ export default function HostOverlay({
     notes,
     selectedId,
     mode,
+    readOnly = false,
     reanchoring,
     onSelectNote,
     onCloseSelected,
@@ -256,6 +259,7 @@ export default function HostOverlay({
                 <Popover
                     ref={popoverRef}
                     note={selectedNote}
+                    readOnly={readOnly}
                     placement={popover.placement}
                     style={{ left: popover.left, top: popover.top, zIndex: Z_OVERLAY + 1 }}
                     onClose={onCloseSelected}
