@@ -3,6 +3,7 @@ export interface Project {
     title: string;
     description: string;
     status: "Active" | "Inactive";
+    exportEnabled?: boolean;
     created: Date;
     updated: Date;
 }

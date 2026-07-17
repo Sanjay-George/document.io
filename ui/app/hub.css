@@ -294,6 +294,14 @@
 .hub-btn-save { height: 40px; padding: 0 20px; background: var(--dio-accent); color: hsl(var(--white)); border: none; border-radius: 11px; font-size: 13.5px; font-weight: 600; cursor: pointer; font-family: inherit; }
 .hub-btn-save:hover { background: var(--dio-accent-hover); }
 
+/* ---------- Export confirm warning ---------- */
+.hub-warn-lead { font-size: 14px; line-height: 1.55; color: var(--dio-text-body); }
+.hub-warn-callout {
+    display: flex; gap: 10px; margin-top: 12px; padding: 12px 14px; border-radius: 11px;
+    font-size: 13px; line-height: 1.5; color: var(--dio-danger-text); background: var(--dio-danger-bg);
+}
+.hub-warn-callout svg { flex: none; margin-top: 1px; }
+
 /* ---------- Install modal ---------- */
 .hub-install {
     width: 440px; max-width: 100%; background: hsl(var(--white)); border-radius: 18px; box-shadow: 0 24px 60px hsl(var(--ink) / .3);
