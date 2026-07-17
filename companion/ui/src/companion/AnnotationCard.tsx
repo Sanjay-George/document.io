@@ -16,6 +16,8 @@ import {
 
 type Props = {
     note: Note;
+    /** Hide editing actions (Edit / Re-anchor / Delete / reorder) — exported files. */
+    readOnly?: boolean;
     selected: boolean;
     onSelect: () => void;
     onEdit: () => void;
@@ -37,6 +39,7 @@ type Props = {
  */
 export default function AnnotationCard({
     note,
+    readOnly = false,
     selected,
     onSelect,
     onEdit,
@@ -102,6 +105,7 @@ export default function AnnotationCard({
             {expanded && (
                 <div className="ml-9 mt-[11px]">
                     <NoteBody note={note} />
+                    {!readOnly && (
                     <div className="mt-[14px] flex items-center gap-[14px]">
                         <TextButton
                             label="Edit"
@@ -152,6 +156,7 @@ export default function AnnotationCard({
                             )
                         )}
                     </div>
+                    )}
                 </div>
             )}
 
@@ -168,10 +173,12 @@ export default function AnnotationCard({
                         <div className="text-[12.5px] leading-[1.4] text-dio-danger">
                             This element isn&apos;t on the page anymore.
                         </div>
-                        <div className="mt-2 flex gap-[14px]">
-                            <TextButton label="Re-anchor" onClick={stop(onReanchor)} className="!text-[12px] text-dio-danger-2" />
-                            <TextButton label="Dismiss" onClick={stop(onDelete)} className="!text-[12px] text-[#B79A93]" />
-                        </div>
+                        {!readOnly && (
+                            <div className="mt-2 flex gap-[14px]">
+                                <TextButton label="Re-anchor" onClick={stop(onReanchor)} className="!text-[12px] text-dio-danger-2" />
+                                <TextButton label="Dismiss" onClick={stop(onDelete)} className="!text-[12px] text-[#B79A93]" />
+                            </div>
+                        )}
                     </div>
                 </div>
             )}

@@ -24,6 +24,10 @@ import HostOverlay from '@/companion/HostOverlay';
 import { debounce } from '@/utils';
 import { AnchorMeta, resolveAnchoredElement } from '@/utils/anchor';
 import { pageMatches, safeUrl, toRelativeUrl } from '@/companion/helpers';
+import { exportCurrentPage } from '@/export/serializePage';
+
+/** True inside an exported HTML file: data is inlined, all editing is hidden. */
+const READ_ONLY = typeof window !== 'undefined' && !!window.__DOCIO_EXPORT__;
 
 /** A freshly picked anchor target, captured from a click on the host page. */
 export type PickedTarget = {
@@ -108,6 +112,15 @@ export default function CompanionContainer() {
         // documentation moves between domains (localhost → dev-server, etc.).
         const here = toRelativeUrl(window.location.href);
         const flagsFor = (a: Annotation): NoteFlags => {
+            // In an export the payload is already scoped to this page and anchors are
+            // baked to a unique attribute, so skip page matching and just resolve.
+            if (READ_ONLY) {
+                try {
+                    return { onPage: true, broken: resolveAnchoredElement(a.target, a.anchor) === null };
+                } catch {
+                    return { onPage: true, broken: true };
+                }
+            }
             // A note belongs to the page(s) it was captured on. By default that's
             // the exact path; an optional `urlPattern` with `*` wildcards lets one
             // note cover a family of pages (e.g. the same report across document
@@ -375,6 +388,20 @@ export default function CompanionContainer() {
         });
     };
 
+    // ---- Export the active page as a self-contained, read-only HTML file ----
+    const handleExport = async () => {
+        showToast('Preparing export…', 'warn');
+        const result = await exportCurrentPage(
+            { id: documentationId ?? undefined, title: documentation?.title },
+            annotations,
+        );
+        if (result.ok) {
+            showToast(`Exported ${result.notes} note${result.notes === 1 ? '' : 's'}`, 'ok');
+        } else {
+            showToast(`Export failed: ${result.error}`, 'warn');
+        }
+    };
+
     // ---- Resizable dock handle highlight (from App.tsx) ----
     const handlePanelResize = (size: number) => setHighlightResizeHandle(size < 10);
     const debouncedHandlePanelResize = useRef(debounce(handlePanelResize, 100)).current;
@@ -390,8 +417,10 @@ export default function CompanionContainer() {
     const panel = (
         <CompanionPanel
             fill
+            readOnly={READ_ONLY}
+            onExport={READ_ONLY || !documentation?.exportEnabled ? undefined : handleExport}
             title={title}
-            mode={mode}
+            mode={READ_ONLY ? 'view' : mode}
             onModeChange={changeMode}
             tab={tab}
             onTabChange={setTab}
@@ -470,7 +499,8 @@ export default function CompanionContainer() {
             <HostOverlay
                 notes={onPageHealthy}
                 selectedId={selectedId}
-                mode={mode}
+                mode={READ_ONLY ? 'view' : mode}
+                readOnly={READ_ONLY}
                 reanchoring={!!reanchorId}
                 onSelectNote={selectNote}
                 onCloseSelected={() => setSelectedId(null)}

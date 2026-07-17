@@ -53,3 +53,8 @@ export const Annotate: Story = { render: () => <Harness initialMode="edit" /> };
 
 /** Without `onOrientationChange` the dock toggle is hidden. */
 export const NoOrientationToggle: Story = {};
+
+/** Read-only export view — mode toggle and scope tabs are hidden. */
+export const ReadOnly: Story = {
+    args: { readOnly: true, orientation: PanelOrientation.VERTICAL, onOrientationChange: noop },
+};

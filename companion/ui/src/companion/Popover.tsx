@@ -7,6 +7,8 @@ import { ChevronLeftIcon, ChevronRightIcon, CloseIcon, EditIcon, TargetIcon } fr
 
 type Props = {
     note: Note;
+    /** Hide editing actions (Edit / Re-anchor / Delete) — used by exported files. */
+    readOnly?: boolean;
     onClose: () => void;
     onEdit: () => void;
     onDelete: () => void;
@@ -26,7 +28,7 @@ type Props = {
  * Positioning (x/y/placement) is owned by the host; this renders the card.
  */
 const Popover = forwardRef<HTMLDivElement, Props>(function Popover(
-    { note, onClose, onEdit, onDelete, onReanchor, onPrev, onNext, placement = 'below', style },
+    { note, readOnly = false, onClose, onEdit, onDelete, onReanchor, onPrev, onNext, placement = 'below', style },
     ref,
 ) {
     const navBtn =
@@ -71,21 +73,23 @@ const Popover = forwardRef<HTMLDivElement, Props>(function Popover(
                 </div>
                 <div className="max-h-[320px] overflow-y-auto px-[15px] pb-[14px]">
                     <NoteBody note={note} />
-                    <div className="mt-[14px] flex gap-[14px] border-t border-dio-border-divider pt-3">
-                        <TextButton
-                            label="Edit"
-                            onClick={onEdit}
-                            icon={<EditIcon size={13} />}
-                            className="text-dio-tertiary hover:text-dio-primary"
-                        />
-                        <TextButton
-                            label="Re-anchor"
-                            onClick={onReanchor}
-                            icon={<TargetIcon size={13} />}
-                            className="text-dio-tertiary hover:text-dio-primary"
-                        />
-                        <TextButton label="Delete" onClick={onDelete} className="text-[#B79A93] hover:text-dio-danger" />
-                    </div>
+                    {!readOnly && (
+                        <div className="mt-[14px] flex gap-[14px] border-t border-dio-border-divider pt-3">
+                            <TextButton
+                                label="Edit"
+                                onClick={onEdit}
+                                icon={<EditIcon size={13} />}
+                                className="text-dio-tertiary hover:text-dio-primary"
+                            />
+                            <TextButton
+                                label="Re-anchor"
+                                onClick={onReanchor}
+                                icon={<TargetIcon size={13} />}
+                                className="text-dio-tertiary hover:text-dio-primary"
+                            />
+                            <TextButton label="Delete" onClick={onDelete} className="text-[#B79A93] hover:text-dio-danger" />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

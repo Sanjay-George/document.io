@@ -1,8 +1,9 @@
 "use client";
 
 import { use, useState } from "react";
+import { useRouter } from "next/navigation";
 import { mutate } from "swr";
-import { Plus, Upload, Download } from "lucide-react";
+import { Plus, Upload, Download, Check, Ban, AlertTriangle } from "lucide-react";
 import { useProject, SINGLE_PROJECT_KEY, ALL_PROJECTS_KEY } from "@/data_access/swr/projects";
 import { edit } from "@/data_access/api/projects";
 import { useDocumentations } from "@/data_access/swr/documentations";
@@ -19,6 +20,7 @@ import {
     SectionHeader,
     EmptyState,
     Spinner,
+    KebabMenu,
     useHubToast,
 } from "@/components/hub";
 
@@ -27,6 +29,7 @@ const slugify = (n?: string) =>
 
 export default function ProjectDetails({ params }: { params: { id: string } }) {
     const projectId = use(params as any)?.id as string;
+    const router = useRouter();
     const { data: project, isLoading: projectLoading } = useProject(projectId as any);
     const { data: docs, isLoading: docsLoading } = useDocumentations(projectId as any);
     const { toast } = useHubToast();
@@ -34,6 +37,7 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [editDocId, setEditDocId] = useState<string | null>(null);
     const [importOpen, setImportOpen] = useState(false);
+    const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
 
     const active = project?.status === "Active";
 
@@ -44,6 +48,23 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
         mutate(SINGLE_PROJECT_KEY(projectId));
         mutate(ALL_PROJECTS_KEY);
         toast(status === "Active" ? "Project set active" : "Project set inactive");
+    };
+
+    const setExport = async (next: boolean) => {
+        if (!project) return;
+        await edit(projectId, { ...project, exportEnabled: next });
+        mutate(SINGLE_PROJECT_KEY(projectId));
+        toast(next ? "Export enabled (beta)" : "Export disabled");
+    };
+
+    // Enabling is security-sensitive (exports leave the app), so confirm it with a
+    // warning first; disabling is harmless and applies immediately.
+    const onToggleExport = () =>
+        project?.exportEnabled ? setExport(false) : setExportConfirmOpen(true);
+
+    const confirmEnableExport = () => {
+        setExportConfirmOpen(false);
+        setExport(true);
     };
 
     const openNewDoc = () => {
@@ -85,15 +106,29 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                     {project?.description && <p className="hub-detail-lead">{project.description}</p>}
                 </div>
                 <div className="hub-detail-actions">
-                    <Button variant="ghost" icon={<Download size={15} />} onClick={() => setImportOpen(true)}>
-                        Import
-                    </Button>
-                    <Button variant="ghost" icon={<Upload size={15} />} href={`/projects/${projectId}/upload`}>
-                        Upload assets
-                    </Button>
                     <Button variant="primary" icon={<Plus size={16} strokeWidth={2.2} />} onClick={openNewDoc}>
                         Add documentation
                     </Button>
+                    <KebabMenu
+                        items={[
+                            {
+                                label: project?.exportEnabled ? "Disable export (beta)" : "Enable export (beta)",
+                                icon: project?.exportEnabled ? <Ban size={15} /> : <Check size={15} />,
+                                onClick: onToggleExport,
+                            },
+                            {
+                                label: "Import",
+                                icon: <Download size={15} />,
+                                onClick: () => setImportOpen(true),
+                                separatorBefore: true,
+                            },
+                            {
+                                label: "Upload assets",
+                                icon: <Upload size={15} />,
+                                onClick: () => router.push(`/projects/${projectId}/upload`),
+                            },
+                        ]}
+                    />
                 </div>
             </div>
 
@@ -127,6 +162,35 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                 <ModalHeader title="Import data" onClose={() => setImportOpen(false)} />
                 <div className="hub-modal-body">
                     <ImportForm documentationId={projectId} postSubmit={() => setImportOpen(false)} />
+                </div>
+            </HubModal>
+
+            {/* export enable confirmation */}
+            <HubModal open={exportConfirmOpen} onClose={() => setExportConfirmOpen(false)}>
+                <ModalHeader title="Enable export (beta)?" onClose={() => setExportConfirmOpen(false)} />
+                <div className="hub-modal-body">
+                    <p className="hub-warn-lead">
+                        Adds an “Export this page” button to the companion app on this project’s documentations.
+                        It downloads only your current page view as a self-contained HTML file.
+                    </p>
+                    <p className="hub-warn-callout">
+                        <AlertTriangle size={16} />
+                        <span>
+                            The file bakes in every note and any personal data (PII) it captured, and the saved
+                            page can be reused for phishing — only share exports with people you trust and use safe communication methods.
+                        </span>
+                    </p>
+                    <div className="hub-modal-foot">
+                        <span />
+                        <div className="hub-modal-btns">
+                            <button className="hub-btn-cancel" onClick={() => setExportConfirmOpen(false)}>
+                                Cancel
+                            </button>
+                            <button className="hub-btn-save" onClick={confirmEnableExport}>
+                                Enable export
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </HubModal>
 

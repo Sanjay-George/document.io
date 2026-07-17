@@ -41,10 +41,12 @@ function Harness({
     initialMode = 'view' as Mode,
     notes = sampleNotes,
     initialOrientation = PanelOrientation.VERTICAL,
+    readOnly = false,
 }: {
     initialMode?: Mode;
     notes?: Note[];
     initialOrientation?: PanelOrientation;
+    readOnly?: boolean;
 }) {
     const [mode, setMode] = useState<Mode>(initialMode);
     const [tab, setTab] = useState<Tab>('page');
@@ -70,6 +72,8 @@ function Harness({
             onMoveDown={noop}
             firstNoteId={notes[0]?.id}
             lastNoteId={notes[notes.length - 1]?.id}
+            readOnly={readOnly}
+            onExport={readOnly ? undefined : noop}
             orientation={orientation}
             onOrientationChange={setOrientation}
         />
@@ -91,6 +95,11 @@ export const HorizontalDock: Story = {
 
 export const Empty: Story = {
     render: () => <Harness notes={[]} />,
+};
+
+/** Read-only export view — no mode toggle, tabs, or per-note editing actions. */
+export const ReadOnly: Story = {
+    render: () => <Harness readOnly />,
 };
 
 /**
