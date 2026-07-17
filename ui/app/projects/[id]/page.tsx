@@ -10,7 +10,6 @@ import { useDocumentations } from "@/data_access/swr/documentations";
 import List from "./components/List";
 import Form from "./components/Form";
 import ImportForm from "./components/ImportForm";
-import AISearch from "./components/AISearch";
 import {
     HubModal,
     ModalHeader,
@@ -193,8 +192,6 @@ export default function ProjectDetails({ params }: { params: { id: string } }) {
                     </div>
                 </div>
             </HubModal>
-
-            <AISearch projectName={project?.title} />
         </div>
     );
 }
