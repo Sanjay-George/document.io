@@ -1,9 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import Spinner from "./Spinner";
 
+/** Centered loading indicator used while a hub view fetches its data. */
 const meta = {
-    title: "Hub/Spinner",
+    title: "Hub/Primitives/Spinner",
     component: Spinner,
+    parameters: { layout: "fullscreen" },
 } satisfies Meta<typeof Spinner>;
 
 export default meta;
