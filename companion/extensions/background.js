@@ -153,7 +153,12 @@ async function fetchAsset(url, tab) {
         throw new Error("Export not enabled for this page");
     }
 
-    const res = await fetch(target.href);
+    // Don't follow redirects: the allowlist validated `target`, but a 3xx to an
+    // internal host (169.254.169.254, localhost, …) would bypass it entirely.
+    const res = await fetch(target.href, { redirect: "manual" });
+    if (res.type === "opaqueredirect" || (res.status >= 300 && res.status < 400)) {
+        throw new Error("Asset URL redirected");
+    }
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const buf = await res.arrayBuffer();
     const bytes = new Uint8Array(buf);
