@@ -63,6 +63,9 @@ export default function CompanionContainer() {
     const [tab, setTab] = useState<Tab>('page');
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [reanchorId, setReanchorId] = useState<string | null>(null);
+    // A picked target awaiting confirmation because applying it would move the
+    // note to a different page (see handlePickTarget).
+    const [pendingReanchor, setPendingReanchor] = useState<{ id: string; target: PickedTarget } | null>(null);
     const [composer, setComposer] = useState<ComposerState>(null);
     const [pendingDelete, setPendingDelete] = useState<string | null>(null);
     const [toast, setToast] = useState<{ text: string; tone: Tone } | null>(null);
@@ -136,6 +139,15 @@ export default function CompanionContainer() {
         return toNotes(annotations, flagsFor);
         // eslint-disable-next-line
     }, [annotations, tick]);
+
+    // Signature of the fields the live-DOM watcher depends on (which annotations
+    // exist and where each is anchored/scoped). Keying the watcher effect on this
+    // — rather than just the count — re-arms it after a re-anchor or urlPattern
+    // edit that changes anchoring without changing how many notes there are.
+    const watchKey = useMemo(
+        () => annotations.map((a) => `${a.id}|${a.target}|${a.url}|${a.urlPattern ?? ''}`).join('~'),
+        [annotations],
+    );
 
     const onPageHealthy = useMemo(() => notes.filter((n) => n.onPage !== false && !n.broken), [notes]);
     const displayed = useMemo(() => {
@@ -219,7 +231,7 @@ export default function CompanionContainer() {
             if (scrollRaf) cancelAnimationFrame(scrollRaf);
         };
         // eslint-disable-next-line
-    }, [annotations.length]);
+    }, [watchKey]);
 
     useEffect(() => {
         function handleMessage(event: MessageEvent) {
@@ -243,6 +255,7 @@ export default function CompanionContainer() {
         setComposer(null);
         if (next === 'view' && reanchorId) {
             setReanchorId(null);
+            setPendingReanchor(null);
             setToast(null);
         }
     };
@@ -312,6 +325,7 @@ export default function CompanionContainer() {
     };
     const cancelReanchor = () => {
         setReanchorId(null);
+        setPendingReanchor(null);
         setMode('view');
         setToast(null);
     };
@@ -359,27 +373,40 @@ export default function CompanionContainer() {
         setMode('view');
     };
 
+    const applyReanchor = async (id: string, target: PickedTarget) => {
+        if (!documentationId) return;
+        const existing = annotations.find((a) => a.id === id);
+        if (existing) {
+            await updateAnnotation(id, {
+                ...existing,
+                target: target.selector,
+                anchor: target.anchor,
+                url: target.url,
+                type: target.type,
+                updated: new Date(),
+            });
+            await mutate(ALL_ANNOTATIONS_KEY(documentationId));
+            await mutate(SINGLE_ANNOTATION_KEY(id));
+        }
+        setPendingReanchor(null);
+        setSelectedId(id);
+        setReanchorId(null);
+        setMode('view');
+        showToast('Note re-anchored', 'ok');
+    };
+
     // ---- Element pick (Annotate-mode click / re-anchor completion) ----
     const handlePickTarget = async (target: PickedTarget) => {
         if (reanchorId) {
-            if (!documentationId) return;
             const existing = annotations.find((a) => a.id === reanchorId);
-            if (existing) {
-                await updateAnnotation(reanchorId, {
-                    ...existing,
-                    target: target.selector,
-                    anchor: target.anchor,
-                    url: target.url,
-                    type: target.type,
-                    updated: new Date(),
-                });
-                await mutate(ALL_ANNOTATIONS_KEY(documentationId));
-                await mutate(SINGLE_ANNOTATION_KEY(reanchorId));
+            // Re-anchoring onto a different page re-homes the note there — a
+            // silent, easy-to-make mistake for off-page notes. Confirm first;
+            // a same-page re-anchor (e.g. fixing a broken pin) applies directly.
+            if (existing && toRelativeUrl(existing.url) !== toRelativeUrl(target.url)) {
+                setPendingReanchor({ id: reanchorId, target });
+                return;
             }
-            setSelectedId(reanchorId);
-            setReanchorId(null);
-            setMode('view');
-            showToast('Note re-anchored', 'ok');
+            await applyReanchor(reanchorId, target);
             return;
         }
         setComposer({
@@ -528,6 +555,16 @@ export default function CompanionContainer() {
                     message={`“${notes.find((n) => n.id === pendingDelete)?.title ?? 'This note'}” will be permanently deleted.`}
                     onConfirm={() => performDelete(pendingDelete)}
                     onCancel={() => setPendingDelete(null)}
+                />
+            )}
+
+            {pendingReanchor && (
+                <ConfirmDialog
+                    title="Move note to this page?"
+                    message={`This note was made on ${toRelativeUrl(annotations.find((a) => a.id === pendingReanchor.id)?.url ?? '')}. Re-anchoring here will move it to ${toRelativeUrl(pendingReanchor.target.url)}.`}
+                    confirmLabel="Move it here"
+                    onConfirm={() => applyReanchor(pendingReanchor.id, pendingReanchor.target)}
+                    onCancel={() => setPendingReanchor(null)}
                 />
             )}
 
