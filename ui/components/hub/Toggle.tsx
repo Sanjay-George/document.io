@@ -10,11 +10,18 @@ export default function Toggle({
     label?: string;
 }) {
     return (
-        <label className="hub-toggle-label" onClick={() => onChange(!on)}>
+        <button
+            type="button"
+            role="switch"
+            aria-checked={on}
+            aria-label={label}
+            className="hub-toggle-label"
+            onClick={() => onChange(!on)}
+        >
             <span className={`hub-toggle-track${on ? " on" : ""}`}>
                 <span className="hub-toggle-knob" />
             </span>
             {label !== undefined && <span className="hub-toggle-text">{label}</span>}
-        </label>
+        </button>
     );
 }
