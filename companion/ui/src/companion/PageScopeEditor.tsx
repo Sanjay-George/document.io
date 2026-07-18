@@ -10,12 +10,9 @@ type Props = {
     onChange: (pattern: string | undefined) => void;
 };
 
-/** Split a relative URL into path segments and a (search/hash) remainder. */
-function splitPath(relative: string): { segments: string[]; rest: string } {
-    const cut = relative.search(/[?#]/);
-    const path = cut === -1 ? relative : relative.slice(0, cut);
-    const rest = cut === -1 ? '' : relative.slice(cut);
-    return { segments: path.split('/').filter((s) => s.length > 0), rest };
+/** Split a relative URL (already stripped of search/hash by toRelativeUrl) into path segments. */
+function splitPath(relative: string): string[] {
+    return relative.split('/').filter((s) => s.length > 0);
 }
 
 /**
@@ -30,12 +27,12 @@ function splitPath(relative: string): { segments: string[]; rest: string } {
  */
 export default function PageScopeEditor({ url, value, onChange }: Props) {
     const relativeUrl = toRelativeUrl(url);
-    const { segments, rest } = useMemo(() => splitPath(relativeUrl), [relativeUrl]);
+    const segments = useMemo(() => splitPath(relativeUrl), [relativeUrl]);
 
     // Which segments are wildcarded right now, aligned to the real segments.
     const wild = useMemo(() => {
         if (!value) return segments.map(() => false);
-        const patternSegs = splitPath(toRelativeUrl(value)).segments;
+        const patternSegs = splitPath(toRelativeUrl(value));
         return segments.map((_, i) => patternSegs[i] === '*');
     }, [value, segments]);
 
@@ -45,7 +42,7 @@ export default function PageScopeEditor({ url, value, onChange }: Props) {
 
     const emit = (next: boolean[]) => {
         if (!next.some(Boolean)) return onChange(undefined); // back to exact match
-        onChange('/' + segments.map((s, i) => (next[i] ? '*' : s)).join('/') + rest);
+        onChange('/' + segments.map((s, i) => (next[i] ? '*' : s)).join('/'));
     };
     const toggle = (i: number) => emit(wild.map((w, idx) => (idx === i ? !w : w)));
     const reset = () => onChange(undefined);
@@ -95,7 +92,6 @@ export default function PageScopeEditor({ url, value, onChange }: Props) {
                                 </button>
                             </span>
                         ))}
-                        {rest && <span className="ml-0.5 text-dio-faint">{rest}</span>}
                     </>
                 )}
             </div>

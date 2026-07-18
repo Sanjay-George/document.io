@@ -29,12 +29,15 @@ function lastSelectorTag(selector: string): string {
 
 /**
  * Reduce any URL (absolute or already-relative) to its origin-independent
- * identity: pathname + hash. Absolute URLs have their origin stripped; relative
- * URLs resolve against `base` (defaults to the current page).
+ * identity: the pathname only. Absolute URLs have their origin stripped;
+ * relative URLs resolve against `base` (defaults to the current page).
  *
- * The query string is intentionally dropped: in this app query params are
- * companion configuration (e.g. `?documentation-id=…&api-host=…`), not page
- * identity.
+ * Both the query string and the hash are intentionally dropped:
+ * - query params are companion configuration (e.g.
+ *   `?documentation-id=…&api-host=…`), not page identity;
+ * - the hash identifies a section *within* a page (`/guide#install`), so it
+ *   must not split one page into several — an annotation made anywhere on the
+ *   page should be discoverable regardless of the current anchor.
  */
 export function toRelativeUrl(url: string, base?: string): string {
     const resolvedBase = base ?? (typeof window !== 'undefined' ? window.location.href : undefined);
