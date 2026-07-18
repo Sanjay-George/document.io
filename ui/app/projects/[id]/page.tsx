@@ -37,23 +37,38 @@ export default function ProjectDetails({ params }: { params: Promise<{ id: strin
     const [editDocId, setEditDocId] = useState<string | null>(null);
     const [importOpen, setImportOpen] = useState(false);
     const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
+    const [busy, setBusy] = useState(false);
 
     const active = project?.status === "Active";
 
     const toggleActive = async () => {
-        if (!project) return;
+        if (!project || busy) return;
+        setBusy(true);
         const status = active ? "Inactive" : "Active";
-        await edit(projectId, { title: project.title, description: project.description, status });
-        mutate(SINGLE_PROJECT_KEY(projectId));
-        mutate(ALL_PROJECTS_KEY);
-        toast(status === "Active" ? "Project set active" : "Project set inactive");
+        try {
+            await edit(projectId, { title: project.title, description: project.description, status });
+            mutate(SINGLE_PROJECT_KEY(projectId));
+            mutate(ALL_PROJECTS_KEY);
+            toast(status === "Active" ? "Project set active" : "Project set inactive");
+        } catch {
+            toast("Couldn’t update project");
+        } finally {
+            setBusy(false);
+        }
     };
 
     const setExport = async (next: boolean) => {
-        if (!project) return;
-        await edit(projectId, { ...project, exportEnabled: next });
-        mutate(SINGLE_PROJECT_KEY(projectId));
-        toast(next ? "Export enabled (beta)" : "Export disabled");
+        if (!project || busy) return;
+        setBusy(true);
+        try {
+            await edit(projectId, { ...project, exportEnabled: next });
+            mutate(SINGLE_PROJECT_KEY(projectId));
+            toast(next ? "Export enabled (beta)" : "Export disabled");
+        } catch {
+            toast("Couldn’t update export setting");
+        } finally {
+            setBusy(false);
+        }
     };
 
     // Enabling is security-sensitive (exports leave the app), so confirm it with a

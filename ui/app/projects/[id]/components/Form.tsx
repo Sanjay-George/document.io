@@ -6,6 +6,11 @@ import { Globe } from "lucide-react";
 import { add, edit } from "@/data_access/api/documentations";
 import { ALL_DOCUMENTATIONS_KEY, SINGLE_DOCUMENTATION_KEY, useDocumentation } from "@/data_access/swr/documentations";
 import { Button, ModalHeader, useHubToast } from "@/components/hub";
+import { safeUrl } from "@/lib/utils";
+
+/** Accept bare hosts (`app.example.com/x`) by assuming https, then require http(s). */
+const normalizeUrl = (raw: string): string | null =>
+    safeUrl(/^[a-zA-Z][\w+.-]*:/.test(raw) ? raw : `https://${raw}`);
 
 export default function Form({
     projectId,
@@ -33,15 +38,18 @@ export default function Form({
         }
     }, [documentationId, documentation]);
 
+    const safeUrlValue = normalizeUrl(url.trim());
+    const urlInvalid = url.trim().length > 0 && !safeUrlValue;
+
     const save = async () => {
-        if (!title.trim() || !url.trim()) return;
+        if (!title.trim() || !safeUrlValue) return;
         setSaving(true);
         try {
             if (!documentationId) {
-                await add({ title: title.trim(), url: url.trim(), projectId });
+                await add({ title: title.trim(), url: safeUrlValue, projectId });
                 toast("Documentation added");
             } else {
-                await edit(documentationId, { title: title.trim(), url: url.trim(), projectId });
+                await edit(documentationId, { title: title.trim(), url: safeUrlValue, projectId });
                 mutate(SINGLE_DOCUMENTATION_KEY(documentationId));
                 toast("Documentation updated");
             }
@@ -72,24 +80,32 @@ export default function Form({
                 <div className="hub-url-field">
                     <Globe size={15} color="#DD6234" style={{ flex: "none" }} />
                     <input
+                        type="url"
                         className="hub-url-input"
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
                         placeholder="app.example.com/settings"
+                        aria-invalid={urlInvalid}
                         onKeyDown={(e) => e.key === "Enter" && save()}
                     />
                 </div>
                 <div className="hub-field-hint">
-                    Opening this guide launches the target in your browser with the companion active.
-                    Notes attach to the path only, so you can change the domain (e.g. localhost → a
-                    dev server) here and your annotations move with it.
+                    {urlInvalid ? (
+                        <span className="hub-field-error">Enter a valid http(s) URL.</span>
+                    ) : (
+                        <>
+                            Opening this guide launches the target in your browser with the companion
+                            active. Notes attach to the path only, so you can change the domain (e.g.
+                            localhost → a dev server) here and your annotations move with it.
+                        </>
+                    )}
                 </div>
 
                 <div className="hub-modal-foot">
                     <span />
                     <div className="hub-modal-btns">
                         <Button variant="cancel" onClick={onClose}>Cancel</Button>
-                        <Button variant="save" onClick={save} disabled={saving || !title.trim() || !url.trim()}>
+                        <Button variant="save" onClick={save} disabled={saving || !title.trim() || !safeUrlValue}>
                             {documentationId ? "Save" : "Add guide"}
                         </Button>
                     </div>

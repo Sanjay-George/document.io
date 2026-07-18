@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { mutate } from "swr";
 import { Pencil, Power, Link2, Trash2 } from "lucide-react";
@@ -12,19 +13,37 @@ const ICON = 15;
 export default function List({ projects, onEdit }: { projects: any[]; onEdit: (id: string) => void }) {
     const router = useRouter();
     const { toast } = useHubToast();
+    // Guards against duplicate requests from rapid double-clicks, per project row.
+    const inFlight = useRef<Set<string>>(new Set());
 
     const handleToggle = async (p: any) => {
+        if (inFlight.current.has(p._id)) return;
+        inFlight.current.add(p._id);
         const status = p.status === "Active" ? "Inactive" : "Active";
-        await edit(p._id, { title: p.title, description: p.description, status });
-        mutate(ALL_PROJECTS_KEY);
-        toast(status === "Active" ? "Project set active" : "Project set inactive");
+        try {
+            await edit(p._id, { title: p.title, description: p.description, status });
+            mutate(ALL_PROJECTS_KEY);
+            toast(status === "Active" ? "Project set active" : "Project set inactive");
+        } catch {
+            toast("Couldn’t update project");
+        } finally {
+            inFlight.current.delete(p._id);
+        }
     };
 
     const handleDelete = async (p: any) => {
         if (!window.confirm(`Delete “${p.title}”? This can’t be undone.`)) return;
-        await remove(p._id);
-        mutate(ALL_PROJECTS_KEY);
-        toast("Project deleted");
+        if (inFlight.current.has(p._id)) return;
+        inFlight.current.add(p._id);
+        try {
+            await remove(p._id);
+            mutate(ALL_PROJECTS_KEY);
+            toast("Project deleted");
+        } catch {
+            toast("Couldn’t delete project");
+        } finally {
+            inFlight.current.delete(p._id);
+        }
     };
 
     const handleShare = async (p: any) => {
