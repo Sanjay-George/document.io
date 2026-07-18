@@ -60,7 +60,6 @@ export default function List({ projects, onEdit }: { projects: any[]; onEdit: (i
         <div className="hub-index">
             {projects.map((p: any, i: number) => {
                 const active = p.status === "Active";
-                const docs: any[] | undefined = p.documentations;
                 return (
                     <div
                         key={p._id}
@@ -94,25 +93,6 @@ export default function List({ projects, onEdit }: { projects: any[]; onEdit: (i
                             </div>
 
                             {p.description && <div className="hub-row-desc">{p.description}</div>}
-
-                            {docs && docs.length > 0 && (
-                                <div className="hub-row-chips">
-                                    {docs.slice(0, 3).map((d: any) => (
-                                        <button
-                                            key={d._id}
-                                            className="hub-chip"
-                                            title="Open guide"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                window.open(d.url, "_blank", "noopener");
-                                            }}
-                                        >
-                                            <span className="hub-chip-url">{d.url}</span>
-                                        </button>
-                                    ))}
-                                    {docs.length > 3 && <span className="hub-chip-more">+{docs.length - 3} more</span>}
-                                </div>
-                            )}
                         </div>
                     </div>
                 );
