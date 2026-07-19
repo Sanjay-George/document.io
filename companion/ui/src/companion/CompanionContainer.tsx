@@ -233,13 +233,34 @@ export default function CompanionContainer() {
         // eslint-disable-next-line
     }, [watchKey]);
 
+    // ---- SPA navigation ----
+    // The host swaps pages via the History API without a reload, so re-evaluate
+    // on-page scope whenever the pathname changes. Patching history here (in the
+    // page's main world, where this bundle runs) intercepts the host router's own
+    // pushState — a content-script patch cannot, as it lives in an isolated world.
     useEffect(() => {
-        function handleMessage(event: MessageEvent) {
-            if (event.data?.type !== 'DOCIO_NAVIGATION_UPDATED') return;
+        let lastPath = window.location.pathname;
+        const onNav = () => {
+            if (window.location.pathname === lastPath) return;
+            lastPath = window.location.pathname;
             bump();
-        }
-        window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
+        };
+        const origPush = window.history.pushState;
+        const origReplace = window.history.replaceState;
+        window.history.pushState = function (...args) {
+            origPush.apply(this, args);
+            onNav();
+        };
+        window.history.replaceState = function (...args) {
+            origReplace.apply(this, args);
+            onNav();
+        };
+        window.addEventListener('popstate', onNav);
+        return () => {
+            window.history.pushState = origPush;
+            window.history.replaceState = origReplace;
+            window.removeEventListener('popstate', onNav);
+        };
     }, []);
 
     // ---- Toast: success auto-dismisses; warn persists until state changes ----
