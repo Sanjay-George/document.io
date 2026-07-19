@@ -65,6 +65,9 @@ const MAX_CONTEXT = 3;
 /** Roles worth recording on an ancestor even without an id (sectioning-ish). */
 const SECTION_ROLE = /^(tabpanel|tab|dialog|region|navigation|menu|group|form|search|complementary|main)$/;
 const TESTID_ATTRS = ['data-testid', 'data-test', 'data-cy'];
+/** Attribute names an app rarely reuses across unrelated elements (test ids,
+ *  `name`, `for`, `data-id`) — strong enough to identify an element on their own. */
+const STRONG_ATTR = /testid|test|cy|data-id|name|for/;
 
 /** Collapse runs of whitespace and trim — makes text comparisons robust. */
 function normalizeText(raw: string | null | undefined): string {
@@ -194,7 +197,7 @@ function scoreCandidate(el: HTMLElement, anchor: AnchorMeta): number {
         for (const [name, value] of Object.entries(anchor.attributes)) {
             if (el.getAttribute(name) === value) {
                 // Test ids and names are near-unique; generic attrs (type) weaker.
-                score += /testid|test|cy|data-id|name|for/.test(name) ? 40 : 15;
+                score += STRONG_ATTR.test(name) ? 40 : 15;
             }
         }
     }
@@ -259,24 +262,74 @@ function gatherCandidates(anchor: AnchorMeta): HTMLElement[] {
     return Array.from(found).slice(0, MAX_POOL);
 }
 
+/** Whether the anchor carries a signal worth verifying against — one an app
+ *  rarely shares across unrelated elements (id, accessible name, exact text, or
+ *  a strong attr). When it has none, there's nothing to catch a rotted selector
+ *  with, so we keep trusting the selector. */
+function hasDiscriminatingIdentity(anchor: AnchorMeta): boolean {
+    return Boolean(
+        anchor.id ||
+        anchor.ariaLabel ||
+        anchor.text ||
+        (anchor.attributes && Object.keys(anchor.attributes).some((name) => STRONG_ATTR.test(name)))
+    );
+}
+
+/**
+ * True when `el` corroborates at least one of the anchor's discriminating
+ * signals. Used to reject a selector match that landed on a lookalike sibling
+ * after the real target was removed (a class/`nth-of-type` selector rotting).
+ * Text is matched exactly or by prefix, so minor label edits/truncation still
+ * corroborate (e.g. `"Start Analysis"` ↔ `"Start Analysis (beta)"`).
+ */
+function sharesDiscriminatingSignal(el: HTMLElement, anchor: AnchorMeta): boolean {
+    if (anchor.id && el.id === anchor.id) return true;
+    if (anchor.ariaLabel && ariaLabelOf(el) === anchor.ariaLabel) return true;
+    if (anchor.attributes) {
+        for (const [name, value] of Object.entries(anchor.attributes)) {
+            if (STRONG_ATTR.test(name) && el.getAttribute(name) === value) return true;
+        }
+    }
+    if (anchor.text) {
+        const text = normalizeText(el.textContent).slice(0, TEXT_MAX);
+        if (text === anchor.text) return true;
+        if (text && (text.startsWith(anchor.text) || anchor.text.startsWith(text))) return true;
+    }
+    return false;
+}
+
 /**
  * Resolve the element a note points at, robustly.
  *
- * 1. Selector matches exactly one element → use it.
- * 2. Selector matches several → pick the one that best fits the anchor metadata.
- * 3. Selector matches none → recover by scoring candidates gathered from the
- *    anchor's identity signals, accepting only a confident match.
+ * 1. Selector still resolves → use the best match that corroborates the anchor's
+ *    discriminating identity (id / accessible name / strong attr / text). A bare
+ *    CSS selector is a liar: a class/`nth-of-type` selector can rot onto a
+ *    lookalike sibling once the real target is removed, so we never trust it
+ *    alone when we stored something to verify against.
+ * 2. Nothing corroborates (or the selector matches none) → recover by scoring
+ *    candidates gathered from the anchor's identity signals, accepting only a
+ *    confident match (`MIN_RECOVERY_SCORE`); otherwise `null` → note is "broken".
  *
- * Legacy notes without `anchor` fall back to plain first-match behaviour, so
- * nothing that resolved before stops resolving.
+ * The identity gate applies to *both* paths: `context`/`tag`/`role` are shared by
+ * siblings and can't tell a target from its neighbour, so an element must share
+ * an element-specific signal before it can be adopted. Anchors with no
+ * discriminating identity keep plain selector-trust behaviour (there's nothing to
+ * verify), as do legacy notes without `anchor`.
  */
 export function resolveAnchoredElement(target: string, anchor?: AnchorMeta): HTMLElement | null {
     const candidates = queryAll(target);
 
     if (!anchor) return candidates[0] ?? null;
 
-    if (candidates.length === 1) return candidates[0];
-    if (candidates.length > 1) return bestByScore(candidates, anchor);
+    // Only elements that corroborate an element-specific signal may be adopted —
+    // context/tag alone can't distinguish the target from a sibling the selector
+    // rotted onto, and they can reach MIN_RECOVERY_SCORE on their own.
+    const gate = hasDiscriminatingIdentity(anchor)
+        ? (els: HTMLElement[]) => els.filter((el) => sharesDiscriminatingSignal(el, anchor))
+        : (els: HTMLElement[]) => els;
 
-    return bestByScore(gatherCandidates(anchor), anchor, MIN_RECOVERY_SCORE);
+    const direct = gate(candidates);
+    if (direct.length) return bestByScore(direct, anchor) ?? direct[0];
+
+    return bestByScore(gate(gatherCandidates(anchor)), anchor, MIN_RECOVERY_SCORE);
 }
