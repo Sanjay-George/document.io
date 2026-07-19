@@ -7,7 +7,7 @@
     "copy:ui": "copyfiles -u 2 ui/dist/** ui/dist/**/* extensions/dist",
     "build:ui": "npm --prefix ./ui run build",
     "build": "npm run clean && npm run build:ui && npm run copy:ui",
-    "test": "npm --prefix ./extensions test"
+    "test": "npm --prefix ./ui test && npm --prefix ./extensions test"
   },
   "author": "",
   "license": "ISC",
