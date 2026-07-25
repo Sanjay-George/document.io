@@ -1,22 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildAnchor, resolveAnchoredElement, type AnchorMeta } from '@/utils/anchor';
+import { byText, mount, resetDom } from '../../support/dom';
 
-/** Render `html` into the document body and return the root's first element. */
-function mount(html: string): void {
-    document.body.innerHTML = html;
-}
-
-function byText(tag: string, text: string): HTMLElement {
-    const el = Array.from(document.querySelectorAll<HTMLElement>(tag)).find(
-        (e) => e.textContent?.trim() === text,
-    );
-    if (!el) throw new Error(`no <${tag}> with text "${text}"`);
-    return el;
-}
-
-afterEach(() => {
-    document.body.innerHTML = '';
-});
+afterEach(resetDom);
 
 describe('resolveAnchoredElement — selector rot onto a sibling', () => {
     it('Path A: single-match rot → broken, not the neighbour (the Excel Export bug)', () => {
