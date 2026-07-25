@@ -1,4 +1,7 @@
 import { assertAllowedAssetUrl } from "./security.js";
+import "./messages.js"; // populates globalThis.DOCIO_MESSAGES
+
+const { RUNTIME_REQUEST } = globalThis.DOCIO_MESSAGES;
 
 const DEFAULT_API_HOST = "http://localhost:5001";
 
@@ -56,7 +59,7 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
 
 // ---- Message Handling ----
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-    if (msg.type === "GET_DOC_ID") {
+    if (msg.type === RUNTIME_REQUEST.getCurrentDocumentationId) {
         // Use sender.tab info
         if (!sender.tab?.id || !sender.tab?.url) {
             sendResponse({ documentationId: null });
@@ -78,7 +81,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true; // Keep response channel open
     }
 
-    if (msg.type === "API_FETCH") {
+    if (msg.type === RUNTIME_REQUEST.fetchData) {
         doFetch(msg.url, msg.options)
             .then((data) => sendResponse({ ok: true, data }))
             .catch((err) => sendResponse({ ok: false, error: err.message }));
@@ -86,7 +89,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true; // async response
     }
 
-    if (msg.type === "ASSET_FETCH") {
+    if (msg.type === RUNTIME_REQUEST.fetchAsset) {
         fetchAssetForExport(msg.url, sender.tab)
             .then((data) => sendResponse({ ok: true, data }))
             .catch((err) => sendResponse({ ok: false, error: err.message }));
@@ -94,12 +97,12 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         return true; // async response
     }
 
-    if (msg.type === "GET_API_HOST") {
+    if (msg.type === RUNTIME_REQUEST.getApiHost) {
         getApiHost().then((host) => sendResponse({ host }));
         return true;
     }
 
-    if (msg.type === "SET_API_HOST") {
+    if (msg.type === RUNTIME_REQUEST.setApiHost) {
         chrome.storage.local.set({ docio_api_host: msg.host }).then(() => sendResponse({ ok: true }));
         return true;
     }
@@ -182,6 +185,10 @@ async function fetchAssetForExport(url, tab) {
 async function doFetch(url, options) {
     const base = await getApiHost();
 
+    // TODO: Only support relative URLs. 
+    //  Host should be configured by user. No defaults.
+
+    // TODO: Don't override with full URL. Only relative paths.
     if (!/^https?:\/\//i.test(url)) url = base + url;
 
     console.debug(`[Document.io Companion] Background fetching: ${url}`);
