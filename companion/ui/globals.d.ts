@@ -6,7 +6,7 @@ interface Window {
     documentioAPI: {
         fetch: (url: string, options?: RequestInit) => Promise<any>;
         /** Fetch an arbitrary asset (CORS-bypassed via the extension) as base64. */
-        fetchAsset?: (url: string) => Promise<{ contentType: string; base64: string }>;
+        fetchAssetForExport?: (url: string) => Promise<{ contentType: string; base64: string }>;
     }
     /**
      * Present only inside an exported, self-contained HTML file. Its presence puts

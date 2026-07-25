@@ -87,7 +87,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
 
     if (msg.type === "ASSET_FETCH") {
-        fetchAsset(msg.url, sender.tab)
+        fetchAssetForExport(msg.url, sender.tab)
             .then((data) => sendResponse({ ok: true, data }))
             .catch((err) => sendResponse({ ok: false, error: err.message }));
 
@@ -141,13 +141,18 @@ async function tabExportEnabled(tab) {
     }
 }
 
+// INFO: ONLY USED FOR EXPORT, WHICH IS IN BETA.
 // ---- Asset Fetch (arbitrary bytes → base64, bypasses page CORS) ----
-async function fetchAsset(url, tab) {
+async function fetchAssetForExport(url, tab) {
     if (!tab?.id || !tab?.url) throw new Error("No tab context");
 
     // Reject bad schemes / cross-origin internal hosts before doing anything.
     const target = assertAllowedAssetUrl(url, tab.url);
 
+    // TODO: HAndle DNS rebinding issue. Use the IP resolved from assertAllowedAssetUrl call. 
+    //  Discard new IP.
+
+    // TODO: Check what this does.
     // Only proxy bytes for projects that opted into export (beta).
     if (!(await tabExportEnabled(tab))) {
         throw new Error("Export not enabled for this page");
@@ -181,6 +186,8 @@ async function doFetch(url, options) {
 
     console.debug(`[Document.io Companion] Background fetching: ${url}`);
     const res = await fetch(url, options);
+
+    // TODO: CHECK if there should be an allow-lists for urls.
 
     if (res.status === 401) {
         const err = new Error("HTTP 401");
