@@ -53,13 +53,13 @@ export default function AnnotationCard({
 }: Props) {
     const broken = !!note.broken;
     const otherPage = !broken && note.onPage === false;
-    const expanded = selected && !broken;
-    const collapsed = !selected && !broken;
+    const expanded = selected;
+    const collapsed = !selected;
 
     const numVariant = broken ? 'broken' : otherPage ? 'other' : selected ? 'selected' : 'idle';
 
     const container = broken
-        ? 'border border-dashed border-dio-broken-border bg-dio-broken-bg'
+        ? `border border-dashed border-dio-broken-border bg-dio-broken-bg${selected ? ' shadow-dio-card' : ''}`
         : otherPage
             ? `border border-dio-border-field bg-dio-subtle-2${selected ? ' shadow-dio-card' : ''}`
             : selected
@@ -104,82 +104,86 @@ export default function AnnotationCard({
 
             {expanded && (
                 <div className="ml-9 mt-[11px]">
-                    <NoteBody note={note} />
-                    {!readOnly && (
-                    <div className="mt-[14px] flex items-center gap-[14px]">
-                        <TextButton
-                            label="Edit"
-                            onClick={stop(onEdit)}
-                            icon={<EditIcon size={13} />}
-                            className="text-dio-tertiary hover:text-dio-primary"
-                        />
-                        <TextButton
-                            label="Re-anchor"
-                            onClick={stop(onReanchor)}
-                            icon={<TargetIcon size={13} />}
-                            className="text-dio-tertiary hover:text-dio-primary"
-                        />
-                        <TextButton label="Delete" onClick={stop(onDelete)} className="text-[#B79A93] hover:text-dio-danger" />
-                        {otherPage ? (
-                            onOpen && (
-                                <button
-                                    type="button"
-                                    title="Go to page"
-                                    onClick={stop(onOpen)}
-                                    className={`ml-auto ${moveBtn}`}
-                                >
-                                    <ExternalLinkIcon size={15} />
-                                </button>
-                            )
-                        ) : (
-                            (onMoveUp || onMoveDown) && (
-                                <div className="ml-auto flex items-center gap-0.5">
-                                    <button
-                                        type="button"
-                                        title="Move up"
-                                        disabled={!canMoveUp}
-                                        onClick={stop(onMoveUp)}
-                                        className={moveBtn}
-                                    >
-                                        <ChevronUpIcon size={15} />
-                                    </button>
-                                    <button
-                                        type="button"
-                                        title="Move down"
-                                        disabled={!canMoveDown}
-                                        onClick={stop(onMoveDown)}
-                                        className={moveBtn}
-                                    >
-                                        <ChevronDownIcon size={15} />
-                                    </button>
+                    <NoteBody note={note} showContext={!broken} />
+
+                    {broken && (
+                        <div className="mt-[11px] flex items-start gap-2">
+                            <AlertTriangleIcon size={14} className="mt-px flex-none text-dio-danger-2" />
+                            <div className="min-w-0 flex-1">
+                                <div className="text-[12.5px] leading-[1.4] text-dio-danger">
+                                    This element isn&apos;t on the page anymore.
                                 </div>
-                            )
-                        )}
-                    </div>
-                    )}
-                </div>
-            )}
-
-            {broken && note.body && (
-                <div className="ml-9 mt-1.5 line-clamp-2 text-[12.5px] leading-[1.45] text-dio-muted">
-                    {snippet(note.body)}
-                </div>
-            )}
-
-            {broken && (
-                <div className="ml-9 mt-[9px] flex items-start gap-2">
-                    <AlertTriangleIcon size={14} className="mt-px flex-none text-dio-danger-2" />
-                    <div className="flex-1">
-                        <div className="text-[12.5px] leading-[1.4] text-dio-danger">
-                            This element isn&apos;t on the page anymore.
-                        </div>
-                        {!readOnly && (
-                            <div className="mt-2 flex gap-[14px]">
-                                <TextButton label="Re-anchor" onClick={stop(onReanchor)} className="!text-[12px] text-dio-danger-2" />
-                                <TextButton label="Dismiss" onClick={stop(onDelete)} className="!text-[12px] text-[#B79A93]" />
+                                {note.selector && (
+                                    <code className="mt-1.5 block truncate rounded-dio-tab bg-dio-danger-bg px-1.5 py-1 font-dio-mono text-[11.5px] text-dio-danger-2">
+                                        {note.selector}
+                                    </code>
+                                )}
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
+
+                    {!readOnly && (broken ? (
+                        <div className="mt-[14px] flex gap-[14px]">
+                            <TextButton
+                                label="Re-anchor"
+                                onClick={stop(onReanchor)}
+                                icon={<TargetIcon size={13} />}
+                                className="text-dio-danger-2"
+                            />
+                            <TextButton label="Dismiss" onClick={stop(onDelete)} className="text-[#B79A93] hover:text-dio-danger" />
+                        </div>
+                    ) : (
+                        <div className="mt-[14px] flex items-center gap-[14px]">
+                            <TextButton
+                                label="Edit"
+                                onClick={stop(onEdit)}
+                                icon={<EditIcon size={13} />}
+                                className="text-dio-tertiary hover:text-dio-primary"
+                            />
+                            <TextButton
+                                label="Re-anchor"
+                                onClick={stop(onReanchor)}
+                                icon={<TargetIcon size={13} />}
+                                className="text-dio-tertiary hover:text-dio-primary"
+                            />
+                            <TextButton label="Delete" onClick={stop(onDelete)} className="text-[#B79A93] hover:text-dio-danger" />
+                            {otherPage ? (
+                                onOpen && (
+                                    <button
+                                        type="button"
+                                        title="Go to page"
+                                        onClick={stop(onOpen)}
+                                        className={`ml-auto ${moveBtn}`}
+                                    >
+                                        <ExternalLinkIcon size={15} />
+                                    </button>
+                                )
+                            ) : (
+                                (onMoveUp || onMoveDown) && (
+                                    <div className="ml-auto flex items-center gap-0.5">
+                                        <button
+                                            type="button"
+                                            title="Move up"
+                                            disabled={!canMoveUp}
+                                            onClick={stop(onMoveUp)}
+                                            className={moveBtn}
+                                        >
+                                            <ChevronUpIcon size={15} />
+                                        </button>
+                                        <button
+                                            type="button"
+                                            title="Move down"
+                                            disabled={!canMoveDown}
+                                            onClick={stop(onMoveDown)}
+                                            className={moveBtn}
+                                        >
+                                            <ChevronDownIcon size={15} />
+                                        </button>
+                                    </div>
+                                )
+                            )}
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

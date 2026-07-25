@@ -1,22 +1,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { buildAnchor, resolveAnchoredElement, type AnchorMeta } from '@/utils/anchor';
+import { byText, mount, resetDom } from '../../support/dom';
 
-/** Render `html` into the document body and return the root's first element. */
-function mount(html: string): void {
-    document.body.innerHTML = html;
-}
-
-function byText(tag: string, text: string): HTMLElement {
-    const el = Array.from(document.querySelectorAll<HTMLElement>(tag)).find(
-        (e) => e.textContent?.trim() === text,
-    );
-    if (!el) throw new Error(`no <${tag}> with text "${text}"`);
-    return el;
-}
-
-afterEach(() => {
-    document.body.innerHTML = '';
-});
+afterEach(resetDom);
 
 describe('resolveAnchoredElement — selector rot onto a sibling', () => {
     it('Path A: single-match rot → broken, not the neighbour (the Excel Export bug)', () => {
@@ -36,9 +22,30 @@ describe('resolveAnchoredElement — selector rot onto a sibling', () => {
         startBtn.remove();
         expect(document.querySelector(anchor.selector)).toBe(exportBtn);
 
-        // ...but the fingerprint (text "Start Analysis") doesn't corroborate the
+        // ...but the fingerprint (eg: text "Start Analysis") doesn't corroborate the
         // export button, and a shared toolbar ancestor (+25) + tag (+5) must NOT
         // be enough to recover it either.
+        expect(resolveAnchoredElement(anchor.selector, anchor)).toBeNull();
+    });
+
+    it('Path A: a shared framework-generic attr (PrimeVue data-pc-name) does NOT corroborate', () => {
+        // PrimeVue tags every button with data-pc-name="button" — a component
+        // type, not an identity.
+        mount(`
+            <div id="analysis-toolbar">
+                <button class="p-button" data-pc-name="button" data-pc-section="root" aria-label="Excel Export">Excel Export</button>
+            </div>
+        `);
+        const anchor: AnchorMeta = {
+            selector: '#analysis-toolbar > button.p-button:nth-of-type(1)',
+            tag: 'button',
+            ariaLabel: 'Start Analysis',
+            text: 'Start Analysis',
+            attributes: { type: 'button', 'data-pc-name': 'button', 'data-pc-section': 'root' },
+        };
+        // The selector matches
+        expect(document.querySelector(anchor.selector)).not.toBeNull();
+        // but final resolution does not
         expect(resolveAnchoredElement(anchor.selector, anchor)).toBeNull();
     });
 

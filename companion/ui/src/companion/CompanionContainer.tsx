@@ -73,6 +73,8 @@ export default function CompanionContainer() {
     // Bumped to re-evaluate live-DOM on/off-page + broken flags.
     const [tick, setTick] = useState(0);
     const bump = () => setTick((t) => t + 1);
+    // Bumped on host-router navigation; re-arms the live-DOM watcher below.
+    const [navTick, setNavTick] = useState(0);
 
     const showToast = (text: string, tone: Tone) => setToast({ text, tone });
 
@@ -160,11 +162,12 @@ export default function CompanionContainer() {
     // Re-run the flag computation as host-page elements appear/disappear and on
     // SPA navigation, so "This page" scope and broken pins stay accurate.
     //
-    // Anchored content arrives two ways: (1) hydration shortly after load, and
+    // Anchored content arrives three ways: (1) hydration shortly after load,
     // (2) elements lazy-mounted on scroll (e.g. notes near the bottom of a long
-    // GitHub page). A short-lived MutationObserver catches the first; re-arming it
-    // whenever the user scrolls — while any on-page note is still unresolved —
-    // catches the second, without keeping a subtree observer running forever.
+    // GitHub page), and (3) a host-router route swap, which renders *after* the
+    // URL changes. A short-lived MutationObserver catches the first; re-arming it
+    // on scroll and on navigation — while any on-page note is still unresolved —
+    // catches the others, without keeping a subtree observer running forever.
     useEffect(() => {
         if (!annotations.length) return;
         bump(); // quick first pass for static pages
@@ -231,19 +234,25 @@ export default function CompanionContainer() {
             if (scrollRaf) cancelAnimationFrame(scrollRaf);
         };
         // eslint-disable-next-line
-    }, [watchKey]);
+    }, [watchKey, navTick]);
 
     // ---- SPA navigation ----
     // The host swaps pages via the History API without a reload, so re-evaluate
-    // on-page scope whenever the pathname changes. Patching history here (in the
+    // on-page scope whenever the URL changes. Patching history here (in the
     // page's main world, where this bundle runs) intercepts the host router's own
     // pushState — a content-script patch cannot, as it lives in an isolated world.
+    //
+    // The router updates the URL *before* it renders the new route, so this only
+    // signals that a navigation happened: the watcher effect above re-runs (via
+    // `navTick`) and observes the DOM until the new page's anchors show up.
+    // Compare the full href, not just the pathname — plenty of hosts route on the
+    // query string or hash alone.
     useEffect(() => {
-        let lastPath = window.location.pathname;
+        let lastUrl = window.location.href;
         const onNav = () => {
-            if (window.location.pathname === lastPath) return;
-            lastPath = window.location.pathname;
-            bump();
+            if (window.location.href === lastUrl) return;
+            lastUrl = window.location.href;
+            setNavTick((n) => n + 1);
         };
         const origPush = window.history.pushState;
         const origReplace = window.history.replaceState;

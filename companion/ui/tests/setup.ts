@@ -1,3 +1,12 @@
+// Component tests drive React with `act()` from react-dom/client directly.
+(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
+// jsdom does not implement scrollIntoView; HostOverlay calls it when a note is
+// selected. A no-op keeps selection-driven tests from throwing.
+if (typeof Element.prototype.scrollIntoView !== 'function') {
+    Element.prototype.scrollIntoView = () => {};
+}
+
 // jsdom does not implement the `CSS` namespace object, but anchor resolution
 // relies on `CSS.escape` (available natively in the extension's browser
 // environment). Provide the standard CSSOM serialization polyfill for tests.

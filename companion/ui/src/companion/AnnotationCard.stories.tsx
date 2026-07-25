@@ -37,9 +37,14 @@ export const OtherPageExpanded: Story = {
     args: { note: sampleNotes[4], selected: true, onOpen: noop },
 };
 
-/** Broken (off-anchor) note — shows the body snippet so it's identifiable before re-anchoring. */
+/** Broken (off-anchor) note, collapsed — same shape as any other card, flagged by the "!" circle. */
 export const Broken: Story = {
     args: { note: sampleNotes[5], selected: false },
+};
+
+/** Broken note, expanded — reveals the body, the dead selector, and Re-anchor/Dismiss. */
+export const BrokenExpanded: Story = {
+    args: { note: sampleNotes[5], selected: true },
 };
 
 /** Expanded card with the reorder (move up/down) controls. */
@@ -59,9 +64,9 @@ export const ReadOnly: Story = {
     args: { note: sampleNotes[3], selected: true, readOnly: true },
 };
 
-/** Read-only broken note — warning stays, but Re-anchor/Dismiss are hidden. */
+/** Read-only broken note (expanded) — warning and selector stay, but Re-anchor/Dismiss are hidden. */
 export const ReadOnlyBroken: Story = {
-    args: { note: sampleNotes[5], selected: false, readOnly: true },
+    args: { note: sampleNotes[5], selected: true, readOnly: true },
 };
 
 export const Interactive: Story = {
