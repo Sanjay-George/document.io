@@ -170,6 +170,13 @@ function ancestorMatches(el: HTMLElement, ref: AncestorRef): boolean {
             }
         }
     }
+    // Accessible name alone — a section labelled by aria-label with no id/role
+    // (which strongAncestorRef records) still distinguishes twins by their panel.
+    if (ref.ariaLabel && !ref.role) {
+        for (let node = el.parentElement; node && node !== document.body; node = node.parentElement) {
+            if (ariaLabelOf(node) === ref.ariaLabel) return true;
+        }
+    }
     return false;
 }
 
@@ -334,7 +341,8 @@ export function resolveAnchoredElement(target: string, anchor?: AnchorMeta): HTM
         : (els: HTMLElement[]) => els;
 
     const direct = gate(candidates);
-    if (direct.length) return bestByScore(direct, anchor) ?? direct[0];
+    // bestByScore only returns null for an empty list, which direct.length excludes.
+    if (direct.length) return bestByScore(direct, anchor);
 
     return bestByScore(gate(gatherCandidates(anchor)), anchor, MIN_RECOVERY_SCORE);
 }
