@@ -115,8 +115,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 const EXPORT_FLAG_TTL_MS = 60_000;
 const exportFlagCache = new Map(); // docId -> { enabled, at }
 
-// Whether the documentation *we* recorded for this tab (from navigation, not a
-// page-supplied value) belongs to a project with export enabled. Cached briefly.
+
+/**
+ * Checks if export is enabled for given documentation ID.
+ * Called by @see tabExportEnabled()
+ * Cached for EXPORT_FLAG_TTL_MS to avoid excessive network calls.
+ * @param {*} docId 
+ * @returns boolean
+ */
 async function isExportEnabled(docId) {
     const cached = exportFlagCache.get(docId);
     if (cached && Date.now() - cached.at < EXPORT_FLAG_TTL_MS) return cached.enabled;
@@ -132,6 +138,11 @@ async function isExportEnabled(docId) {
     return enabled;
 }
 
+/**
+ * Checks if export is enabled for the documentation associated with the given tab.
+ * @param {*} tab 
+ * @returns boolean
+ */
 async function tabExportEnabled(tab) {
     if (!tab?.id || !tab?.url) return false;
     try {
@@ -144,8 +155,14 @@ async function tabExportEnabled(tab) {
     }
 }
 
-// INFO: ONLY USED FOR EXPORT, WHICH IS IN BETA.
 // ---- Asset Fetch (arbitrary bytes → base64, bypasses page CORS) ----
+/**
+ * Fetches an asset for export, bypassing CORS restrictions.
+ * IMPORTANT: This feature is in beta and is susceptible to SSRF attacks (Read TODOs below). Work with caution!!! 
+ * @param {*} url 
+ * @param {*} tab 
+ * @returns 
+ */
 async function fetchAssetForExport(url, tab) {
     if (!tab?.id || !tab?.url) throw new Error("No tab context");
 
@@ -181,7 +198,13 @@ async function fetchAssetForExport(url, tab) {
     };
 }
 
-// ---- Fetch Helper ----
+/**
+ * Fetches data from backend server (ie. hub).
+ * @param {*} url 
+ * @param {*} options 
+ * @returns 
+ * @throws on non-2xx responses
+ */
 async function doFetch(url, options) {
     const base = await getApiHost();
 
