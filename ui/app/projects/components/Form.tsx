@@ -1,111 +1,87 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { add, edit } from "@/data_access/api/projects";
 import { mutate } from "swr";
+import { add, edit } from "@/data_access/api/projects";
 import { ALL_PROJECTS_KEY, SINGLE_PROJECT_KEY, useProject } from "@/data_access/swr/projects";
-import { Project } from "@/data_access/models/project";
-import ButtonPrimary from "@/components/ButtonPrimary";
+import { Button, ModalHeader, Toggle, useHubToast } from "@/components/hub";
 
-export default function Form({ projectId, postSubmit }: { projectId: string | null, postSubmit: (data?: any) => void }) {
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        status: 'Active'
-    });
-    const project: Project = useProject(projectId as any)?.data;
+export default function Form({ projectId, onClose }: { projectId: string | null; onClose: () => void }) {
+    const { toast } = useHubToast();
+    const project = useProject(projectId as any)?.data;
+
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [active, setActive] = useState(true);
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
-        if (project) {
-            setFormData({
-                ...project
-            })
+        if (projectId && project) {
+            setName(project.title || "");
+            setDescription(project.description || "");
+            setActive(project.status !== "Inactive");
+        } else {
+            setName("");
+            setDescription("");
+            setActive(true);
         }
-        else {
-            resetForm();
-        }
-    }, [project]);
+    }, [projectId, project]);
 
-    const handleTextChange = (e: any) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
-
-    const handleStatusChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setFormData({
-            ...formData,
-            status: e.target.checked ? 'Active' : 'Inactive'
-        });
-    };
-
-    const resetForm = () => {
-        setFormData({
-            title: '',
-            description: '',
-            status: 'Active'
-        });
-    }
-
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
-        const { title, description, status } = formData;
-        if (!title) {
-            // TODO: show alert.
-            console.error('Title is required');
-            return;
-        }
-
+    const save = async () => {
+        if (!name.trim()) return;
+        setSaving(true);
+        const status = active ? "Active" : "Inactive";
         try {
             if (!projectId) {
-                await add({ title, description, status });
-            }
-            else {
-                await edit(projectId, { title, description, status });
+                await add({ title: name.trim(), description, status });
+                toast("Project created");
+            } else {
+                await edit(projectId, { title: name.trim(), description, status });
                 mutate(SINGLE_PROJECT_KEY(projectId));
+                toast("Project updated");
             }
+            mutate(ALL_PROJECTS_KEY);
+            onClose();
+        } catch (e) {
+            console.error(e);
+            toast("Couldn’t save project");
+        } finally {
+            setSaving(false);
         }
-        catch (error) {
-            console.error(error);
-            return;
-        }
-
-        // Refetch data with useSWR
-        mutate(ALL_PROJECTS_KEY);
-        resetForm();
-        postSubmit();
-    }
-
-    const isProjectActive = formData.status === 'Active';
+    };
 
     return (
-        <form className="w-full mx-auto my-2" onSubmit={handleSubmit}>
-            <div className="mb-5">
-                <label htmlFor="title" className="block mb-2 text-sm font-medium text-gray-900 ">Title</label>
-                <input value={formData.title} type="text" id="title" name="title" onChange={handleTextChange} className="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-emerald-500 focus:border-emerald-500 block w-full p-2.5       " placeholder="eg: Lead Form - User Flow" required />
-            </div>
+        <>
+            <ModalHeader title={projectId ? "Edit project" : "New project"} onClose={onClose} />
+            <div className="hub-modal-body">
+                <label className="hub-field-label">Project name</label>
+                <input
+                    className="hub-input"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="e.g. Support Playbook"
+                    autoFocus
+                    onKeyDown={(e) => e.key === "Enter" && save()}
+                />
 
-            <div className="mb-5">
-                <label htmlFor="description" className="block mb-2 text-sm font-medium text-gray-900 ">Description</label>
-                <textarea value={formData.description} id="description" name="description" rows={4}
-                    onChange={handleTextChange} className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 
-                        rounded-lg border border-gray-300 focus:ring-emerald-500 focus:border-emerald-500 
-                            
-                          " placeholder="Project description..."></textarea>
-            </div>
+                <label className="hub-field-label mt">Description</label>
+                <textarea
+                    className="hub-textarea"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="What does this project document?"
+                />
 
-            <div className="mb-5 ms-0.5">
-                <label className="inline-flex items-center cursor-pointer">
-                    <input name='status' type="checkbox" className="sr-only peer" checked={isProjectActive} onChange={handleStatusChange} />
-                    <div className="relative w-7 h-4 bg-gray-200 peer-focus:outline-none rounded-full peer  peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:w-3 after:h-3 after:transition-all peer-checked:bg-primary"></div>
-                    <span className="ms-3 text-sm font-sm text-gray-900">
-                        {isProjectActive ? 'Active' : 'Inactive'}</span>
-                </label>
+                <div className="hub-modal-foot">
+                    <Toggle on={active} onChange={setActive} label={active ? "Active" : "Inactive"} />
+                    <div className="hub-modal-btns">
+                        <Button variant="cancel" onClick={onClose}>Cancel</Button>
+                        <Button variant="save" onClick={save} disabled={saving || !name.trim()}>
+                            {projectId ? "Save" : "Create"}
+                        </Button>
+                    </div>
+                </div>
             </div>
-
-            <ButtonPrimary text="Save" icon />
-        </form>
-    )
+        </>
+    );
 }

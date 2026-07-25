@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Mode, Note, Placement } from '@/companion/types';
 import Badge from '@/companion/Badge';
 import HighlightRing from '@/companion/HighlightRing';
 import Popover from '@/companion/Popover';
-import { getQuerySelector } from '@/utils';
+import { buildAnchor, resolveAnchoredElement } from '@/utils/anchor';
 import { isHighlightable } from '@/utils/annotations';
 import { HOVERED_ELEMENT_CLASS, MODAL_ROOT_ID } from '@/utils/constants';
 import type { PickedTarget } from '@/companion/CompanionContainer';
@@ -16,43 +16,85 @@ type Props = {
     notes: Note[];
     selectedId: string | null;
     mode: Mode;
+    /** Export/read-only: hide editing actions on the popover. */
+    readOnly?: boolean;
     /** A re-anchor pick is in progress — the next element click completes it. */
     reanchoring: boolean;
     onSelectNote: (id: string) => void;
     onCloseSelected: () => void;
     onEditNote: (id: string) => void;
+    onReanchorNote: (id: string) => void;
     onDeleteNote: (id: string) => void;
     onPickTarget: (target: PickedTarget) => void;
 };
 
 type RectInfo = { top: number; left: number; width: number; height: number; radius: string };
 
-/** Measure a selector against the live DOM in viewport (fixed) coordinates. */
-function measure(selector: string): RectInfo | null {
-    try {
-        const el = document.querySelector<HTMLElement>(selector);
-        if (!el) return null;
-        const r = el.getBoundingClientRect();
-        if (r.width === 0 && r.height === 0) return null;
-        const radius = window.getComputedStyle(el).borderRadius || '8px';
-        return { top: r.top, left: r.left, width: r.width, height: r.height, radius };
-    } catch {
-        return null;
-    }
+/** Measure a note's anchor against the live DOM in viewport (fixed) coordinates. */
+function measure(note: Note): RectInfo | null {
+    const el = resolveAnchoredElement(note.selector, note.anchor);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    if (r.width === 0 && r.height === 0) return null;
+    const radius = window.getComputedStyle(el).borderRadius || '8px';
+    return { top: r.top, left: r.left, width: r.width, height: r.height, radius };
 }
 
-/** Place the popover next to the target, flipping above when there's no room below. */
-function computePopover(rect: RectInfo): { left: number; top: number; placement: Placement } {
-    const W = 308;
-    const margin = 12;
-    const estH = 200;
-    const left = Math.max(margin, Math.min(rect.left, window.innerWidth - W - margin));
-    const belowTop = rect.top + rect.height + 8;
-    const roomBelow = window.innerHeight - belowTop;
-    if (roomBelow >= estH || rect.top < estH) {
-        return { left, top: belowTop, placement: 'below' };
+const POPOVER_W = 308;
+const VIEWPORT_MARGIN = 12;
+const ANCHOR_GAP = 8;
+const BADGE_SIZE = 22;
+/** Default pin offset — overlaps the anchor's top-left corner. */
+const BADGE_OFFSET = -11;
+const BADGE_MARGIN = 4;
+/** Height estimate used before the popover has been measured, to avoid a first-paint jump. */
+const POPOVER_EST_H = 240;
+
+/**
+ * Place the popover beside the target and fully inside the viewport. Prefers
+ * below the element, flips above when it doesn't fit, and for elements too tall
+ * to sit beside (taller than the viewport) pins it next to the visible anchor.
+ * The final top is always clamped so the card can't spill off either edge.
+ */
+function computePopover(rect: RectInfo, popH: number): { left: number; top: number; placement: Placement } {
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const left = Math.max(VIEWPORT_MARGIN, Math.min(rect.left, vw - POPOVER_W - VIEWPORT_MARGIN));
+
+    const maxTop = vh - popH - VIEWPORT_MARGIN;
+    const below = rect.top + rect.height + ANCHOR_GAP;
+    const above = rect.top - ANCHOR_GAP - popH;
+
+    let top: number;
+    let placement: Placement;
+    if (below <= maxTop) {
+        top = below;
+        placement = 'below';
+    } else if (above >= VIEWPORT_MARGIN) {
+        top = above;
+        placement = 'above';
+    } else {
+        // No room beside the element (e.g. a table taller than the viewport): pin
+        // the card to the anchor's top edge and let the clamp keep it on screen.
+        top = rect.top;
+        placement = 'below';
     }
-    return { left, top: rect.top - 8, placement: 'above' };
+    top = Math.max(VIEWPORT_MARGIN, Math.min(top, maxTop));
+    return { left, top, placement };
+}
+
+/**
+ * Pin offset (relative to the anchor) that keeps the badge inside the viewport.
+ * Falls back to the default corner overlap; slides along an edge when the anchor
+ * sits against it, so the top-left-most element's pin stays on screen.
+ */
+function computeBadgeOffset(rect: RectInfo): { top: number; left: number } {
+    const clamp = (pos: number, extent: number) =>
+        Math.max(BADGE_MARGIN, Math.min(pos, extent - BADGE_SIZE - BADGE_MARGIN));
+    return {
+        top: clamp(rect.top + BADGE_OFFSET, window.innerHeight) - rect.top,
+        left: clamp(rect.left + BADGE_OFFSET, window.innerWidth) - rect.left,
+    };
 }
 
 /**
@@ -67,10 +109,12 @@ export default function HostOverlay({
     notes,
     selectedId,
     mode,
+    readOnly = false,
     reanchoring,
     onSelectNote,
     onCloseSelected,
     onEditNote,
+    onReanchorNote,
     onDeleteNote,
     onPickTarget,
 }: Props) {
@@ -78,7 +122,7 @@ export default function HostOverlay({
 
     const recompute = useCallback(() => {
         const next = new Map<string, RectInfo | null>();
-        for (const n of notes) next.set(n.id, measure(n.selector));
+        for (const n of notes) next.set(n.id, measure(n));
         setRects(next);
     }, [notes]);
 
@@ -110,11 +154,7 @@ export default function HostOverlay({
         if (mode !== 'view' || !selectedId) return;
         const note = notes.find((n) => n.id === selectedId);
         if (!note) return;
-        try {
-            document.querySelector(note.selector)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        } catch {
-            /* invalid selector — ignore */
-        }
+        resolveAnchoredElement(note.selector, note.anchor)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, [selectedId, mode, notes]);
 
     // Annotate mode: hover-highlight pickable elements + click to pick a target.
@@ -139,7 +179,12 @@ export default function HostOverlay({
             e.preventDefault();
             e.stopPropagation();
             el.classList.remove(HOVERED_ELEMENT_CLASS);
-            onPickTarget({ selector: getQuerySelector(el), url: window.location.href, type: 'component' });
+            // Store the origin-independent path (no query string, no hash) —
+            // matching strips both, so the stored URL must too. See toRelativeUrl.
+            const relativeUrl = window.location.pathname;
+            // Capture selector + identity signals so the note re-resolves robustly.
+            const anchor = buildAnchor(el);
+            onPickTarget({ selector: anchor.selector, anchor, url: relativeUrl, type: 'component' });
         };
 
         document.addEventListener('mouseover', onOver, { passive: true });
@@ -160,7 +205,20 @@ export default function HostOverlay({
         [selectedId, notes],
     );
     const selectedRect = selectedId ? rects.get(selectedId) ?? null : null;
-    const popover = selectedRect ? computePopover(selectedRect) : null;
+
+    // Step through the on-page notes in list order from the popover header.
+    const selectedIndex = notes.findIndex((n) => n.id === selectedId);
+    const prevId = selectedIndex > 0 ? notes[selectedIndex - 1].id : null;
+    const nextId = selectedIndex >= 0 && selectedIndex < notes.length - 1 ? notes[selectedIndex + 1].id : null;
+
+    // Measure the popover so it can be flipped/clamped against its real height.
+    const popoverRef = useRef<HTMLDivElement>(null);
+    const [popoverHeight, setPopoverHeight] = useState(POPOVER_EST_H);
+    useLayoutEffect(() => {
+        if (popoverRef.current) setPopoverHeight(popoverRef.current.offsetHeight);
+    }, [selectedNote]);
+
+    const popover = selectedRect ? computePopover(selectedRect, popoverHeight) : null;
 
     return (
         <>
@@ -168,6 +226,7 @@ export default function HostOverlay({
                 const rect = rects.get(note.id);
                 if (!rect) return null;
                 const selected = note.id === selectedId;
+                const badge = computeBadgeOffset(rect);
                 return (
                     <div
                         key={note.id}
@@ -187,8 +246,8 @@ export default function HostOverlay({
                             state={selected ? 'selected' : 'idle'}
                             onClick={() => onSelectNote(note.id)}
                             style={{
-                                top: -11,
-                                left: -11,
+                                top: badge.top,
+                                left: badge.left,
                                 // In Annotate mode let clicks fall through to pick the element.
                                 pointerEvents: mode === 'edit' ? 'none' : 'auto',
                             }}
@@ -199,12 +258,17 @@ export default function HostOverlay({
 
             {mode === 'view' && selectedNote && popover && (
                 <Popover
+                    ref={popoverRef}
                     note={selectedNote}
+                    readOnly={readOnly}
                     placement={popover.placement}
                     style={{ left: popover.left, top: popover.top, zIndex: Z_OVERLAY + 1 }}
                     onClose={onCloseSelected}
                     onEdit={() => onEditNote(selectedNote.id)}
+                    onReanchor={() => onReanchorNote(selectedNote.id)}
                     onDelete={() => onDeleteNote(selectedNote.id)}
+                    onPrev={prevId ? () => onSelectNote(prevId) : null}
+                    onNext={nextId ? () => onSelectNote(nextId) : null}
                 />
             )}
         </>

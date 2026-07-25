@@ -1,121 +1,212 @@
 "use client";
 
-import { Library, Search, Video } from 'lucide-react';
-import H2 from "@/components/H2";
-import PrimaryBtn from "@/components/ButtonPrimary";
-import Form from "./components/Form";
-import { useProject } from "@/data_access/swr/projects";
-import Spinner from "@/components/icons/spinner";
-import RightArrowIcon from "@/components/icons/right_arrow";
 import { use, useState } from "react";
+import { useRouter } from "next/navigation";
+import { mutate } from "swr";
+import { Plus, Upload, Download, Check, Ban, AlertTriangle } from "lucide-react";
+import { useProject, SINGLE_PROJECT_KEY, ALL_PROJECTS_KEY } from "@/data_access/swr/projects";
+import { edit } from "@/data_access/api/projects";
 import { useDocumentations } from "@/data_access/swr/documentations";
-import { Tooltip } from "@heroui/tooltip"
-import ImportForm from "./components/ImportForm";
-import ImportIcon from "@/components/icons/import_icon";
 import List from "./components/List";
-import { Button } from "@heroui/button";
-import ButtonAccent from '@/components/ButtonAccent';
-import ButtonSecondary from '@/components/ButtonSecondary';
-import ButtonPrimary from '@/components/ButtonPrimary';
+import Form from "./components/Form";
+import ImportForm from "./components/ImportForm";
 import {
-    Modal,
-    ModalContent,
+    HubModal,
     ModalHeader,
-    ModalBody,
-    ModalFooter
-} from "@heroui/modal";
-import AISearch from './components/AISearch';
+    Breadcrumb,
+    StatusPill,
+    Button,
+    SectionHeader,
+    EmptyState,
+    Spinner,
+    KebabMenu,
+    useHubToast,
+} from "@/components/hub";
 
+const slugify = (n?: string) =>
+    (n || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-export default function ProjectDetails({ params }: { params: { id: string } }) {
+export default function ProjectDetails({ params }: { params: Promise<{ id: string }> }) {
     const projectId = use(params)?.id;
-    const { data: projectData, isLoading: isProjectLoading } = useProject(projectId as any);
-    const { data: documentations, isLoading: isDocumentationLoading } = useDocumentations(projectId as any);
+    const router = useRouter();
+    const { data: project, isLoading: projectLoading } = useProject(projectId as any);
+    const { data: docs, isLoading: docsLoading } = useDocumentations(projectId as any);
+    const { toast } = useHubToast();
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isImportModalOpen, setImportModalOpen] = useState(false);
-    const [selectedDocumentation, setSelectedDocumentation] = useState<null | string>(null);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [editDocId, setEditDocId] = useState<string | null>(null);
+    const [importOpen, setImportOpen] = useState(false);
+    const [exportConfirmOpen, setExportConfirmOpen] = useState(false);
+    const [busy, setBusy] = useState(false);
 
-    const showModal = () => {
-        setIsModalOpen(true);
-    };
-    const handleCancel = () => {
-        setIsModalOpen(false);
-        setSelectedDocumentation(null);
-    };
-    const handleAddClick = () => {
-        console.log('Add documentation');
-        setSelectedDocumentation(null);
-        showModal();
-    };
-    const handleEditClick = (id: string) => {
-        console.log('Edit documentation', id);
-        setSelectedDocumentation(id);
-        showModal();
+    const active = project?.status === "Active";
+
+    const toggleActive = async () => {
+        if (!project || busy) return;
+        setBusy(true);
+        const status = active ? "Inactive" : "Active";
+        try {
+            await edit(projectId, { title: project.title, description: project.description, status });
+            mutate(SINGLE_PROJECT_KEY(projectId));
+            mutate(ALL_PROJECTS_KEY);
+            toast(status === "Active" ? "Project set active" : "Project set inactive");
+        } catch {
+            toast("Couldn’t update project");
+        } finally {
+            setBusy(false);
+        }
     };
 
-    const handleImportModalCancel = () => {
-        setImportModalOpen(false);
+    const setExport = async (next: boolean) => {
+        if (!project || busy) return;
+        setBusy(true);
+        try {
+            await edit(projectId, { ...project, exportEnabled: next });
+            mutate(SINGLE_PROJECT_KEY(projectId));
+            toast(next ? "Export enabled (beta)" : "Export disabled");
+        } catch {
+            toast("Couldn’t update export setting");
+        } finally {
+            setBusy(false);
+        }
+    };
+
+    // Enabling is security-sensitive (exports leave the app), so confirm it with a
+    // warning first; disabling is harmless and applies immediately.
+    const onToggleExport = () =>
+        project?.exportEnabled ? setExport(false) : setExportConfirmOpen(true);
+
+    const confirmEnableExport = () => {
+        setExportConfirmOpen(false);
+        setExport(true);
+    };
+
+    const openNewDoc = () => {
+        setEditDocId(null);
+        setModalOpen(true);
+    };
+    const openEditDoc = (id: string) => {
+        setEditDocId(id);
+        setModalOpen(true);
+    };
+    const closeModal = () => setModalOpen(false);
+
+    if (projectLoading) {
+        return (
+            <div className="hub-container hub-container--detail">
+                <Spinner />
+            </div>
+        );
     }
-    const handleImportClick = () => {
-        setImportModalOpen(true);
-    }
 
+    const list: any[] = docs || [];
 
-    if (isProjectLoading || isDocumentationLoading) {
-        return <Spinner />;
-    }
     return (
-        <>
-            <div className="flex justify-between">
-                <div>
-                    <H2>{projectData?.title}</H2>
-                </div>
-                <div className="inline-flex space-x-1 items-center">
-                    <Tooltip content="Import data" placement="left" offset={-10}>
-                        <button className=" text-slate-400 px-3 py-2 hover:text-slate-700"
-                            onClick={handleImportClick}>
-                            <ImportIcon />
-                        </button>
-                    </Tooltip>
+        <div className="hub-container hub-container--detail">
+            <Breadcrumb
+                items={[
+                    { label: "projects", href: "/projects" },
+                    { label: slugify(project?.title), current: true },
+                ]}
+            />
 
-                    <ButtonSecondary text="Upload Assets" icon={<Video size={18} />}
-                        href={`/projects/${projectId}/upload`}
+            {/* header */}
+            <div className="hub-detail-head">
+                <div style={{ minWidth: 0 }}>
+                    <div className="hub-detail-title-row">
+                        <h1 className="hub-detail-h1">{project?.title}</h1>
+                        <StatusPill active={active} onClick={toggleActive} />
+                    </div>
+                    {project?.description && <p className="hub-detail-lead">{project.description}</p>}
+                </div>
+                <div className="hub-detail-actions">
+                    <Button variant="primary" icon={<Plus size={16} strokeWidth={2.2} />} onClick={openNewDoc}>
+                        Add documentation
+                    </Button>
+                    <KebabMenu
+                        items={[
+                            {
+                                label: project?.exportEnabled ? "Disable export (beta)" : "Enable export (beta)",
+                                icon: project?.exportEnabled ? <Ban size={15} /> : <Check size={15} />,
+                                onClick: onToggleExport,
+                            },
+                            {
+                                label: "Import",
+                                icon: <Download size={15} />,
+                                onClick: () => setImportOpen(true),
+                                separatorBefore: true,
+                            },
+                            {
+                                label: "Upload assets",
+                                icon: <Upload size={15} />,
+                                onClick: () => router.push(`/projects/${projectId}/upload`),
+                            },
+                        ]}
                     />
-
-                    <ButtonPrimary text="Add documentation"
-                        icon={<Library size={18} />}
-                        onClick={handleAddClick} />
-
                 </div>
-
             </div>
 
-            <div>
-                <p className="mb-4 pb-2 text-slate-400 font-light ">{projectData?.description}</p>
-            </div>
+            {/* guides section */}
+            <SectionHeader label="Guides" meta={`${list.length} ${list.length === 1 ? "guide" : "guides"}`} />
 
-            <List projectId={projectId} onRowEdit={handleEditClick} />
+            {docsLoading ? (
+                <Spinner />
+            ) : list.length === 0 ? (
+                <EmptyState
+                    variant="detail"
+                    title="No guides yet"
+                    body="Each guide points at a real URL. Add one, then open it to annotate the live page."
+                    action={
+                        <Button variant="dark" onClick={openNewDoc}>
+                            Add documentation
+                        </Button>
+                    }
+                />
+            ) : (
+                <List projectId={projectId} documentations={list} onEdit={openEditDoc} />
+            )}
 
-            <Modal isOpen={isModalOpen} onClose={handleCancel} size="xl">
-                <ModalContent>
-                    <ModalBody>
-                        <Form projectId={projectId}
-                            documentationId={selectedDocumentation}
-                            postSubmit={() => setIsModalOpen(false)} />
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+            {/* composer */}
+            <HubModal open={modalOpen} onClose={closeModal}>
+                <Form projectId={projectId} documentationId={editDocId} onClose={closeModal} />
+            </HubModal>
 
-            <Modal isOpen={isImportModalOpen} onClose={handleImportModalCancel} size="xl">
-                <ModalContent>
-                    <ModalBody>
-                        <ImportForm documentationId={projectId} postSubmit={() => setImportModalOpen(false)} />
-                    </ModalBody>
-                </ModalContent>
-            </Modal>
+            {/* import */}
+            <HubModal open={importOpen} onClose={() => setImportOpen(false)}>
+                <ModalHeader title="Import data" onClose={() => setImportOpen(false)} />
+                <div className="hub-modal-body">
+                    <ImportForm documentationId={projectId} postSubmit={() => setImportOpen(false)} />
+                </div>
+            </HubModal>
 
-            <AISearch projectName={projectData?.title} />
-        </>
+            {/* export enable confirmation */}
+            <HubModal open={exportConfirmOpen} onClose={() => setExportConfirmOpen(false)}>
+                <ModalHeader title="Enable export (beta)?" onClose={() => setExportConfirmOpen(false)} />
+                <div className="hub-modal-body">
+                    <p className="hub-warn-lead">
+                        Adds an “Export this page” button to the companion app on this project’s documentations.
+                        It downloads only your current page view as a self-contained HTML file.
+                    </p>
+                    <p className="hub-warn-callout">
+                        <AlertTriangle size={16} />
+                        <span>
+                            The file bakes in every note and any personal data (PII) it captured, and the saved
+                            page can be reused for phishing — only share exports with people you trust and use safe communication methods.
+                        </span>
+                    </p>
+                    <div className="hub-modal-foot">
+                        <span />
+                        <div className="hub-modal-btns">
+                            <button className="hub-btn-cancel" onClick={() => setExportConfirmOpen(false)}>
+                                Cancel
+                            </button>
+                            <button className="hub-btn-save" onClick={confirmEnableExport}>
+                                Enable export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </HubModal>
+        </div>
     );
 }

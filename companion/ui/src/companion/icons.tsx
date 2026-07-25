@@ -68,6 +68,10 @@ export function ChevronRightIcon(props: IconProps) {
     return <Icon {...props}><path d="M9 18l6-6-6-6" /></Icon>;
 }
 
+export function ChevronLeftIcon(props: IconProps) {
+    return <Icon {...props}><path d="M15 18l-6-6 6-6" /></Icon>;
+}
+
 export function ChevronUpIcon(props: IconProps) {
     return <Icon {...props}><path d="M18 15l-6-6-6 6" /></Icon>;
 }
@@ -81,6 +85,24 @@ export function LinkIcon(props: IconProps) {
         <Icon {...props}>
             <path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" />
             <path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
+        </Icon>
+    );
+}
+
+export function DownloadIcon(props: IconProps) {
+    return (
+        <Icon {...props}>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+            <path d="M7 10l5 5 5-5M12 15V3" />
+        </Icon>
+    );
+}
+
+export function ExternalLinkIcon(props: IconProps) {
+    return (
+        <Icon {...props}>
+            <path d="M15 3h6v6M10 14L21 3" />
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
         </Icon>
     );
 }

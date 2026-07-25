@@ -2,23 +2,25 @@
   "name": "ui",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
+    "audit": "npm audit",
+    "test": "echo \"(no ui tests yet)\" && exit 0",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@heroui/button": "^2.2.27",
-    "@heroui/card": "^2.2.25",
-    "@heroui/chip": "^2.2.22",
     "@heroui/drawer": "^2.2.24",
-    "@heroui/modal": "^2.2.24",
     "@heroui/navbar": "^2.2.25",
     "@heroui/system": "2.4.18",
     "@heroui/theme": "2.4.17",
-    "@heroui/tooltip": "^2.2.24",
-    "@mdxeditor/editor": "^3.19.3",
     "@radix-ui/react-avatar": "^1.1.10",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-scroll-area": "^1.2.10",
@@ -31,7 +33,6 @@
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-markdown": "^10.1.0",
-    "react-resizable-panels": "^2.1.7",
     "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "swr": "^2.2.5",
@@ -39,13 +40,30 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^10.5.0",
+    "@storybook/nextjs-vite": "^10.5.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.7",
-    "postcss": "^8",
+    "postcss": "^8.5.16",
+    "storybook": "^10.5.0",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite": "^6.4.3"
+  },
+  "overrides": {
+    "js-yaml": "^4.3.0",
+    "postcss": "^8.5.16",
+    "sharp": "^0.35.3",
+    "minimatch": "^10.0.0",
+    "brace-expansion": "^5.0.8",
+    "@next/eslint-plugin-next": {
+      "glob": "^10.5.0"
+    },
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^10.0.0"
+    }
   }
 }

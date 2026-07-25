@@ -41,6 +41,12 @@ shadowRoot.appendChild(appStyle);
 const rootContainer = document.createElement("div");
 shadowRoot.appendChild(rootContainer);
 
+// Prevent keyboard events from bubbling out of the shadow DOM to the host page. 
+// This is necessary because the host page has global keyboard shortcuts that can steal focus 
+// from the companion while typing in an input field.
+for (const type of ['keydown', 'keyup', 'keypress'] as const) {
+  rootContainer.addEventListener(type, (e) => e.stopPropagation());
+}
 
 createRoot(rootContainer).render(
   <StrictMode>

@@ -22,11 +22,17 @@ import Toast from '@/companion/Toast';
 import ConfirmDialog from '@/companion/ConfirmDialog';
 import HostOverlay from '@/companion/HostOverlay';
 import { debounce } from '@/utils';
-import { safeUrl } from '@/companion/helpers';
+import { AnchorMeta, resolveAnchoredElement } from '@/utils/anchor';
+import { pageMatches, safeUrl, toRelativeUrl } from '@/companion/helpers';
+import { exportCurrentPage } from '@/export/serializePage';
+
+/** True inside an exported HTML file: data is inlined, all editing is hidden. */
+const READ_ONLY = typeof window !== 'undefined' && !!window.__DOCIO_EXPORT__;
 
 /** A freshly picked anchor target, captured from a click on the host page. */
 export type PickedTarget = {
     selector: string;
+    anchor: AnchorMeta;
     url: string;
     type: NoteType;
 };
@@ -35,6 +41,8 @@ type ComposerState = { editingId: string | null; draft: Draft } | null;
 
 const TOAST_TIMEOUT = 2600;
 const MAX_Z = 2147483647;
+/** How long to keep watching the DOM after each burst of activity (load/scroll). */
+const WATCH_WINDOW = 4000;
 
 /**
  * Data-connected root of the companion. Replaces the legacy routed App + views:
@@ -55,6 +63,9 @@ export default function CompanionContainer() {
     const [tab, setTab] = useState<Tab>('page');
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [reanchorId, setReanchorId] = useState<string | null>(null);
+    // A picked target awaiting confirmation because applying it would move the
+    // note to a different page (see handlePickTarget).
+    const [pendingReanchor, setPendingReanchor] = useState<{ id: string; target: PickedTarget } | null>(null);
     const [composer, setComposer] = useState<ComposerState>(null);
     const [pendingDelete, setPendingDelete] = useState<string | null>(null);
     const [toast, setToast] = useState<{ text: string; tone: Tone } | null>(null);
@@ -62,6 +73,8 @@ export default function CompanionContainer() {
     // Bumped to re-evaluate live-DOM on/off-page + broken flags.
     const [tick, setTick] = useState(0);
     const bump = () => setTick((t) => t + 1);
+    // Bumped on host-router navigation; re-arms the live-DOM watcher below.
+    const [navTick, setNavTick] = useState(0);
 
     const showToast = (text: string, tone: Tone) => setToast({ text, tone });
 
@@ -100,24 +113,43 @@ export default function CompanionContainer() {
 
     // ---- Notes derived from annotations + live-DOM flags ----
     const notes: Note[] = useMemo(() => {
-        const resolves = (a: Annotation): boolean => {
-            try {
-                if (a.type === 'page') {
-                    return a.url === window.location.href && document.querySelector(a.target) !== null;
-                }
-                return document.querySelector(a.target) !== null;
-            } catch {
-                return false;
-            }
-        };
+        // Match on the origin-independent path so notes stay attached when a
+        // documentation moves between domains (localhost → dev-server, etc.).
+        const here = toRelativeUrl(window.location.href);
         const flagsFor = (a: Annotation): NoteFlags => {
-            if (resolves(a)) return { onPage: true, broken: false };
-            if (a.url === window.location.href) return { onPage: true, broken: true };
-            return { onPage: false, broken: false };
+            // In an export the payload is already scoped to this page and anchors are
+            // baked to a unique attribute, so skip page matching and just resolve.
+            if (READ_ONLY) {
+                try {
+                    return { onPage: true, broken: resolveAnchoredElement(a.target, a.anchor) === null };
+                } catch {
+                    return { onPage: true, broken: true };
+                }
+            }
+            // A note belongs to the page(s) it was captured on. By default that's
+            // the exact path; an optional `urlPattern` with `*` wildcards lets one
+            // note cover a family of pages (e.g. the same report across document
+            // ids) without blindly matching any page that shares a selector.
+            if (!pageMatches(here, a.url, a.urlPattern)) return { onPage: false, broken: false };
+            try {
+                const found = resolveAnchoredElement(a.target, a.anchor) !== null;
+                return { onPage: true, broken: !found };
+            } catch {
+                return { onPage: true, broken: true };
+            }
         };
         return toNotes(annotations, flagsFor);
         // eslint-disable-next-line
     }, [annotations, tick]);
+
+    // Signature of the fields the live-DOM watcher depends on (which annotations
+    // exist and where each is anchored/scoped). Keying the watcher effect on this
+    // — rather than just the count — re-arms it after a re-anchor or urlPattern
+    // edit that changes anchoring without changing how many notes there are.
+    const watchKey = useMemo(
+        () => annotations.map((a) => `${a.id}|${a.target}|${a.url}|${a.urlPattern ?? ''}`).join('~'),
+        [annotations],
+    );
 
     const onPageHealthy = useMemo(() => notes.filter((n) => n.onPage !== false && !n.broken), [notes]);
     const displayed = useMemo(() => {
@@ -129,45 +161,115 @@ export default function CompanionContainer() {
     // ---- Live-DOM re-evaluation (ported from AnnotationListView) ----
     // Re-run the flag computation as host-page elements appear/disappear and on
     // SPA navigation, so "This page" scope and broken pins stay accurate.
+    //
+    // Anchored content arrives three ways: (1) hydration shortly after load,
+    // (2) elements lazy-mounted on scroll (e.g. notes near the bottom of a long
+    // GitHub page), and (3) a host-router route swap, which renders *after* the
+    // URL changes. A short-lived MutationObserver catches the first; re-arming it
+    // on scroll and on navigation — while any on-page note is still unresolved —
+    // catches the others, without keeping a subtree observer running forever.
     useEffect(() => {
         if (!annotations.length) return;
         bump(); // quick first pass for static pages
 
-        const allResolved = () =>
-            annotations.every((a) => {
+        const hasUnresolvedOnPage = () => {
+            const here = toRelativeUrl(window.location.href);
+            return annotations.some((a) => {
+                if (!pageMatches(here, a.url, a.urlPattern)) return false;
                 try {
-                    return document.querySelector(a.target) !== null;
+                    return resolveAnchoredElement(a.target, a.anchor) === null;
                 } catch {
-                    return true; // invalid selector — stop watching
+                    return false; // unresolvable selector — never watch for it
                 }
             });
-        if (allResolved()) return;
+        };
 
         let debounceTimer: ReturnType<typeof setTimeout>;
+        let idleTimer: ReturnType<typeof setTimeout>;
+        let observing = false;
+
+        const stop = () => {
+            observer.disconnect();
+            observing = false;
+            clearTimeout(debounceTimer);
+            clearTimeout(idleTimer);
+        };
+
+        // Observe for a bounded window, extended by fresh DOM activity or scroll;
+        // give up once everything on-page resolves or the page goes quiet.
+        const arm = () => {
+            if (!observing) {
+                observer.observe(document.body, { childList: true, subtree: true });
+                observing = true;
+            }
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(stop, WATCH_WINDOW);
+        };
+
         const observer = new MutationObserver(() => {
             clearTimeout(debounceTimer);
             debounceTimer = setTimeout(() => {
                 bump();
-                if (allResolved()) observer.disconnect();
+                if (hasUnresolvedOnPage()) arm();
+                else stop();
             }, 150);
         });
-        observer.observe(document.body, { childList: true, subtree: true });
-        const safety = setTimeout(() => observer.disconnect(), 5000);
+
+        // Lazy content mounts as the user scrolls into it — re-arm to catch it.
+        let scrollRaf = 0;
+        const onScroll = () => {
+            if (scrollRaf) return;
+            scrollRaf = requestAnimationFrame(() => {
+                scrollRaf = 0;
+                if (hasUnresolvedOnPage()) arm();
+            });
+        };
+
+        if (hasUnresolvedOnPage()) arm();
+        window.addEventListener('scroll', onScroll, true);
+
         return () => {
-            observer.disconnect();
-            clearTimeout(debounceTimer);
-            clearTimeout(safety);
+            stop();
+            window.removeEventListener('scroll', onScroll, true);
+            if (scrollRaf) cancelAnimationFrame(scrollRaf);
         };
         // eslint-disable-next-line
-    }, [annotations.length]);
+    }, [watchKey, navTick]);
 
+    // ---- SPA navigation ----
+    // The host swaps pages via the History API without a reload, so re-evaluate
+    // on-page scope whenever the URL changes. Patching history here (in the
+    // page's main world, where this bundle runs) intercepts the host router's own
+    // pushState — a content-script patch cannot, as it lives in an isolated world.
+    //
+    // The router updates the URL *before* it renders the new route, so this only
+    // signals that a navigation happened: the watcher effect above re-runs (via
+    // `navTick`) and observes the DOM until the new page's anchors show up.
+    // Compare the full href, not just the pathname — plenty of hosts route on the
+    // query string or hash alone.
     useEffect(() => {
-        function handleMessage(event: MessageEvent) {
-            if (event.data?.type !== 'DOCIO_NAVIGATION_UPDATED') return;
-            bump();
-        }
-        window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
+        let lastUrl = window.location.href;
+        const onNav = () => {
+            if (window.location.href === lastUrl) return;
+            lastUrl = window.location.href;
+            setNavTick((n) => n + 1);
+        };
+        const origPush = window.history.pushState;
+        const origReplace = window.history.replaceState;
+        window.history.pushState = function (...args) {
+            origPush.apply(this, args);
+            onNav();
+        };
+        window.history.replaceState = function (...args) {
+            origReplace.apply(this, args);
+            onNav();
+        };
+        window.addEventListener('popstate', onNav);
+        return () => {
+            window.history.pushState = origPush;
+            window.history.replaceState = origReplace;
+            window.removeEventListener('popstate', onNav);
+        };
     }, []);
 
     // ---- Toast: success auto-dismisses; warn persists until state changes ----
@@ -183,6 +285,7 @@ export default function CompanionContainer() {
         setComposer(null);
         if (next === 'view' && reanchorId) {
             setReanchorId(null);
+            setPendingReanchor(null);
             setToast(null);
         }
     };
@@ -252,6 +355,7 @@ export default function CompanionContainer() {
     };
     const cancelReanchor = () => {
         setReanchorId(null);
+        setPendingReanchor(null);
         setMode('view');
         setToast(null);
     };
@@ -270,6 +374,7 @@ export default function CompanionContainer() {
                 title: noteTitle,
                 value: input.value,
                 type: input.type,
+                urlPattern: input.urlPattern,
                 updated: new Date(),
             });
             await mutate(ALL_ANNOTATIONS_KEY(documentationId));
@@ -283,7 +388,9 @@ export default function CompanionContainer() {
                 title: noteTitle,
                 value: input.value,
                 target: input.target,
+                anchor: input.anchor,
                 url: input.url,
+                urlPattern: input.urlPattern,
                 type: input.type,
                 created: new Date(),
                 updated: new Date(),
@@ -296,32 +403,60 @@ export default function CompanionContainer() {
         setMode('view');
     };
 
+    const applyReanchor = async (id: string, target: PickedTarget) => {
+        if (!documentationId) return;
+        const existing = annotations.find((a) => a.id === id);
+        if (existing) {
+            await updateAnnotation(id, {
+                ...existing,
+                target: target.selector,
+                anchor: target.anchor,
+                url: target.url,
+                type: target.type,
+                updated: new Date(),
+            });
+            await mutate(ALL_ANNOTATIONS_KEY(documentationId));
+            await mutate(SINGLE_ANNOTATION_KEY(id));
+        }
+        setPendingReanchor(null);
+        setSelectedId(id);
+        setReanchorId(null);
+        setMode('view');
+        showToast('Note re-anchored', 'ok');
+    };
+
     // ---- Element pick (Annotate-mode click / re-anchor completion) ----
     const handlePickTarget = async (target: PickedTarget) => {
         if (reanchorId) {
-            if (!documentationId) return;
             const existing = annotations.find((a) => a.id === reanchorId);
-            if (existing) {
-                await updateAnnotation(reanchorId, {
-                    ...existing,
-                    target: target.selector,
-                    url: target.url,
-                    type: target.type,
-                    updated: new Date(),
-                });
-                await mutate(ALL_ANNOTATIONS_KEY(documentationId));
-                await mutate(SINGLE_ANNOTATION_KEY(reanchorId));
+            // Re-anchoring onto a different page re-homes the note there — a
+            // silent, easy-to-make mistake for off-page notes. Confirm first;
+            // a same-page re-anchor (e.g. fixing a broken pin) applies directly.
+            if (existing && toRelativeUrl(existing.url) !== toRelativeUrl(target.url)) {
+                setPendingReanchor({ id: reanchorId, target });
+                return;
             }
-            setSelectedId(reanchorId);
-            setReanchorId(null);
-            setMode('view');
-            showToast('Note re-anchored', 'ok');
+            await applyReanchor(reanchorId, target);
             return;
         }
         setComposer({
             editingId: null,
-            draft: { type: target.type, selector: target.selector, url: target.url, title: '', body: '' },
+            draft: { type: target.type, selector: target.selector, anchor: target.anchor, url: target.url, title: '', body: '' },
         });
+    };
+
+    // ---- Export the active page as a self-contained, read-only HTML file ----
+    const handleExport = async () => {
+        showToast('Preparing export…', 'warn');
+        const result = await exportCurrentPage(
+            { id: documentationId ?? undefined, title: documentation?.title },
+            annotations,
+        );
+        if (result.ok) {
+            showToast(`Exported ${result.notes} note${result.notes === 1 ? '' : 's'}`, 'ok');
+        } else {
+            showToast(`Export failed: ${result.error}`, 'warn');
+        }
     };
 
     // ---- Resizable dock handle highlight (from App.tsx) ----
@@ -339,8 +474,10 @@ export default function CompanionContainer() {
     const panel = (
         <CompanionPanel
             fill
+            readOnly={READ_ONLY}
+            onExport={READ_ONLY || !documentation?.exportEnabled ? undefined : handleExport}
             title={title}
-            mode={mode}
+            mode={READ_ONLY ? 'view' : mode}
             onModeChange={changeMode}
             tab={tab}
             onTabChange={setTab}
@@ -410,7 +547,6 @@ export default function CompanionContainer() {
 
             {minimized && (
                 <MinimizedPill
-                    count={onPageHealthy.length}
                     mode={mode}
                     onModeChange={setMode}
                     onRestore={() => setMinimized(false)}
@@ -420,17 +556,20 @@ export default function CompanionContainer() {
             <HostOverlay
                 notes={onPageHealthy}
                 selectedId={selectedId}
-                mode={mode}
+                mode={READ_ONLY ? 'view' : mode}
+                readOnly={READ_ONLY}
                 reanchoring={!!reanchorId}
                 onSelectNote={selectNote}
                 onCloseSelected={() => setSelectedId(null)}
                 onEditNote={editNote}
+                onReanchorNote={startReanchor}
                 onDeleteNote={deleteNote}
                 onPickTarget={handlePickTarget}
             />
 
             {composer && (
                 <Composer
+                    key={composer.editingId ?? 'new'}
                     mode={composer.editingId ? 'edit' : 'new'}
                     draft={composer.draft}
                     onChange={(patch) =>
@@ -446,6 +585,16 @@ export default function CompanionContainer() {
                     message={`“${notes.find((n) => n.id === pendingDelete)?.title ?? 'This note'}” will be permanently deleted.`}
                     onConfirm={() => performDelete(pendingDelete)}
                     onCancel={() => setPendingDelete(null)}
+                />
+            )}
+
+            {pendingReanchor && (
+                <ConfirmDialog
+                    title="Move note to this page?"
+                    message={`This note was made on ${toRelativeUrl(annotations.find((a) => a.id === pendingReanchor.id)?.url ?? '')}. Re-anchoring here will move it to ${toRelativeUrl(pendingReanchor.target.url)}.`}
+                    confirmLabel="Move it here"
+                    onConfirm={() => applyReanchor(pendingReanchor.id, pendingReanchor.target)}
+                    onCancel={() => setPendingReanchor(null)}
                 />
             )}
 

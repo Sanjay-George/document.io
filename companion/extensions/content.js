@@ -13,7 +13,6 @@
     injectAssets();
     injectBridge();
     setupMessageListener();
-    setupNavigationListener();
 
     // ---- Functions ----
     function getDocumentationId() {
@@ -32,6 +31,9 @@
             root.dataset.documentationId = docId;
             document.body.appendChild(root);
         }
+        // Expose the companion bundle URLs so the export serializer can inline them.
+        root.dataset.assetJs = chrome.runtime.getURL("dist/assets/index.js");
+        root.dataset.assetCss = chrome.runtime.getURL("dist/assets/index.css");
     }
 
     function injectAssets() {
@@ -56,21 +58,41 @@
     // ---- Message Listener ----
     function setupMessageListener() {
         window.addEventListener("message", async (event) => {
-            if (event.source !== window) return;
+            // Only accept messages from this page's own context — not cross-origin
+            // frames or opener windows. The bridge runs in-page, so origin matches.
+            if (event.source !== window || event.origin !== window.location.origin) return;
             const msg = event.data;
-            if (msg.type !== "DOCIO_FETCH") return;
-
-            try {
-                const result = await apiFetch(msg.url, msg.options);
-                window.postMessage({ type: "DOCIO_FETCH_RESPONSE", reqId: msg.reqId, ok: true, data: result });
-            } catch (err) {
-                window.postMessage({
-                    type: "DOCIO_FETCH_RESPONSE",
-                    reqId: msg.reqId,
-                    ok: false,
-                    error: err.message,
-                });
+            if (!msg || typeof msg !== "object") return;
+            if (msg.type === "DOCIO_FETCH") {
+                try {
+                    const result = await apiFetch(msg.url, msg.options);
+                    window.postMessage({ type: "DOCIO_FETCH_RESPONSE", reqId: msg.reqId, ok: true, data: result });
+                } catch (err) {
+                    window.postMessage({ type: "DOCIO_FETCH_RESPONSE", reqId: msg.reqId, ok: false, error: err.message });
+                }
+                return;
             }
+
+            if (msg.type === "DOCIO_ASSET_FETCH") {
+                try {
+                    const result = await assetFetch(msg.url);
+                    window.postMessage({ type: "DOCIO_ASSET_FETCH_RESPONSE", reqId: msg.reqId, ok: true, data: result });
+                } catch (err) {
+                    window.postMessage({ type: "DOCIO_ASSET_FETCH_RESPONSE", reqId: msg.reqId, ok: false, error: err.message });
+                }
+                return;
+            }
+        });
+    }
+
+    // ---- Asset Fetch Bridge (CORS-bypassed, base64) — used by the export serializer ----
+    function assetFetch(url) {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ type: "ASSET_FETCH", url }, (resp) => {
+                if (chrome.runtime.lastError) return reject(chrome.runtime.lastError);
+                if (!resp?.ok) return reject(new Error(resp?.error || "Unknown error"));
+                resolve(resp.data);
+            });
         });
     }
 
@@ -83,25 +105,5 @@
                 resolve(resp.data);
             });
         });
-    }
-
-    // ---- SPA Navigation Detection ----
-    function setupNavigationListener() {
-        const notify = () => window.postMessage({ type: "DOCIO_NAVIGATION_UPDATED" }, "*");
-
-        const originalPushState = history.pushState.bind(history);
-        const originalReplaceState = history.replaceState.bind(history);
-
-        history.pushState = function (...args) {
-            originalPushState(...args);
-            notify();
-        };
-
-        history.replaceState = function (...args) {
-            originalReplaceState(...args);
-            notify();
-        };
-
-        window.addEventListener("popstate", notify);
     }
 })();

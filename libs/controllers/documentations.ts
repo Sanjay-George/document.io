@@ -3,11 +3,13 @@ import OriginDB from "../database/origin";
 import AnnotationDB from "../database/annotation";
 import { AnnotationFilters } from "../filters/annotation_filters";
 import DocumentationDB from "../database/documentation";
+import ProjectDB from "../database/project";
 import { Documentation } from "../models/documentation";
 
 const documentationDB = new DocumentationDB();
 const annotationDB = new AnnotationDB();
 const originDB = new OriginDB();
+const projectDB = new ProjectDB();
 const router = express.Router();
 
 
@@ -21,7 +23,10 @@ router.get("/:id", async (req, res) => {
     try {
         const id = req.params.id;
         const doc = await documentationDB.get(id);
-        res.send(JSON.stringify(doc));
+        // Denormalize the parent project's export flag so the companion can gate
+        // the "Export this page" button without a second fetch.
+        const project = doc?.projectId ? await projectDB.get(doc.projectId.toString()) : null;
+        res.send(JSON.stringify({ ...doc, exportEnabled: project?.exportEnabled ?? false }));
     }
     catch (ex) {
         console.error(ex);

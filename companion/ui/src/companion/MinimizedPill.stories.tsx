@@ -7,7 +7,7 @@ const meta = {
     title: 'Companion/Components/MinimizedPill',
     component: MinimizedPill,
     parameters: { layout: 'fullscreen' },
-    args: { count: 5, mode: 'view', onRestore: () => {}, onModeChange: () => {} },
+    args: { mode: 'view', onRestore: () => {}, onModeChange: () => {} },
     render: (args) => {
         const [mode, setMode] = useState<Mode>(args.mode);
         return <MinimizedPill {...args} mode={mode} onModeChange={setMode} />;

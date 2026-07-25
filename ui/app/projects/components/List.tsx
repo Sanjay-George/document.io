@@ -1,98 +1,102 @@
-import React from 'react';
-import { Chip } from "@heroui/chip";
-import { Card } from "@heroui/card";
-import EditIcon from '@/components/icons/edit_icon';
-import DeleteIcon from '@/components/icons/delete_icon';
-import Spinner from '@/components/icons/spinner';
-import OpenExternalIcon from '@/components/icons/open_external';
-import Link from 'next/link';
+"use client";
 
-import { mutate } from 'swr';
-import { remove } from '@/data_access/api/projects';
-import { ALL_PROJECTS_KEY, useProjects } from '@/data_access/swr/projects';
+import { useRef } from "react";
+import { useRouter } from "next/navigation";
+import { mutate } from "swr";
+import { Pencil, Power, Link2, Trash2 } from "lucide-react";
+import { edit, remove } from "@/data_access/api/projects";
+import { ALL_PROJECTS_KEY } from "@/data_access/swr/projects";
+import { KebabMenu, StatusPill, useHubToast } from "@/components/hub";
 
-export default function List({ onRowEdit }: { onRowEdit: (id: string) => void }) {
-    const { data, isLoading } = useProjects();
+const ICON = 15;
 
-    const handleDelete = async (id: string) => {
-        if (!window.confirm('Are you sure you want to delete this annotation?')) return;
-        await remove(id);
-        mutate(ALL_PROJECTS_KEY);
+export default function List({ projects, onEdit }: { projects: any[]; onEdit: (id: string) => void }) {
+    const router = useRouter();
+    const { toast } = useHubToast();
+    // Guards against duplicate requests from rapid double-clicks, per project row.
+    const inFlight = useRef<Set<string>>(new Set());
+
+    const handleToggle = async (p: any) => {
+        if (inFlight.current.has(p._id)) return;
+        inFlight.current.add(p._id);
+        const status = p.status === "Active" ? "Inactive" : "Active";
+        try {
+            await edit(p._id, { title: p.title, description: p.description, status });
+            mutate(ALL_PROJECTS_KEY);
+            toast(status === "Active" ? "Project set active" : "Project set inactive");
+        } catch {
+            toast("Couldn’t update project");
+        } finally {
+            inFlight.current.delete(p._id);
+        }
     };
 
-    if (isLoading) {
-        return <Spinner />;
-    }
+    const handleDelete = async (p: any) => {
+        if (!window.confirm(`Delete “${p.title}”? This can’t be undone.`)) return;
+        if (inFlight.current.has(p._id)) return;
+        inFlight.current.add(p._id);
+        try {
+            await remove(p._id);
+            mutate(ALL_PROJECTS_KEY);
+            toast("Project deleted");
+        } catch {
+            toast("Couldn’t delete project");
+        } finally {
+            inFlight.current.delete(p._id);
+        }
+    };
 
-    if (!data || data.length === 0) {
-        return <div className='text-center text-slate-500 pt-12'>No projects found.</div>;
-    }
+    const handleShare = async (p: any) => {
+        const link = `${window.location.origin}/projects/${p._id}`;
+        try {
+            await navigator.clipboard.writeText(link);
+            toast("Link copied");
+        } catch {
+            toast("Couldn’t copy link");
+        }
+    };
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4  gap-6 p-1">
-            {data.map((project: any) => (
-                <Card
-                    key={project._id}
-                    className="flex flex-col justify-between shadow border rounded-lg py-5 px-4 bg-white hover:shadow-md"
-                >
-                    <div>
-                        <div className="flex items-start space-x-2 mb-2">
-                            <Link
-                                href={`/projects/${project._id}`}
-                                className="text-lg font-semibold text-slate-800 hover:text-primary flex items-center space-x-1"
-                            >
-                                <span className="pt-0.5"><OpenExternalIcon /></span>
-                                <span>{project.title}</span>
-                            </Link>
-                        </div>
+        <div className="hub-index">
+            {projects.map((p: any, i: number) => {
+                const active = p.status === "Active";
+                return (
+                    <div
+                        key={p._id}
+                        className={`hub-row${active ? "" : " is-inactive"}`}
+                        onClick={() => router.push(`/projects/${p._id}`)}
+                    >
+                        <div className="hub-row-num">{String(i + 1).padStart(2, "0")}</div>
+                        <div className="hub-row-main">
+                            <div className="hub-row-head">
+                                <span className="hub-row-name">{p.title}</span>
+                                <StatusPill active={active} />
+                                <div style={{ flex: 1 }} />
+                                <KebabMenu
+                                    items={[
+                                        { label: "Edit", icon: <Pencil size={ICON} />, onClick: () => onEdit(p._id) },
+                                        {
+                                            label: active ? "Set inactive" : "Set active",
+                                            icon: <Power size={ICON} />,
+                                            onClick: () => handleToggle(p),
+                                        },
+                                        { label: "Copy link", icon: <Link2 size={ICON} />, onClick: () => handleShare(p) },
+                                        {
+                                            label: "Delete project",
+                                            icon: <Trash2 size={ICON} />,
+                                            onClick: () => handleDelete(p),
+                                            danger: true,
+                                            separatorBefore: true,
+                                        },
+                                    ]}
+                                />
+                            </div>
 
-                        <div className="mb-3">
-                            <Chip
-                                color={project.status === 'Active' ? 'success' : 'danger'}
-                                variant="flat"
-                                size="sm"
-                                className="font-semibold tracking-wide"
-                            >
-                                {project.status}
-                            </Chip>
-                        </div>
-
-                        <div className="text-slate-600 mb-4 text-sm line-clamp-3">
-                            {project.description}
-                        </div>
-
-                        <div className="text-xs text-slate-400">
-                            {new Date(project.updated).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: 'numeric',
-                                minute: 'numeric',
-                            })}
+                            {p.description && <div className="hub-row-desc">{p.description}</div>}
                         </div>
                     </div>
-
-                    <div className="flex justify-between items-center mt-4 pt-2 border-t">
-
-                        <div className="flex gap-3 text-gray-400">
-                            <button
-                                onClick={() => onRowEdit(project._id)}
-                                className="hover:text-primary transition"
-                                aria-label="Edit project"
-                            >
-                                <EditIcon />
-                            </button>
-                            <button
-                                onClick={() => handleDelete(project._id)}
-                                className="hover:text-red-600 transition"
-                                aria-label="Delete project"
-                            >
-                                <DeleteIcon />
-                            </button>
-                        </div>
-                    </div>
-                </Card>
-            ))}
+                );
+            })}
         </div>
     );
 }
