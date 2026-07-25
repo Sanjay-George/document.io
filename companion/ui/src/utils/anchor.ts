@@ -66,8 +66,13 @@ const MAX_CONTEXT = 3;
 const SECTION_ROLE = /^(tabpanel|tab|dialog|region|navigation|menu|group|form|search|complementary|main)$/;
 const TESTID_ATTRS = ['data-testid', 'data-test', 'data-cy'];
 /** Attribute names an app rarely reuses across unrelated elements (test ids,
- *  `name`, `for`, `data-id`) — strong enough to identify an element on their own. */
-const STRONG_ATTR = /testid|test|cy|data-id|name|for/;
+ *  `name`, `for`, `data-id`) — strong enough to identify an element on their own.
+ *  Anchored to whole names: a substring match wrongly promotes framework-generic
+ *  attrs that merely *contain* these words — e.g. PrimeVue tags every button with
+ *  `data-pc-name="button"` (a shared component type, not an identity), and `for`
+ *  hides inside `data-format`/`platform` — which would re-anchor a note onto any
+ *  lookalike sibling. */
+const STRONG_ATTR = /^(data-)?test(-?id)?$|^(data-)?cy$|^data-id$|^name$|^for$/;
 
 /** Collapse runs of whitespace and trim — makes text comparisons robust. */
 function normalizeText(raw: string | null | undefined): string {

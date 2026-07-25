@@ -36,9 +36,30 @@ describe('resolveAnchoredElement — selector rot onto a sibling', () => {
         startBtn.remove();
         expect(document.querySelector(anchor.selector)).toBe(exportBtn);
 
-        // ...but the fingerprint (text "Start Analysis") doesn't corroborate the
+        // ...but the fingerprint (eg: text "Start Analysis") doesn't corroborate the
         // export button, and a shared toolbar ancestor (+25) + tag (+5) must NOT
         // be enough to recover it either.
+        expect(resolveAnchoredElement(anchor.selector, anchor)).toBeNull();
+    });
+
+    it('Path A: a shared framework-generic attr (PrimeVue data-pc-name) does NOT corroborate', () => {
+        // PrimeVue tags every button with data-pc-name="button" — a component
+        // type, not an identity.
+        mount(`
+            <div id="analysis-toolbar">
+                <button class="p-button" data-pc-name="button" data-pc-section="root" aria-label="Excel Export">Excel Export</button>
+            </div>
+        `);
+        const anchor: AnchorMeta = {
+            selector: '#analysis-toolbar > button.p-button:nth-of-type(1)',
+            tag: 'button',
+            ariaLabel: 'Start Analysis',
+            text: 'Start Analysis',
+            attributes: { type: 'button', 'data-pc-name': 'button', 'data-pc-section': 'root' },
+        };
+        // The selector matches
+        expect(document.querySelector(anchor.selector)).not.toBeNull();
+        // but final resolution does not
         expect(resolveAnchoredElement(anchor.selector, anchor)).toBeNull();
     });
 
