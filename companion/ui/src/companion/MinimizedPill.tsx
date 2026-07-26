@@ -23,9 +23,9 @@ export default function MinimizedPill({ mode, onModeChange, onRestore }: Props) 
             <div className="flex items-center gap-[7px] pl-1 pr-[3px]">
                 <span
                     title={recording ? 'Recording annotations on this page' : 'document.io'}
-                    className={`flex h-[26px] w-[26px] flex-none items-center justify-center rounded-dio-chip text-white transition-colors ${accentBg} ${recording ? 'animate-dio-record' : ''}`}
+                    className={`flex h-[26px] w-[26px] flex-none items-center justify-center rounded-dio-chip text-white transition-colors ${accentBg}`}
                 >
-                    <BrandGlyph size={9} />
+                    <BrandGlyph size={9} className={recording ? 'animate-dio-record' : undefined} />
                 </span>
             </div>
             <div className="h-[22px] w-px bg-white/[.14]" />
