@@ -2,7 +2,7 @@
 
 **Document.io** is a streamlined tool for capturing, annotating, and documenting websites. Whether you’re building tutorials, managing workflows, or documenting app interfaces, document.io makes the process easy and collaborative.
 
-> ⚠️ Under intense rework! Complete UI/UX rehaul and security improvements
+> ⚠️ Under intense rework! UI/UX rehaul and security improvements in progress. Beta release planned in Sept. 2026.
 
 
 #### New Hub
