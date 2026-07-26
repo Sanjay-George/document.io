@@ -98,6 +98,8 @@ export default {
           'success': '#3FCF8E',
           'danger': '#B03024',
           'danger-2': '#C0392B',
+          // Resting tone for destructive text actions, which deepen to `danger` on hover.
+          'danger-muted': '#B79A93',
           'danger-bg': '#FCEBEA',
           'danger-border': '#F1CFCB',
           'broken-border': '#EAC7C3',
