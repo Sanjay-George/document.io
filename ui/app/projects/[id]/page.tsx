@@ -19,7 +19,7 @@ import {
     SectionHeader,
     EmptyState,
     Spinner,
-    KebabMenu,
+    MeatballMenu,
     useHubToast,
 } from "@/components/hub";
 
@@ -123,7 +123,7 @@ export default function ProjectDetails({ params }: { params: Promise<{ id: strin
                     <Button variant="primary" icon={<Plus size={16} strokeWidth={2.2} />} onClick={openNewDoc}>
                         Add documentation
                     </Button>
-                    <KebabMenu
+                    <MeatballMenu
                         items={[
                             {
                                 label: project?.exportEnabled ? "Disable export (beta)" : "Enable export (beta)",
