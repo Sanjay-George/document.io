@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Document.io Companion</title>
+    <style>
+      :root {
+        --var-primary: #0075a0;
+        --var-accent: #ff8749;
+        --var-danger: #b74606;
+        --var-slate-50: #f8fafc;
+        --var-slate-100: #f1f5f9;
+        --var-slate-200: #e2e8f0;
+        --var-slate-300: #cbd5e1;
+        --var-slate-400: #94a3b8;
+        --var-slate-500: #64748b;
+        --var-slate-700: #334155;
+        --var-slate-900: #0f172a;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 320px;
+        padding: 12px;
+        background: var(--var-slate-50);
+        color: var(--var-slate-900);
+        font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+      }
+
+      .panel {
+        border: 1px solid var(--var-slate-200);
+        border-radius: 12px;
+        padding: 14px;
+        background: #fff;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+      }
+
+      h1 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--var-slate-900);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      h1 span {
+        color: var(--var-primary);
+      }
+
+      label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--var-slate-500);
+        text-transform: capitalize;
+        /* letter-spacing: 0.04em; */
+        margin-bottom: 6px;
+      }
+
+      input {
+        display: block;
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 12px;
+        border: 1px solid var(--var-slate-300);
+        border-radius: 8px;
+        outline: none;
+        color: var(--var-slate-900);
+        background: var(--var-slate-50);
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+
+      input:focus {
+        border-color: var(--var-primary);
+        box-shadow: 0 0 0 3px rgba(0, 117, 160, 0.15);
+      }
+
+      button {
+        margin-top: 12px;
+        width: 100%;
+        padding: 9px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        border: 1px solid var(--var-primary);
+        border-radius: 8px;
+        background: var(--var-primary);
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+      }
+
+      button:hover {
+        background: #005f82;
+        border-color: #005f82;
+      }
+
+      .hint {
+        font-size: 11px;
+        font-style: italic;
+        color: var(--var-slate-400);
+        margin-top: 7px;
+      }
+
+      .status {
+        font-size: 11px;
+        margin-top: 8px;
+        color: var(--var-slate-700);
+        font-weight: 500;
+        min-height: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel">
+      <h1>Document.io <span>Companion</span></h1>
+      <label for="host">Connect to:</label>
+      <input id="host" type="url" placeholder="http://localhost:5001" />
+      <p class="hint">(The URL of your document.io server.)</p>
+      <button id="save">Save</button>
+      <p class="status" id="status"></p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

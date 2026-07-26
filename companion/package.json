@@ -1,0 +1,22 @@
+{
+  "name": "document-io-companion-app",
+  "version": "1.0.0-beta.2",
+  "type": "commonjs",
+  "scripts": {
+    "clean": "rimraf extensions/dist",
+    "copy:ui": "copyfiles -u 2 ui/dist/** ui/dist/**/* extensions/dist",
+    "build:ui": "npm --prefix ./ui run build",
+    "build": "npm run clean && npm run build:ui && npm run copy:ui"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "copyfiles": "^2.4.1",
+    "dotenv": "^16.4.7",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
