@@ -28,6 +28,12 @@ function handleUrl(details) {
         const domain = urlObj.hostname;
         const docId = urlObj.searchParams.get("documentation-id");
 
+        // CRITICAL ISSUE.
+        
+        // TODO: Add further checks here to check if docId + stored origin matches the current URL.
+        // if not, don't store docID as it could be an attack. And don't let any API calls.
+
+
         if (docId) {
             const key = makeKey(details.tabId, domain);
 
@@ -103,6 +109,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
 
     if (msg.type === RUNTIME_REQUEST.setApiHost) {
+        // TODO: (5) Don't blindly accept any host. 
+        //  Requuire http(s) origin, no path. 
+        //  Require sender.tab === undefined (ie. only popup.js can set it, not content.js)
         chrome.storage.local.set({ docio_api_host: msg.host }).then(() => sendResponse({ ok: true }));
         return true;
     }
@@ -129,6 +138,7 @@ async function isExportEnabled(docId) {
 
     let enabled = false;
     try {
+        // TODO: (6) Verify this still works
         const doc = await doFetch(`/documentations/${encodeURIComponent(docId)}`, {});
         enabled = doc?.exportEnabled === true;
     } catch {
@@ -158,7 +168,8 @@ async function tabExportEnabled(tab) {
 // ---- Asset Fetch (arbitrary bytes → base64, bypasses page CORS) ----
 /**
  * Fetches an asset for export, bypassing CORS restrictions.
- * IMPORTANT: This feature is in beta and is susceptible to SSRF attacks (Read TODOs below). Work with caution!!! 
+ * IMPORTANT: This feature is in beta and is susceptible to SSRF attacks (Read TODOs below). 
+ *  USE WITH CAUTION!!! 
  * @param {*} url 
  * @param {*} tab 
  * @returns 
@@ -200,24 +211,33 @@ async function fetchAssetForExport(url, tab) {
 
 /**
  * Fetches data from backend server (ie. hub).
- * @param {*} url 
- * @param {*} options 
- * @returns 
+ * @param {*} url Only relative URLs allowed. Absolute URLs will be rejected.
+ * @param {*} options Only allowlisted options allowed. All others will be rejected.
+ * @returns JSON-parsed response body
  * @throws on non-2xx responses
  */
 async function doFetch(url, options) {
     const base = await getApiHost();
 
-    // TODO: Only support relative URLs. 
-    //  Host should be configured by user. No defaults.
+    // TODO: (1) Validate `url` against `base` (ie. getApiHost()). 
+    //  If `url` is not relative, reject.
+    //  If origin different after URL formation (ie. after URL()), reject.
 
-    // TODO: Don't override with full URL. Only relative paths.
-    if (!/^https?:\/\//i.test(url)) url = base + url;
-
+    if (!/^https?:\/\//i.test(url)) url = base + url;  // TODO: Don't override, use new URL(url, base) instead.
     console.debug(`[Document.io Companion] Background fetching: ${url}`);
-    const res = await fetch(url, options);
 
-    // TODO: CHECK if there should be an allow-lists for urls.
+    // TODO: (2) Validate options. Don't spread options to fetch(). 
+    //  Allowlist methods (GET, POST, DELETE, PUT) per specific paths (ie. PUT / POST annotations allowed, but no writes on project or documentation), 
+    //  Allow only Content-Type: application/json.
+    //  Validate body and limit supported body types & size (if possible)
+    //  Reject any other options. 
+
+    // TODO: (3) Allowlist path prefixes (eg: /documentations /annotations). Reject any other paths.
+
+    // TODO: (4) Block redirects. Refer fetchAssetForExport()
+
+
+    const res = await fetch(url, options);
 
     if (res.status === 401) {
         const err = new Error("HTTP 401");
