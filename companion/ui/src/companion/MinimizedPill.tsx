@@ -15,14 +15,15 @@ type Props = {
  * echoes the active mode's colour (orange Read / red Annotate).
  */
 export default function MinimizedPill({ mode, onModeChange, onRestore }: Props) {
-    const accentBg = mode === 'edit' ? 'bg-dio-danger' : 'bg-dio-accent';
+    const recording = mode === 'edit';
+    const accentBg = recording ? 'bg-dio-danger' : 'bg-dio-accent';
 
     return (
         <div className="animate-dio-pop-pill fixed bottom-[22px] right-[22px] z-[50] flex items-center gap-1 rounded-dio-pill bg-dio-ink p-1.5 font-dio-ui shadow-dio-pill">
             <div className="flex items-center gap-[7px] pl-1 pr-[3px]">
                 <span
-                    title="document.io"
-                    className={`flex h-[26px] w-[26px] flex-none items-center justify-center rounded-dio-chip text-white transition-colors ${accentBg}`}
+                    title={recording ? 'Recording annotations on this page' : 'document.io'}
+                    className={`flex h-[26px] w-[26px] flex-none items-center justify-center rounded-dio-chip text-white transition-colors ${accentBg} ${recording ? 'animate-dio-record' : ''}`}
                 >
                     <BrandGlyph size={9} />
                 </span>

@@ -141,6 +141,12 @@ export default {
           '70%': { boxShadow: '0 0 0 12px rgba(221,98,52,0)' },
           '100%': { boxShadow: '0 0 0 0 rgba(221,98,52,0)' },
         },
+        // Looping "recording" halo — red ring breathes out from the glyph while annotating.
+        'dio-record': {
+          '0%': { boxShadow: '0 0 0 0 rgba(176,48,36,.55)' },
+          '70%': { boxShadow: '0 0 0 7px rgba(176,48,36,0)' },
+          '100%': { boxShadow: '0 0 0 0 rgba(176,48,36,0)' },
+        },
         'dio-pop': {
           '0%': { opacity: '0', transform: 'translateY(6px) scale(.985)' },
           '100%': { opacity: '1', transform: 'none' },
@@ -153,6 +159,7 @@ export default {
       },
       animation: {
         'dio-pulse': 'dio-pulse 1.3s ease',
+        'dio-record': 'dio-record 1.6s ease-out infinite',
         'dio-pop': 'dio-pop .18s ease',
         'dio-pop-lg': 'dio-pop .22s ease',
         'dio-pop-pill': 'dio-pop .25s ease',
