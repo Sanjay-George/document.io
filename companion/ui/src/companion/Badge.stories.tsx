@@ -4,7 +4,7 @@ import Badge from '@/companion/Badge';
 const meta = {
     title: 'Companion/Primitives/Badge',
     component: Badge,
-    args: { number: 4, state: 'idle' },
+    args: { number: 4, state: 'idle', style: { top: -10, left: -10 } },
     argTypes: { state: { control: 'inline-radio', options: ['idle', 'selected', 'flashing'] } },
     // Badge is absolutely positioned; give it a relative host to sit on.
     decorators: [
@@ -19,6 +19,5 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Idle: Story = { args: { style: { top: -10, left: -10 } } };
-export const Selected: Story = { args: { state: 'selected', style: { top: -10, left: -10 } } };
-export const Flashing: Story = { args: { state: 'flashing', style: { top: -10, left: -10 } } };
+/** Flip `state` for the selected and flashing treatments. */
+export const Default: Story = {};

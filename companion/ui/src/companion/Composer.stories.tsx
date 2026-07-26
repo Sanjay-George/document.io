@@ -19,7 +19,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function ComposerHarness({ mode, initial }: { mode: 'new' | 'edit'; initial: Draft }) {
+/** Live draft — typing updates the preview and the save button's enabled state. */
+function Harness({ mode, initial }: { mode: 'new' | 'edit'; initial: Draft }) {
     const [draft, setDraft] = useState<Draft>(initial);
     return (
         <Composer
@@ -32,50 +33,15 @@ function ComposerHarness({ mode, initial }: { mode: 'new' | 'edit'; initial: Dra
     );
 }
 
-export const NewComponentNote: Story = {
+/** Writing a new note against a freshly picked element. */
+export const Default: Story = {
     render: () => (
-        <ComposerHarness
+        <Harness
             mode="new"
-            initial={{ type: 'component', selector: '#build-4210 button.promote', url: 'halyard.app/deployments', title: '', body: '' }}
-        />
-    ),
-};
-
-export const EditNote: Story = {
-    render: () => (
-        <ComposerHarness
-            mode="edit"
             initial={{
                 type: 'component',
                 selector: '#build-4210 button.promote',
                 url: 'halyard.app/deployments',
-                title: 'Promote the build',
-                body: 'Click **Promote** to open the target picker.',
-            }}
-        />
-    ),
-};
-
-/**
- * Anchor to a deeply-nested element whose CSS-module selector is enormous. The
- * banner shows the smart, single-row label (tag + visible text), never the raw
- * selector chain.
- */
-export const LongSelectorAnchor: Story = {
-    render: () => (
-        <ComposerHarness
-            mode="edit"
-            initial={{
-                type: 'component',
-                selector:
-                    'div.Primer_Brand__Grid-module__Grid__column___Hips.lp-CustomerStories-gridColumn:nth-of-type(2) > a.Primer_Brand__Button-module__Button___lDruK > span.Primer_Brand__Button-module__Button__text___Z3ocU > span.Primer_Brand__Text-module__Text___pecHN',
-                anchor: {
-                    selector:
-                        'div.Primer_Brand__Grid-module__Grid__column___Hips.lp-CustomerStories-gridColumn:nth-of-type(2) > a.Primer_Brand__Button-module__Button___lDruK > span.Primer_Brand__Button-module__Button__text___Z3ocU > span.Primer_Brand__Text-module__Text___pecHN',
-                    tag: 'span',
-                    text: 'Read the customer story',
-                },
-                url: '/',
                 title: '',
                 body: '',
             }}
@@ -83,15 +49,26 @@ export const LongSelectorAnchor: Story = {
     ),
 };
 
-/** Scope generalised with a wildcard so the note covers a page across ids. */
-export const WildcardPageScope: Story = {
+/**
+ * Editing an existing note anchored to a deeply-nested element. The enormous
+ * CSS-module selector is the point: the banner shows the smart single-row label
+ * (tag + visible text), never the raw chain.
+ */
+export const Edit: Story = {
     render: () => (
-        <ComposerHarness
+        <Harness
             mode="edit"
             initial={{
                 type: 'component',
-                selector: 'div.col-md-6:nth-of-type(2) > div.card',
-                url: '/en/test-page/abcdef123456',
+                selector:
+                    'div.Primer_Brand__Grid-module__Grid__column___Hips.lp-CustomerStories-gridColumn:nth-of-type(2) > a.Primer_Brand__Button-module__Button___lDruK > span.Primer_Brand__Text-module__Text___pecHN',
+                anchor: {
+                    selector:
+                        'div.Primer_Brand__Grid-module__Grid__column___Hips.lp-CustomerStories-gridColumn:nth-of-type(2) > a.Primer_Brand__Button-module__Button___lDruK > span.Primer_Brand__Text-module__Text___pecHN',
+                    tag: 'span',
+                    text: 'Read the customer story',
+                },
+                url: '/en/commonality/report/commonality/abcdef123456',
                 urlPattern: '/en/commonality/report/commonality/*',
                 title: 'Commonality Matrix',
                 body: 'For each product selected, it shows the commonality rate with each other.',
