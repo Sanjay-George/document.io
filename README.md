@@ -2,13 +2,22 @@
 
 **Document.io** is a streamlined tool for capturing, annotating, and documenting websites. Whether you’re building tutorials, managing workflows, or documenting app interfaces, document.io makes the process easy and collaborative.
 
-![screely-1736026302681](https://github.com/user-attachments/assets/9391e071-c759-479b-940e-3f2414e3b5c0)
+> ⚠️ Under intense rework! Complete UI/UX rehaul and security improvements
+
+
+#### New Hub
+
+<img width="1440" height="775" alt="image" src="https://github.com/user-attachments/assets/7c57177f-fc9f-48ad-8c85-777512b4b5d9" />
+
+#### Current 
+
+![screely-1736026302681](https://github.com/user-attachments/assets/9391e071-c759-479b-940e-3f2414e3b5c0) 
 
 A companion app is required to add and view annotations on websites. [You can set it up from here.](https://github.com/Sanjay-George/document.io-companion?tab=readme-ov-file#-quick-start)
 
-Live demo: https://document-io.tech/
+~Live demo: https://document-io.tech/~
 
-(The demo is restricted to 'GET' requests. You can't add, update, or delete any documentations)
+~(The demo is restricted to 'GET' requests. You can't add, update, or delete any documentations)~
 
 
 
