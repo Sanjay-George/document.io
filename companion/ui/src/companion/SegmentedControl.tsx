@@ -14,9 +14,9 @@ const SEGMENTS: { mode: Mode; label: string; letter: string; activeBg: string }[
 ];
 
 /**
- * Read / Annotate segmented toggle (README §2). The active mode shows its full
- * label in its accent colour; the other collapses to its initial and expands
- * when clicked. Two skins share one behaviour — `panel` (light) / `pill` (dark).
+ * Read / Annotate segmented toggle. 
+ * The active mode shows its full label in its accent colour; the other collapses to its initial and expands when clicked. 
+ * Two skins share one behaviour — `panel` (light) / `pill` (dark).
  */
 export default function SegmentedControl({ value, onChange, variant = 'panel' }: Props) {
     const isPill = variant === 'pill';
