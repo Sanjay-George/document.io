@@ -14,10 +14,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** `meta` is optional — clear it for a bare label. */
 export const Default: Story = {};
-
-/** `meta` is optional — omit it for a bare label. */
-export const NoMeta: Story = { args: { label: "Assets", meta: undefined } };
 
 /** `meta` accepts any node, so it can carry a status chip or other control. */
 export const RichMeta: Story = {

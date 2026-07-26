@@ -6,23 +6,6 @@ const meta = {
     title: "Hub/Components/Breadcrumb",
     component: Breadcrumb,
     parameters: { layout: "padded" },
-} satisfies Meta<typeof Breadcrumb>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-/** Two levels: a linked root and the current project. */
-export const ProjectDetail: Story = {
-    args: {
-        items: [
-            { label: "projects", href: "/projects" },
-            { label: "support-playbook", current: true },
-        ],
-    },
-};
-
-/** Three levels — every crumb but the last is navigable. */
-export const NestedUpload: Story = {
     args: {
         items: [
             { label: "projects", href: "/projects" },
@@ -30,4 +13,10 @@ export const NestedUpload: Story = {
             { label: "upload", current: true },
         ],
     },
-};
+} satisfies Meta<typeof Breadcrumb>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+/** Every crumb but the last is navigable; drop items for a shallower trail. */
+export const Default: Story = {};
