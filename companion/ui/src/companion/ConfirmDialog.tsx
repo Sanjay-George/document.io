@@ -31,7 +31,12 @@ export default function ConfirmDialog({
             >
                 <div className="px-5 pb-[18px] pt-[18px]">
                     <div className="text-[15px] font-semibold text-dio-primary">{title}</div>
-                    <div className="mt-2 text-[13.5px] leading-[1.55] text-dio-muted">{message}</div>
+                    {/* Messages embed URL paths and page-scope patterns, which have no
+                        spaces to wrap at — without this the shell's overflow-hidden
+                        silently clips what the user is being asked to approve. */}
+                    <div className="mt-2 break-words text-[13.5px] leading-[1.55] text-dio-muted">
+                        {message}
+                    </div>
                     <div className="mt-[18px] flex justify-end gap-2">
                         <button
                             type="button"
