@@ -26,8 +26,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-function Harness({ initialMode = 'view' as Mode }: { initialMode?: Mode }) {
-    const [mode, setMode] = useState<Mode>(initialMode);
+function Harness() {
+    const [mode, setMode] = useState<Mode>('view');
     const [tab, setTab] = useState<Tab>('page');
     const [orientation, setOrientation] = useState<PanelOrientation>(PanelOrientation.VERTICAL);
     return (
@@ -45,14 +45,8 @@ function Harness({ initialMode = 'view' as Mode }: { initialMode?: Mode }) {
     );
 }
 
-/** Read mode shows the scope tabs; the dock + minimize controls sit top-right. */
-export const Reading: Story = { render: () => <Harness /> };
-
-/** Annotate mode hides the scope tabs. */
-export const Annotate: Story = { render: () => <Harness initialMode="edit" /> };
-
-/** Without `onOrientationChange` the dock toggle is hidden. */
-export const NoOrientationToggle: Story = {};
+/** Read mode shows the scope tabs; switching to Annotate hides them. */
+export const Default: Story = { render: () => <Harness /> };
 
 /** Read-only export view — mode toggle and scope tabs are hidden. */
 export const ReadOnly: Story = {

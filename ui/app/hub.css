@@ -140,13 +140,13 @@
 .hub-row-name { font-size: 19px; font-weight: 700; letter-spacing: -.01em; }
 .hub-row-desc { margin-top: 6px; font-size: 13.5px; line-height: 1.5; color: var(--dio-mute-warm); max-width: 560px; }
 
-/* ---------- Kebab menu ---------- */
-.hub-kebab-wrap { position: relative; }
-.hub-kebab {
+/* ---------- Meatball menu ---------- */
+.hub-meatball-wrap { position: relative; }
+.hub-meatball {
     width: 28px; height: 28px; border: none; background: none; border-radius: 8px; cursor: pointer;
     color: hsl(var(--text-faint)); display: flex; align-items: center; justify-content: center; transition: background .12s, color .12s;
 }
-.hub-kebab:hover { background: hsl(var(--sand-320)); color: var(--dio-text-secondary); }
+.hub-meatball:hover { background: hsl(var(--sand-320)); color: var(--dio-text-secondary); }
 .hub-menu {
     position: absolute; top: 32px; right: 0; z-index: 30; width: 200px; background: hsl(var(--white));
     border: 1px solid var(--dio-border-panel); border-radius: 12px; box-shadow: 0 14px 40px hsl(var(--ink) / .16);

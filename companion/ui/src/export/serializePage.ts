@@ -34,7 +34,7 @@ function companionAssets(): CompanionAssets | null {
 /** Fetch a URL through the extension (CORS-bypassed) and return a data URI, or null. */
 async function assetDataUri(url: string): Promise<string | null> {
     try {
-        const res = await window.documentioAPI?.fetchAsset?.(url);
+        const res = await window.documentioAPI?.fetchAssetForExport?.(url);
         if (!res) return null;
         return `data:${res.contentType};base64,${res.base64}`;
     } catch {

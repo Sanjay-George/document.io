@@ -7,15 +7,6 @@ import { Plus } from "lucide-react";
 const meta = {
     title: "Hub/Components/EmptyState",
     component: EmptyState,
-    args: { title: "Nothing documented yet" },
-    parameters: { layout: "padded" },
-} satisfies Meta<typeof EmptyState>;
-
-export default meta;
-type Story = StoryObj<typeof meta>;
-
-/** Icon, body copy and a call-to-action — the full first-run state. */
-export const Default: Story = {
     args: {
         title: "Nothing documented yet",
         body: "A project holds related guides. Create one to start documenting a workflow at its source.",
@@ -25,18 +16,14 @@ export const Default: Story = {
             </Button>
         ),
     },
-};
+    parameters: { layout: "padded" },
+} satisfies Meta<typeof EmptyState>;
 
-/** Trimmed variant for empty search/filter results — no icon, no action. */
-export const NoIcon: Story = {
-    args: { showIcon: false, title: "No matching projects", body: "Try a different filter or search term." },
-};
+export default meta;
+type Story = StoryObj<typeof meta>;
 
-/** Compact spacing for use inside a project detail pane. */
-export const Detail: Story = {
-    args: {
-        variant: "detail",
-        title: "No guides here yet",
-        body: "Open the companion on your app to capture the first step.",
-    },
-};
+/**
+ * The full first-run state. Clear `showIcon`/`action` for the trimmed
+ * search-results form, or set `variant` to `detail` for compact spacing.
+ */
+export const Default: Story = {};

@@ -5,20 +5,15 @@ import { sampleNotes } from '@/companion/fixtures';
 const meta = {
     title: 'Companion/Components/NoteBody',
     component: NoteBody,
+    args: { note: sampleNotes[2], showContext: true },
     decorators: [(Story) => <div className="w-[300px]">{Story()}</div>],
 } satisfies Meta<typeof NoteBody>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const WithMarkdown: Story = {
-    args: { note: sampleNotes[2] },
-};
+/** Element-anchored note; clear `showContext` to drop the context line. */
+export const Default: Story = {};
 
-export const PageScoped: Story = {
-    args: { note: sampleNotes[0] },
-};
-
-export const BodyOnly: Story = {
-    args: { note: sampleNotes[3], showContext: false },
-};
+/** Whole-page note — the context line shows the URL instead of an element. */
+export const PageScoped: Story = { args: { note: sampleNotes[0] } };

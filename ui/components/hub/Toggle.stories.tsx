@@ -11,25 +11,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Starts on; the label tracks the state as you flip it. */
-export const Interactive: Story = {
+/** Labelled and bare, both live — the label tracks the state as you flip it. */
+export const Default: Story = {
     render: () => {
-        const [on, setOn] = useState(true);
-        return <Toggle on={on} onChange={setOn} label={on ? "Active" : "Inactive"} />;
-    },
-};
-
-export const Off: Story = {
-    render: () => {
-        const [on, setOn] = useState(false);
-        return <Toggle on={on} onChange={setOn} label={on ? "Active" : "Inactive"} />;
-    },
-};
-
-/** No label — just the switch. */
-export const NoLabel: Story = {
-    render: () => {
-        const [on, setOn] = useState(true);
-        return <Toggle on={on} onChange={setOn} />;
+        const [labelled, setLabelled] = useState(true);
+        const [bare, setBare] = useState(false);
+        return (
+            <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+                <Toggle on={labelled} onChange={setLabelled} label={labelled ? "Active" : "Inactive"} />
+                <Toggle on={bare} onChange={setBare} />
+            </div>
+        );
     },
 };

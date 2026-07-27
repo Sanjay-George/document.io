@@ -5,7 +5,7 @@ import Badge from '@/companion/Badge';
 const meta = {
     title: 'Companion/Primitives/HighlightRing',
     component: HighlightRing,
-    args: { selected: false, radius: '10px' },
+    args: { selected: true, radius: '10px' },
     decorators: [
         (Story) => (
             <div className="relative flex h-[44px] w-[180px] items-center justify-center rounded-[10px] bg-dio-subtle text-[13.5px] text-dio-secondary">
@@ -19,15 +19,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Idle: Story = {};
-export const Selected: Story = { args: { selected: true } };
-
-export const WithBadge: Story = {
-    args: { selected: true },
+/** As it appears on the host page — ring plus its badge. Clear `selected` for the idle ring. */
+export const Default: Story = {
     render: (args) => (
         <>
             <HighlightRing {...args} />
-            <Badge number={4} state="selected" style={{ top: -11, right: -9 }} />
+            <Badge number={4} state={args.selected ? 'selected' : 'idle'} style={{ top: -11, right: -9 }} />
         </>
     ),
 };
