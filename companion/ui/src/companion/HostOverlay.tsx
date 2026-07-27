@@ -180,9 +180,7 @@ export default function HostOverlay({
             e.preventDefault();
             e.stopPropagation();
             el.classList.remove(HOVERED_ELEMENT_CLASS);
-            // Store the origin-independent path, plus the host's own query params
-            // so the scope editor can offer them as opt-in chips. Matching still
-            // compares paths only. See capturePageUrl / pageMatches.
+            // Store relative URL + query string to anchor later
             const relativeUrl = capturePageUrl();
             // Capture selector + identity signals so the note re-resolves robustly.
             const anchor = buildAnchor(el);
