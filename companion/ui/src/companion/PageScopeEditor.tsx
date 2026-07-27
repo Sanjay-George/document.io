@@ -20,18 +20,25 @@ type Props = {
 const NEXT_STATE: Record<SegmentState, SegmentState> = { exact: 'any', any: 'deep', deep: 'exact' };
 
 /** Each state's chip label. The depth chip draws its own slashes so it visibly
- *  spans them — that, not the extra `∗`, is what distinguishes it at a glance. */
+ *  spans them — that, not the extra `∗`, is what distinguishes it at a glance.
+ *  The site root is a chip with an empty label, drawn as the `/` it matches. */
 const LABEL: Record<SegmentState, (seg: string) => string> = {
-    exact: (seg) => seg,
+    exact: (seg) => seg || '/',
     any: () => '∗',
     deep: () => '/ ∗∗ /',
 };
 
 /** Tooltips name the *next* click, so the third state is discoverable by hover. */
 const HINT: Record<SegmentState, (seg: string) => string> = {
-    exact: (seg) => `“${seg}” — click to match any value here`,
+    exact: (seg) =>
+        seg
+            ? `“${seg}” — click to match any value here`
+            : 'The site root — click to match any top-level page',
     any: () => 'Matches any single value here — click again to match any number of levels',
-    deep: (seg) => `Matches any number of levels here — click to require “${seg}”`,
+    deep: (seg) =>
+        seg
+            ? `Matches any number of levels here — click to require “${seg}”`
+            : 'Matches every page — click to go back to the site root only',
 };
 
 /**
@@ -86,13 +93,10 @@ export default function PageScopeEditor({ url, value, onChange }: Props) {
             </div>
 
             <div className="flex flex-wrap items-center rounded-dio-tab border border-dio-border-field bg-dio-subtle px-2 py-[7px] font-dio-mono text-[12px] leading-[1.6]">
-                {segments.length === 0 ? (
-                    <span className="text-dio-body">/</span>
-                ) : (
-                    segments.map((seg, i) => {
-                        // The depth chip carries its own slashes, so the row skips
-                        // the separators it would otherwise duplicate either side.
-                        const spansSlashes = states[i] === 'deep' || states[i - 1] === 'deep';
+                {segments.map((seg, i) => {
+                        // Depth and root chips draw their own slashes; skip the duplicate.
+                        const ownSlash = states[i] === 'deep' || (!seg && states[i] === 'exact');
+                        const spansSlashes = ownSlash || states[i - 1] === 'deep';
                         return (
                             <span key={i} className="flex items-center">
                                 {!spansSlashes && <span className="text-dio-faint">/</span>}
@@ -106,8 +110,7 @@ export default function PageScopeEditor({ url, value, onChange }: Props) {
                                 </button>
                             </span>
                         );
-                    })
-                )}
+                })}
                 {params.map((param, i) => (
                     <button
                         key={param.key}

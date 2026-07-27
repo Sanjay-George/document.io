@@ -235,6 +235,34 @@ describe('parsePageScope / buildPageScope — the chip-state codec', () => {
         expect(buildPageScope(scope)).toBe(pattern);
     });
 
+    it('gives the site root a chip, so a note on / can still be widened', () => {
+        // `/` has no path segments; without a synthetic one there is nothing to
+        // click, and a note on a global component could never reach `/**`.
+        const root = parsePageScope('/');
+        expect(root.segments).toEqual(['']);
+        expect(root.states).toEqual(['exact']);
+        expect(buildPageScope(root)).toBeUndefined();
+
+        expect(buildPageScope({ ...root, states: ['any'] })).toBe('/*');
+        expect(buildPageScope({ ...root, states: ['deep'] })).toBe('/**');
+    });
+
+    it('round-trips the root chip through its widened patterns', () => {
+        expect(parsePageScope('/', '/*').states).toEqual(['any']);
+        expect(parsePageScope('/', '/**').states).toEqual(['deep']);
+    });
+
+    it('builds a root pattern with a required param without doubling the slash', () => {
+        const root = parsePageScope('/?tab=repositories');
+        expect(root.segments).toEqual(['']);
+        expect(
+            buildPageScope({
+                ...root,
+                params: [{ key: 'tab', value: 'repositories', required: true }],
+            }),
+        ).toBe('/?tab=repositories');
+    });
+
     it('keeps a chip for a required param the current url does not have', () => {
         // Editing the note from a page without `?tab=` must not silently drop it.
         const scope = parsePageScope('/Sanjay-George', '/*?tab=repositories');

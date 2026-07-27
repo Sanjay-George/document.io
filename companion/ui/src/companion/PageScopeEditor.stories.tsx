@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import PageScopeEditor from '@/companion/PageScopeEditor';
 
 const REPORT_URL = '/en/commonality/report/59bb70f8d5d71c7b8768b5257d8f60b8?qs=1&sort=4';
+const ONLY_ORIGIN = '/';
 
 /** Holds the pattern so the chips are live — the row itself renders the result. */
 function Harness({ url }: { url: string }) {
@@ -38,3 +39,9 @@ type Story = StoryObj<typeof meta>;
  * to match any number of levels there; click a param chip to require it.
  */
 export const Default: Story = {};
+
+/**
+ * A note made on the site root. `/` has no path segments, so it gets one chip of
+ * its own — otherwise a note on a global component could never widen to `/**`.
+ */
+export const OnlyOrigin: Story = { args: { url: ONLY_ORIGIN } };

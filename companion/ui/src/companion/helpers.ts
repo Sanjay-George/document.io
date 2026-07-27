@@ -32,13 +32,7 @@ function lastSelectorTag(selector: string): string {
  * identity: the pathname only. Absolute URLs have their origin stripped;
  * relative URLs resolve against `base` (defaults to the current page).
  *
- * Both the query string and the hash are intentionally dropped:
- * - a page's identity is its path; params like `?tab=repositories` vary within
- *   one page, and enforcing them is opt-in per note via `urlPattern` (see
- *   `pageMatches`), never a default;
- * - the hash identifies a section *within* a page (`/guide#install`), so it
- *   must not split one page into several — an annotation made anywhere on the
- *   page should be discoverable regardless of the current anchor.
+ * Both the query string and the hash are intentionally dropped
  */
 export function toRelativeUrl(url: string, base?: string): string {
     const resolvedBase = base ?? (typeof window !== 'undefined' ? window.location.href : undefined);
@@ -176,7 +170,9 @@ const GLYPH: Record<SegmentState, string> = { exact: '', any: '*', deep: '**' };
  * `buildPageScope`), so the missing tail reads back as `deep`.
  */
 export function parsePageScope(url: string, pattern?: string): PageScope {
-    const segments = splitPath(toRelativeUrl(url));
+    const capturedSegments = splitPath(toRelativeUrl(url));
+    // Root has no segments but still needs a chip, or `/` could never widen to `/**`.
+    const segments = capturedSegments.length ? capturedSegments : [''];
     const captured = [...searchParamsOf(url)];
 
     if (!pattern || !pattern.trim()) {
