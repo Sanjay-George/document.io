@@ -3,6 +3,7 @@ import { Mode, Note, Placement } from '@/companion/types';
 import Badge from '@/companion/Badge';
 import HighlightRing from '@/companion/HighlightRing';
 import Popover from '@/companion/Popover';
+import { capturePageUrl } from '@/companion/helpers';
 import { buildAnchor, resolveAnchoredElement } from '@/utils/anchor';
 import { isHighlightable } from '@/utils/annotations';
 import { HOVERED_ELEMENT_CLASS, MODAL_ROOT_ID } from '@/utils/constants';
@@ -179,9 +180,8 @@ export default function HostOverlay({
             e.preventDefault();
             e.stopPropagation();
             el.classList.remove(HOVERED_ELEMENT_CLASS);
-            // Store the origin-independent path (no query string, no hash) —
-            // matching strips both, so the stored URL must too. See toRelativeUrl.
-            const relativeUrl = window.location.pathname;
+            // Store relative URL + query string to anchor later
+            const relativeUrl = capturePageUrl();
             // Capture selector + identity signals so the note re-resolves robustly.
             const anchor = buildAnchor(el);
             onPickTarget({ selector: anchor.selector, anchor, url: relativeUrl, type: 'component' });

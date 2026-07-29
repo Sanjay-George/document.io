@@ -143,13 +143,24 @@ flowchart LR
         r["resolveAnchoredElement<br/>searches the WHOLE live DOM"]
     end
     subgraph scope["CompanionContainer — whether"]
-        p["pageMatches(here, url)<br/>gates by pathname"]
+        p["pageMatches(here, url, urlPattern)<br/>gates by pathname"]
     end
     note["a note"] --> p -.->|"on this page?"| r
 ```
 
 - **Resolution has no idea what page it's on.** `gatherCandidates` will happily match a lookalike element anywhere in the document ([`anchor.ts:244`](anchor.ts:244)).
 - **Page identity is enforced upstream**, by `pageMatches` in [`CompanionContainer.tsx`](../companion/CompanionContainer.tsx) — *not* here.
+- **Scope widens by pattern, never by accident.** With no `urlPattern` a note matches one exact path. `urlPattern` (built by clicking chips in `PageScopeEditor`) generalises it:
+
+  | Pattern | Matches |
+  |---|---|
+  | `/en/report/*` | any value in that one segment — not `/en/report/a/b` |
+  | `/docs/**` | `/docs` and any depth below it (`**` is zero-or-more whole segments) |
+  | `/a/**/b` | `/a/b`, `/a/x/b`, `/a/x/y/b` |
+  | `/**` | every page — for a note on a global component |
+  | `/*?tab=repositories` | any top-level page, but only on that tab |
+
+- **Query params are opt-in.** Paths alone decide identity ([`toRelativeUrl`](../companion/helpers.ts)), so `?documentation-id=…` and `#hash` never split one page into several. A param constrains matching only when a pattern names it explicitly, and params the pattern doesn't name are ignored — `?tab=repositories&q=x` still matches `?tab=repositories`.
 - **This split caused the SPA leftover-pins bug.** On soft navigation the URL gate wasn't firing, so stale notes stayed "on page" and the resilient resolver re-anchored them onto lookalikes on the new page. The fix restored the URL gate; anchoring itself was working as designed. Do **not** try to make `resolveAnchoredElement` page-aware — keep the "where" and the "whether" separate.
 
 ---

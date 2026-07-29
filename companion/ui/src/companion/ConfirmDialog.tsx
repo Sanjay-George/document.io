@@ -31,7 +31,9 @@ export default function ConfirmDialog({
             >
                 <div className="px-5 pb-[18px] pt-[18px]">
                     <div className="text-[15px] font-semibold text-dio-primary">{title}</div>
-                    <div className="mt-2 text-[13.5px] leading-[1.55] text-dio-muted">{message}</div>
+                    <div className="mt-2 break-words text-[13.5px] leading-[1.55] text-dio-muted">
+                        {message}
+                    </div>
                     <div className="mt-[18px] flex justify-end gap-2">
                         <button
                             type="button"
