@@ -1,4 +1,5 @@
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { AnchorMeta } from '@/utils/anchor';
 import { Draft, Mode, Note, NoteType, Tab, Tone } from '@/companion/types';
 import { PanelOrientation } from '@/models/panelOrientation';
 import CompanionPanel from '@/companion/CompanionPanel';
@@ -9,6 +10,9 @@ import Toast from '@/companion/Toast';
 /** A freshly picked anchor target, captured from a click on the host page. */
 export type PickedTarget = {
     selector: string;
+    /** Identity fingerprint captured at pick time; optional so a demo host that
+     *  only knows a selector can still drive the companion. */
+    anchor?: AnchorMeta;
     url: string;
     type: NoteType;
 };
@@ -86,7 +90,15 @@ const Companion = forwardRef<CompanionHandle, Props>(function Companion(
         if (!note) return;
         setComposer({
             editingId: id,
-            draft: { type: note.type, selector: note.selector, url: note.url, title: note.title, body: note.body },
+            draft: {
+                type: note.type,
+                selector: note.selector,
+                anchor: note.anchor,
+                anchorScope: note.anchorScope,
+                url: note.url,
+                title: note.title,
+                body: note.body,
+            },
         });
     };
 
@@ -119,7 +131,9 @@ const Companion = forwardRef<CompanionHandle, Props>(function Companion(
         if (editingId) {
             setNotes((prev) =>
                 prev.map((a) =>
-                    a.id === editingId ? { ...a, type: draft.type, title: noteTitle, body: draft.body } : a,
+                    a.id === editingId
+                        ? { ...a, type: draft.type, anchorScope: draft.anchorScope, title: noteTitle, body: draft.body }
+                        : a,
                 ),
             );
             setSelectedId(editingId);
@@ -131,6 +145,8 @@ const Companion = forwardRef<CompanionHandle, Props>(function Companion(
                 n: nextN,
                 type: draft.type,
                 selector: draft.selector,
+                anchor: draft.anchor,
+                anchorScope: draft.anchorScope,
                 url: draft.url,
                 title: noteTitle,
                 body: draft.body,
@@ -150,7 +166,8 @@ const Companion = forwardRef<CompanionHandle, Props>(function Companion(
                 setNotes((prev) =>
                     prev.map((a) =>
                         a.id === reanchorId
-                            ? { ...a, ...target, broken: false, onPage: true }
+                            // New element, so the old per-signal scope names nothing.
+                            ? { ...a, ...target, anchorScope: undefined, broken: false, onPage: true }
                             : a,
                     ),
                 );
@@ -162,7 +179,14 @@ const Companion = forwardRef<CompanionHandle, Props>(function Companion(
             }
             setComposer({
                 editingId: null,
-                draft: { type: target.type, selector: target.selector, url: target.url, title: '', body: '' },
+                draft: {
+                    type: target.type,
+                    selector: target.selector,
+                    anchor: target.anchor,
+                    url: target.url,
+                    title: '',
+                    body: '',
+                },
             });
         },
     }));

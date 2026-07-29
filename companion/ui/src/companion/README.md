@@ -31,6 +31,9 @@ webfonts (Instrument Sans + JetBrains Mono) are imported from
 | `AnnotationCard` | List item — collapsed / expanded / broken (§5) |
 | `Popover` | In-context popover next to the selected element (§6) |
 | `Composer` | New / Edit note modal with Markdown toolbar (§7) |
+| `ScopeSection` | Composer's collapsed "where this applies" digest → both scope editors |
+| `PageScopeEditor` | Click-to-wildcard page glob — which URLs the note covers |
+| `AnchorScopeEditor` | Click-to-loosen anchor strictness — how the element is re-found |
 | `FormatToolbar` | Markdown insert controls |
 | `Checkbox` | "Whole page" scope checkbox |
 | `MinimizedPill` | Collapsed companion pill (§8) |
@@ -51,8 +54,14 @@ The host drives note creation and re-anchoring through the `Companion` ref:
 ```tsx
 const ref = useRef<CompanionHandle>(null);
 // when the user clicks an element on the page in Annotate mode:
-ref.current?.pickTarget({ selector, url, type: 'component' });
+ref.current?.pickTarget({ selector, anchor: buildAnchor(el), url, type: 'component' });
 ```
+
+Pass the `anchor` fingerprint: it is what `AnchorScopeEditor` shows as chips, and
+what `resolveAnchoredElement` verifies a match against. A note may also carry an
+`anchorScope` — the user's per-signal strictness — which every resolve call site
+must forward. Absent means the default, more forgiving resolution; see
+[docs/anchoring.md](../../../../docs/anchoring.md).
 
 ## Replacing the existing components
 

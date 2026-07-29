@@ -135,6 +135,52 @@ Higher = better fit. Weights favour signals apps rarely reuse across unrelated e
 
 ---
 
+## 🎛️ Anchor scope — letting the user set the strictness
+
+Everything above is the **default** contract. A note may also store an
+`anchorScope`: a per-signal choice the user makes in the composer's anchor editor
+([`AnchorScopeEditor`](../companion/ui/src/companion/AnchorScopeEditor.tsx)),
+keyed by the signal ids `anchorSignals(anchor)` produces ([`anchor.ts`](anchor.ts)).
+
+| State | Meaning |
+|---|---|
+| `required` | the candidate **must** carry it |
+| `hint` | only ranks the survivors |
+| `ignored` | invisible to the gate *and* the score |
+
+```mermaid
+flowchart LR
+    n{{"stored anchorScope?"}}
+    n -->|"no · the default"| d["gate = ANY one strong signal<br/>(id / aria / strong attr / text)"]
+    n -->|yes| s["gate = ALL required signals"]
+```
+
+**The two gates differ on purpose.** The default is an **OR** — one strong signal
+corroborating is enough — while a stored scope is an **AND**. Switching every note
+to the stricter rule would break notes that resolve correctly today, so `Smart`
+(the editor's default) is stored as *nothing at all*: absent scope, default path.
+Only `Exact`, `Loose` or a hand-tuned chip writes a scope.
+
+Three things follow from that, each with a test in
+[`resolve-scope.test.ts`](../companion/ui/tests/utils/anchor/resolve-scope.test.ts):
+
+- **A scope never gates on a key it doesn't name.** An unlisted signal defaults to
+  `hint`, so a scope saved before the element gained a `data-testid` can't start
+  rejecting candidates over it.
+- **`position` is the odd one out.** It decides *where we look*, not what we
+  accept: `required` pins the note to its stored selector and disables recovery
+  entirely, so a rotted selector surfaces as broken instead of re-finding the
+  element elsewhere. That is what makes `Exact` exact.
+- **Re-anchoring always drops the scope** ([`reanchorScope`](../companion/ui/src/companion/helpers.ts)).
+  It is keyed to the *old* element's signals; the new one has its own.
+
+Storage mirrors `urlPattern`: written as `anchorScope ?? null` on every update, so
+resetting a note back to `Smart` clears it rather than leaving the old scope behind.
+The export path strips it — a baked `[data-docio-note-id]` target is already unique,
+and a stale scope could only reject the very element the exporter stamped.
+
+---
+
 ## 🔗 Anchoring vs. page scoping (important)
 
 ```mermaid
@@ -182,3 +228,4 @@ flowchart LR
 - **Verify then recover** — a live selector match still has to corroborate the fingerprint; when it doesn't (or the selector resolves to nothing), recover only on evidence that clears the floor.
 - **Broken ≠ bug.** A `null` resolve is the system correctly refusing a bad match; the note surfaces as broken so the user can re-anchor.
 - **Keep anchoring page-blind.** Page membership is decided before we ever call the resolver.
+- **Absent scope is a contract, not a gap.** The default path is deliberately more forgiving than any stored scope, so never "fill in" a default scope on save.

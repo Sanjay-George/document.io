@@ -1,4 +1,4 @@
-import { AnchorMeta } from '@/utils/anchor';
+import { AnchorMeta, AnchorScope } from '@/utils/anchor';
 
 export interface Annotation {
     id?: string;
@@ -10,6 +10,10 @@ export interface Annotation {
     /** Resilient anchor descriptor (selector + identity signals). Optional —
      *  legacy notes only have `target`, which stays the source of truth. */
     anchor?: AnchorMeta;
+    /** Per-signal strictness for re-finding the anchored element. Absent means
+     *  the default resolution (see `resolveAnchoredElement`); a stored value is
+     *  always a deliberate choice made in the composer's scope editor. */
+    anchorScope?: AnchorScope;
     /** Page the note was captured on (origin-independent path, plus the host's
      *  own query params — matching still compares paths). */
     url: string;

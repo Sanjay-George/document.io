@@ -1,4 +1,4 @@
-import { AnchorMeta } from '@/utils/anchor';
+import { AnchorMeta, AnchorScope } from '@/utils/anchor';
 
 /**
  * Types for the document.io in-context annotation companion.
@@ -32,6 +32,8 @@ export interface Note {
     selector: string;
     /** Resilient anchor descriptor used to resolve the element robustly. */
     anchor?: AnchorMeta;
+    /** Per-signal strictness for that resolution; absent means the default. */
+    anchorScope?: AnchorScope;
     /** Page URL/path the note was captured on. */
     url: string;
     title: string;
@@ -49,6 +51,8 @@ export interface Draft {
     selector: string;
     /** Anchor descriptor captured at pick time; carried through save. */
     anchor?: AnchorMeta;
+    /** Per-signal anchor strictness; when absent the `smart` default applies. */
+    anchorScope?: AnchorScope;
     url: string;
     /** Optional page glob (`*`/`**`); when absent the note matches `url` exactly. */
     urlPattern?: string;

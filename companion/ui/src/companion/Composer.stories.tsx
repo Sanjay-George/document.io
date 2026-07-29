@@ -49,6 +49,27 @@ export const Default: Story = {
     ),
 };
 
+/** The worst case for height: a deep path with three query params to chip, plus a
+ *  fully fingerprinted element — every scope control at its tallest at once. */
+const CROWDED: Draft = {
+    type: 'component',
+    selector: '#analysis-toolbar > div.flex.gap-2 > button#start-analysis',
+    anchor: {
+        selector: '#analysis-toolbar > div.flex.gap-2 > button#start-analysis',
+        tag: 'button',
+        id: 'start-analysis',
+        role: 'button',
+        ariaLabel: 'Start Analysis',
+        text: '📈 Start Analysis',
+        attributes: { 'data-testid': 'analysis-btn' },
+        context: [{ tag: 'section', id: 'analysis-toolbar', role: 'region', ariaLabel: 'Product Analysis' }],
+    },
+    url: '/en/commonality/report/commonality/59bb70f8d5d71c7b8768b5257d8f60b8?tab=repositories&qs=1&sort=4',
+    urlPattern: '/en/commonality/report/commonality/*?tab=repositories',
+    title: 'Commonality Matrix',
+    body: 'For each product selected, it shows the commonality rate with each other.',
+};
+
 /**
  * Editing an existing note anchored to a deeply-nested element. The enormous
  * CSS-module selector is the point: the banner shows the smart single-row label
@@ -75,4 +96,12 @@ export const Edit: Story = {
             }}
         />
     ),
+};
+
+/**
+ * Height stress test: a deep path with query params *and* a full element
+ * fingerprint, so both scope editors are at their tallest.
+ */
+export const Crowded: Story = {
+    render: () => <Harness mode="edit" initial={CROWDED} />,
 };

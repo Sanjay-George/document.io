@@ -1,9 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Draft } from '@/companion/types';
-import { contextLabel } from '@/companion/helpers';
 import FormatToolbar, { type FormatToken } from '@/companion/FormatToolbar';
-import PageScopeEditor from '@/companion/PageScopeEditor';
-import { CloseIcon, ComponentIcon, FormatIcon, PageIcon } from '@/companion/icons';
+import ScopeSection from '@/companion/ScopeSection';
+import { CloseIcon, FormatIcon } from '@/companion/icons';
 
 type Props = {
     /** `new` titles the modal "New note"; `edit` titles it "Edit note". */
@@ -24,12 +23,14 @@ const SNIPPETS = new Map<FormatToken, string>([
 ]);
 
 /**
- * New / Edit note composer (README §7). Surfaces the real anchor target, the
- * page-scope editor, a title + body, and an optional Markdown toolbar.
+ * New / Edit note composer (README §7). Surfaces the scope section (target, pages,
+ * anchor strictness), a title + body, and an optional Markdown toolbar.
+ *
+ * The modal is capped to the viewport with the title bar and the actions pinned,
+ * so expanding scope scrolls the middle instead of pushing Save off-screen.
  */
 export default function Composer({ mode, draft, onChange, onSave, onClose }: Props) {
     const [showFmt, setShowFmt] = useState(false);
-    const isPage = draft.type === 'page';
 
     // Focus the title on open so stray keystrokes land here, not on host-page
     // keyboard shortcuts (e.g. GitHub's "s"/"/" search) that would re-pick the anchor.
@@ -49,9 +50,9 @@ export default function Composer({ mode, draft, onChange, onSave, onClose }: Pro
             className="fixed inset-0 z-[2147483002] flex items-center justify-center bg-[rgba(20,23,31,.25)] p-6 pr-[400px] backdrop-blur-[1.5px]"
         >
             <div
-                className="animate-dio-pop-lg w-[436px] max-w-full overflow-hidden rounded-dio-modal bg-white font-dio-ui shadow-dio-composer"
+                className="animate-dio-pop-lg flex max-h-full w-[436px] max-w-full flex-col overflow-hidden rounded-dio-modal bg-white font-dio-ui shadow-dio-composer"
             >
-                <div className="flex items-center justify-between px-[18px] pb-[14px] pt-4">
+                <div className="flex flex-none items-center justify-between px-[18px] pb-[14px] pt-4">
                     <span className="text-[15px] font-semibold text-dio-primary">
                         {mode === 'edit' ? 'Edit note' : 'New note'}
                     </span>
@@ -64,30 +65,9 @@ export default function Composer({ mode, draft, onChange, onSave, onClose }: Pro
                     </button>
                 </div>
 
-                <div className="px-[18px] pb-[18px]">
-                    {/* real anchor target */}
-                    <div className="flex items-center gap-[9px] rounded-dio-banner bg-dio-tint-orange px-[13px] py-[11px]">
-                        {isPage ? (
-                            <PageIcon size={15} className="flex-none text-dio-accent" />
-                        ) : (
-                            <ComponentIcon size={15} className="flex-none text-dio-accent" />
-                        )}
-                        <code
-                            title={contextLabel(draft)}
-                            className="min-w-0 flex-1 truncate font-dio-mono text-[11.5px] leading-[1.5] text-dio-accent-ink-mono"
-                        >
-                            {contextLabel(draft)}
-                        </code>
-                    </div>
-
-                    {/* page scope — click segments to wildcard which URL(s) apply */}
-                    <div className="mt-3">
-                        <PageScopeEditor
-                            url={draft.url}
-                            value={draft.urlPattern}
-                            onChange={(urlPattern) => onChange({ urlPattern })}
-                        />
-                    </div>
+                <div className="min-h-0 flex-1 overflow-y-auto px-[18px]">
+                    {/* what it is anchored to, which pages, how strictly — collapsed by default */}
+                    <ScopeSection draft={draft} onChange={onChange} />
 
                     <input
                         ref={titleRef}
@@ -105,24 +85,24 @@ export default function Composer({ mode, draft, onChange, onSave, onClose }: Pro
                     />
 
                     {showFmt && <FormatToolbar onInsert={insert} />}
+                </div>
 
-                    <div className="mt-4 flex items-center justify-between">
-                        <button
-                            type="button"
-                            onClick={() => setShowFmt((v) => !v)}
-                            className="inline-flex cursor-pointer items-center gap-[5px] border-none bg-transparent p-0 font-dio-ui text-[12.5px] font-semibold text-dio-muted hover:text-dio-secondary"
-                        >
-                            <FormatIcon size={15} />
-                            Format
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onSave}
-                            className="h-[38px] cursor-pointer rounded-dio-button border-none bg-dio-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-dio-accent-hover"
-                        >
-                            Save
-                        </button>
-                    </div>
+                <div className="flex flex-none items-center justify-between px-[18px] pb-[18px] pt-3">
+                    <button
+                        type="button"
+                        onClick={() => setShowFmt((v) => !v)}
+                        className="inline-flex cursor-pointer items-center gap-[5px] border-none bg-transparent p-0 font-dio-ui text-[12.5px] font-semibold text-dio-muted hover:text-dio-secondary"
+                    >
+                        <FormatIcon size={15} />
+                        Format
+                    </button>
+                    <button
+                        type="button"
+                        onClick={onSave}
+                        className="h-[38px] cursor-pointer rounded-dio-button border-none bg-dio-accent px-[18px] text-[13.5px] font-semibold text-white hover:bg-dio-accent-hover"
+                    >
+                        Save
+                    </button>
                 </div>
             </div>
         </div>

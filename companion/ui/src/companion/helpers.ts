@@ -1,3 +1,4 @@
+import { AnchorMeta, AnchorScope, AnchorSignal, SignalState, anchorSignals } from '@/utils/anchor';
 import { Note } from '@/companion/types';
 
 /**
@@ -14,11 +15,18 @@ export function contextLabel(note: Pick<Note, 'type' | 'selector' | 'url' | 'anc
 
     const a = note.anchor;
     if (a) {
-        const testid = a.attributes?.['data-testid'];
-        const name = a.text || a.ariaLabel || (a.id ? `#${a.id}` : '') || testid;
+        const name = anchorName(a);
         return name ? `${a.tag} · ${name}` : a.tag;
     }
     return lastSelectorTag(note.selector) || 'element';
+}
+
+/** The human handle for an anchored element — what a reader would call it, with
+ *  no tag name. `undefined` when the element has nothing recognisable to show. */
+export function anchorName(anchor?: AnchorMeta): string | undefined {
+    if (!anchor) return undefined;
+    const testid = anchor.attributes?.['data-testid'];
+    return anchor.text || anchor.ariaLabel || (anchor.id ? `#${anchor.id}` : '') || testid || undefined;
 }
 
 /** Tag of the deepest selector in a descendant chain (drops the class soup). */
@@ -238,18 +246,22 @@ export function buildPageScope({ segments, states, params }: PageScope): string 
  * so it keeps the pattern; leaving the family resets the note to an exact match
  * on where it landed, since the old pattern describes pages it no longer covers.
  *
- * `urlPattern` is always an own property: the server persists `urlPattern ?? null`,
- * so an absent key would leave the stale pattern in place.
+ * `anchorScope` resets unconditionally — it is keyed by the *old* anchor's
+ * signals, and the new element has its own.
+ *
+ * Both are always own properties: the server persists each as `?? null`, so an
+ * absent key would leave the stale value in place.
  */
 export function reanchorScope(
     existing: { url: string; urlPattern?: string },
     targetUrl: string,
-): { movesPage: boolean; url: string; urlPattern: string | undefined } {
+): { movesPage: boolean; url: string; urlPattern: string | undefined; anchorScope: undefined } {
     const inScope = pageMatches(targetUrl, existing.url, existing.urlPattern);
     return {
         movesPage: !inScope,
         url: targetUrl,
         urlPattern: inScope ? existing.urlPattern : undefined,
+        anchorScope: undefined,
     };
 }
 
@@ -267,6 +279,135 @@ export function describePageScope({ states, params }: PageScope): string {
 
     if (!required.length) return scope;
     return `${scope} Only when ${required.map((p) => `${p.key}=${p.value}`).join(' and ')}.`;
+}
+
+// ---- Anchor scope: the chip-state ↔ strictness codec behind AnchorScopeEditor ----
+
+export type AnchorLevel = 'exact' | 'smart' | 'loose';
+
+/** A resolver signal dressed for the editor: same `key`, plus how to say it. */
+export type Signal = AnchorSignal & {
+    /** Chip label — the captured value, so a signal can always be read back. */
+    label: string;
+    /** Same signal inside a sentence. */
+    phrase: string;
+};
+
+export const ANCHOR_LEVELS: AnchorLevel[] = ['exact', 'smart', 'loose'];
+
+export const ANCHOR_LEVEL_COPY: Record<AnchorLevel | 'custom', { label: string; meaning: string }> = {
+    exact: { label: 'Exact', meaning: 'Only this element, exactly as it was captured.' },
+    smart: { label: 'Smart', meaning: 'Follows the element by its identity, even when it moves.' },
+    loose: { label: 'Loose', meaning: 'Settles for the closest match anywhere on the page.' },
+    custom: { label: 'Custom', meaning: 'Your own mix of signals.' },
+};
+
+/** How each signal reads as a chip and inside a sentence. The resolver owns the
+ *  keys and the weights; this only adds words. */
+function describeSignal(signal: AnchorSignal): { label: string; phrase: string } {
+    const value = signal.value ?? '';
+    switch (signal.kind) {
+        case 'id':
+            return { label: `#${value}`, phrase: `#${value}` };
+        case 'attr':
+            return { label: `${signal.name}=${value}`, phrase: `${signal.name}=${value}` };
+        case 'aria':
+            return { label: `aria “${value}”`, phrase: `the label “${value}”` };
+        case 'text':
+            return { label: `“${value}”`, phrase: `the text “${value}”` };
+        case 'tag':
+            return { label: `<${value}>`, phrase: `being a ${value}` };
+        case 'role':
+            return { label: `role=${value}`, phrase: `role ${value}` };
+        case 'context': {
+            const ref = signal.ref!;
+            const name = ref.id ? `#${ref.id}` : ref.testid || (ref.ariaLabel ? `“${ref.ariaLabel}”` : `<${ref.tag}>`);
+            return { label: `in ${name}`, phrase: `sitting inside ${name}` };
+        }
+        case 'position':
+            return { label: 'in place', phrase: 'its exact place in the page' };
+    }
+}
+
+/** The anchor's signals in strength order, which is also how the chips read. */
+export function scopeSignals(anchor: AnchorMeta): Signal[] {
+    return anchorSignals(anchor).map((signal) => ({ ...signal, ...describeSignal(signal) }));
+}
+
+/**
+ * The states a level gives each signal. `smart` requires only the strongest
+ * identity signal — today's behaviour, where one strong signal has to corroborate
+ * and the rest merely rank — while `exact` requires all of them and `loose` none.
+ */
+function presetScope(signals: Signal[], level: AnchorLevel): AnchorScope {
+    const strongest = signals.find((s) => s.strong)?.key;
+    const state = (signal: Signal): SignalState => {
+        if (level === 'exact') return 'required';
+        if (level === 'loose') return signal.kind === 'position' || signal.kind === 'context' ? 'ignored' : 'hint';
+        return signal.key === strongest ? 'required' : 'hint';
+    };
+    return Object.fromEntries(signals.map((s) => [s.key, state(s)]));
+}
+
+/** Every preset's scope for one anchor, keyed by level. */
+export function anchorPresets(signals: Signal[]): Record<AnchorLevel, AnchorScope> {
+    return Object.fromEntries(ANCHOR_LEVELS.map((l) => [l, presetScope(signals, l)])) as Record<
+        AnchorLevel,
+        AnchorScope
+    >;
+}
+
+/** Which preset a scope reads back as — `custom` when it matches none. */
+export function levelOfScope(
+    signals: Signal[],
+    presets: Record<AnchorLevel, AnchorScope>,
+    scope: AnchorScope,
+): AnchorLevel | 'custom' {
+    return ANCHOR_LEVELS.find((l) => signals.every((s) => presets[l][s.key] === scope[s.key])) ?? 'custom';
+}
+
+/** Same, straight from an anchor — for the composer's collapsed scope digest. */
+export function anchorLevelOf(anchor: AnchorMeta, scope?: AnchorScope): AnchorLevel | 'custom' {
+    if (!scope) return 'smart';
+    const signals = scopeSignals(anchor);
+    return levelOfScope(signals, anchorPresets(signals), scope);
+}
+
+/** Comma list ending in “and”, trimmed so the sentence stays one or two lines. */
+function joinPhrases(phrases: string[], max = 3): string {
+    const kept = phrases.slice(0, max);
+    if (phrases.length > max) kept.push(`${phrases.length - max} more`);
+    if (kept.length < 3) return kept.join(' and ');
+    return `${kept.slice(0, -1).join(', ')} and ${kept[kept.length - 1]}`;
+}
+
+/** Plain-English restatement of the chips, so nothing here needs anchor knowledge.
+ *  Mostly-required mixes are stated by their exceptions — shorter, and it's the
+ *  exception that carries the meaning. */
+export function describeAnchorScope(signals: Signal[], scope: AnchorScope): string {
+    const required = signals.filter((s) => scope[s.key] === 'required');
+    const optional = signals.filter((s) => scope[s.key] !== 'required');
+    const ignored = signals.filter((s) => scope[s.key] === 'ignored');
+
+    if (!required.length) return 'Nothing has to match — the best-looking candidate wins.';
+    if (!optional.length) return 'Every signal has to still match.';
+    if (optional.length < required.length) {
+        return `Everything has to still match except ${joinPhrases(optional.map((s) => s.phrase))}.`;
+    }
+
+    const rest = ignored.length
+        ? `Ignores ${joinPhrases(ignored.map((s) => s.phrase))}.`
+        : 'Everything else only breaks ties.';
+    return `Must match ${joinPhrases(required.map((s) => s.phrase))}. ${rest}`;
+}
+
+/** The trade-off the current mix lands on — derived from the chips, so a custom
+ *  mix is judged the same way a preset is. */
+export function anchorVerdict(signals: Signal[], scope: AnchorScope): { text: string; risky: boolean } {
+    const required = signals.filter((s) => scope[s.key] === 'required').length;
+    if (!required) return { text: 'May land on a lookalike.', risky: true };
+    if (required === signals.length) return { text: 'Breaks on the smallest edit.', risky: true };
+    return { text: 'Survives most page changes.', risky: false };
 }
 
 const DEFAULT_SAFE_PROTOCOLS = ['http:', 'https:', 'mailto:'];

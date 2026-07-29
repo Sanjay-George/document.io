@@ -56,6 +56,9 @@ export default class AnnotationDB {
             target: data.target,
             url: data.url,
             urlPattern: data.urlPattern ?? null,
+            // Unconditional, unlike `anchor` below: absent means default
+            // strictness, so a reset has to clear the stored scope.
+            anchorScope: data.anchorScope ?? null,
             type: data.type,
             index: data.index,
             updated: new Date(),

@@ -137,7 +137,10 @@ function bakedPayloadAnnotations(annotations: Annotation[]): Annotation[] {
     const here = window.location.href;
     return annotations
         .filter((a) => a.id && pageMatches(here, a.url, a.urlPattern))
-        .map((a) => ({ ...a, target: `[${NOTE_ID_ATTR}="${a.id}"]` }));
+        // The baked target is unique, so the export needs no strictness — and a
+        // scope keyed to the live page's signals could only reject the very
+        // element we stamped.
+        .map((a) => ({ ...a, target: `[${NOTE_ID_ATTR}="${a.id}"]`, anchorScope: undefined }));
 }
 
 function filename(title?: string): string {
@@ -181,7 +184,7 @@ export async function exportCurrentPage(
     const stamped: HTMLElement[] = [];
     for (const a of annotations) {
         if (!a.id) continue;
-        const el = resolveAnchoredElement(a.target, a.anchor);
+        const el = resolveAnchoredElement(a.target, a.anchor, a.anchorScope);
         if (el) {
             el.setAttribute(NOTE_ID_ATTR, a.id);
             stamped.push(el);

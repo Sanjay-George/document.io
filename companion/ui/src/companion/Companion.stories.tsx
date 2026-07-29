@@ -37,6 +37,15 @@ function PickHarness(args: ComponentProps<typeof Companion>) {
                     onClick={() =>
                         ref.current?.pickTarget({
                             selector: 'header button.btn--deploy',
+                            // A real host passes `buildAnchor(el)` — the fingerprint
+                            // is what the composer's anchor scope editor works on.
+                            anchor: {
+                                selector: 'header button.btn--deploy',
+                                tag: 'button',
+                                ariaLabel: 'Promote to Production',
+                                text: 'Promote',
+                                attributes: { 'data-testid': 'deploy-btn' },
+                            },
                             url: 'halyard.app/deployments',
                             type: 'component',
                         })

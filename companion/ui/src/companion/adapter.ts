@@ -26,6 +26,7 @@ export function toNote(annotation: Annotation, n: number, flags: NoteFlags = {})
         type: annotation.type,
         selector: annotation.target,
         anchor: annotation.anchor,
+        anchorScope: annotation.anchorScope,
         url: annotation.url,
         title: annotation.title || 'No title',
         body: annotation.value,
@@ -50,6 +51,7 @@ export function draftFromAnnotation(annotation: Annotation): Draft {
         type: annotation.type,
         selector: annotation.target,
         anchor: annotation.anchor,
+        anchorScope: annotation.anchorScope,
         url: annotation.url,
         urlPattern: annotation.urlPattern,
         title: annotation.title ?? '',
@@ -58,7 +60,10 @@ export function draftFromAnnotation(annotation: Annotation): Draft {
 }
 
 /** Persisted fields produced from a composer Draft (for add/update calls). */
-export type AnnotationInput = Pick<Annotation, 'title' | 'value' | 'target' | 'anchor' | 'url' | 'urlPattern' | 'type'>;
+export type AnnotationInput = Pick<
+    Annotation,
+    'title' | 'value' | 'target' | 'anchor' | 'anchorScope' | 'url' | 'urlPattern' | 'type'
+>;
 
 /** Map a composer Draft back to the fields the data-access layer persists. */
 export function draftToAnnotationInput(draft: Draft): AnnotationInput {
@@ -67,6 +72,7 @@ export function draftToAnnotationInput(draft: Draft): AnnotationInput {
         value: draft.body,
         target: draft.selector,
         anchor: draft.anchor,
+        anchorScope: draft.anchorScope,
         url: draft.url,
         urlPattern: draft.urlPattern,
         type: draft.type,

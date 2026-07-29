@@ -47,6 +47,35 @@ export interface AncestorRef {
     testid?: string;
 }
 
+/** What one captured signal is allowed to do when the element is re-found. */
+export type SignalState =
+    /** the candidate must carry this exact value */
+    | 'required'
+    /** only ranks near-matches against each other */
+    | 'hint'
+    /** not looked at */
+    | 'ignored';
+
+/** Per-signal strictness, keyed by `AnchorSignal.key`. Absent means the default
+ *  resolution — a stored scope is always a deliberate choice. */
+export type AnchorScope = Record<string, SignalState>;
+
+/** One identity signal carried by an anchor. `key` is the stable id an
+ *  `AnchorScope` addresses it by, so the editor and the resolver can't disagree. */
+export interface AnchorSignal {
+    key: string;
+    kind: 'id' | 'attr' | 'aria' | 'text' | 'tag' | 'role' | 'context' | 'position';
+    /** Attribute name, for `attr` signals. */
+    name?: string;
+    /** Captured value — the element's own, or the ancestor's for `context`. */
+    value?: string;
+    ref?: AncestorRef;
+    /** Identifies an element on its own — apps rarely reuse it across elements. */
+    strong: boolean;
+    /** Points earned when a candidate carries this signal. */
+    weight: number;
+}
+
 /** Attributes stable enough to identify an element across DOM changes. */
 const STABLE_ATTRS = [
     'data-testid', 'data-test', 'data-cy', 'data-id',
@@ -181,59 +210,98 @@ function ancestorMatches(el: HTMLElement, ref: AncestorRef): boolean {
 }
 
 /**
- * Reward candidates whose surrounding structure matches the stored context.
- * This is what pulls resolution toward the right copy when the element itself is
- * indistinguishable from a twin elsewhere on the page (e.g. per-tab widgets).
+ * Every identity signal the anchor carries, strongest first — the single source
+ * of the keys an `AnchorScope` uses. Weights favour signals an app is least
+ * likely to reuse across unrelated elements. `position` scores nothing: it
+ * decides *where* we look rather than what we accept.
  */
-function scoreContext(el: HTMLElement, context?: AncestorRef[]): number {
-    if (!context?.length) return 0;
-    let score = 0;
-    for (const ref of context) {
-        if (ancestorMatches(el, ref)) score += ref.id || ref.testid ? 25 : 10;
+export function anchorSignals(anchor: AnchorMeta): AnchorSignal[] {
+    const signals: AnchorSignal[] = [];
+
+    if (anchor.id) {
+        signals.push({ key: 'id', kind: 'id', value: anchor.id, strong: true, weight: 100 });
     }
-    return score;
+    for (const [name, value] of Object.entries(anchor.attributes ?? {})) {
+        // Test ids and names are near-unique; generic attrs (type, …) are weaker.
+        const strong = STRONG_ATTR.test(name);
+        signals.push({ key: `attr:${name}`, kind: 'attr', name, value, strong, weight: strong ? 40 : 15 });
+    }
+    if (anchor.ariaLabel) {
+        signals.push({ key: 'aria', kind: 'aria', value: anchor.ariaLabel, strong: true, weight: 40 });
+    }
+    if (anchor.text) {
+        signals.push({ key: 'text', kind: 'text', value: anchor.text, strong: true, weight: 30 });
+    }
+    signals.push({ key: 'tag', kind: 'tag', value: anchor.tag, strong: false, weight: 5 });
+    if (anchor.role) {
+        signals.push({ key: 'role', kind: 'role', value: anchor.role, strong: false, weight: 8 });
+    }
+    anchor.context?.forEach((ref, i) => {
+        // An ancestor identified by id/test id pins the right *copy* of a twin;
+        // one identified only by role is a much weaker sectioning hint.
+        signals.push({
+            key: `ctx:${i}`,
+            kind: 'context',
+            value: ref.id || ref.testid || ref.ariaLabel,
+            ref,
+            strong: false,
+            weight: ref.id || ref.testid ? 25 : 10,
+        });
+    });
+    signals.push({ key: 'position', kind: 'position', value: anchor.selector, strong: false, weight: 0 });
+
+    return signals;
 }
 
-/**
- * How well `el` matches the stored anchor. Higher is better; 0 means no shared
- * identity signal. Weights favour signals an app is least likely to reuse across
- * unrelated elements (ids, test ids, accessible names, exact text) plus the
- * element's surrounding context.
- */
-function scoreCandidate(el: HTMLElement, anchor: AnchorMeta): number {
-    let score = scoreContext(el, anchor.context);
-
-    if (anchor.id && el.id === anchor.id) score += 100;
-
-    if (anchor.attributes) {
-        for (const [name, value] of Object.entries(anchor.attributes)) {
-            if (el.getAttribute(name) === value) {
-                // Test ids and names are near-unique; generic attrs (type) weaker.
-                score += STRONG_ATTR.test(name) ? 40 : 15;
-            }
+/** Does `el` carry this signal? Text matches exactly or by prefix, so a minor
+ *  label edit still corroborates (`"Start Analysis"` ↔ `"Start Analysis (beta)"`). */
+function signalMatches(el: HTMLElement, signal: AnchorSignal): boolean {
+    switch (signal.kind) {
+        case 'id':
+            return el.id === signal.value;
+        case 'attr':
+            return el.getAttribute(signal.name!) === signal.value;
+        case 'aria':
+            return ariaLabelOf(el) === signal.value;
+        case 'text': {
+            const text = normalizeText(el.textContent).slice(0, TEXT_MAX);
+            if (text === signal.value) return true;
+            return !!text && (text.startsWith(signal.value!) || signal.value!.startsWith(text));
         }
+        case 'tag':
+            return el.tagName.toLowerCase() === signal.value;
+        case 'role':
+            return el.getAttribute('role') === signal.value;
+        case 'context':
+            return ancestorMatches(el, signal.ref!);
+        case 'position':
+            // Handled by candidate gathering, not by inspecting the element.
+            return true;
     }
+}
 
-    if (anchor.ariaLabel && ariaLabelOf(el) === anchor.ariaLabel) score += 40;
-
-    if (anchor.text) {
+/** Points `el` earns for one signal. Text scores partial credit on a prefix
+ *  match, since truncation shouldn't rank as highly as the real thing. */
+function signalScore(el: HTMLElement, signal: AnchorSignal): number {
+    if (signal.kind === 'text') {
         const text = normalizeText(el.textContent).slice(0, TEXT_MAX);
-        if (text === anchor.text) score += 30;
-        else if (text && (text.startsWith(anchor.text) || anchor.text.startsWith(text))) score += 12;
+        if (text === signal.value) return signal.weight;
+        return text && (text.startsWith(signal.value!) || signal.value!.startsWith(text)) ? 12 : 0;
     }
+    return signalMatches(el, signal) ? signal.weight : 0;
+}
 
-    if (anchor.role && el.getAttribute('role') === anchor.role) score += 8;
-    if (el.tagName.toLowerCase() === anchor.tag) score += 5;
-
-    return score;
+/** How well `el` matches a set of signals. Higher is better. */
+function scoreCandidate(el: HTMLElement, signals: AnchorSignal[]): number {
+    return signals.reduce((total, signal) => total + signalScore(el, signal), 0);
 }
 
 /** Best-scoring element at or above `minScore`; ties resolve to the first. */
-function bestByScore(candidates: HTMLElement[], anchor: AnchorMeta, minScore = 0): HTMLElement | null {
+function bestByScore(candidates: HTMLElement[], signals: AnchorSignal[], minScore = 0): HTMLElement | null {
     let best: HTMLElement | null = null;
     let bestScore = minScore - 1;
     for (const el of candidates) {
-        const score = scoreCandidate(el, anchor);
+        const score = scoreCandidate(el, signals);
         if (score > bestScore) {
             best = el;
             bestScore = score;
@@ -274,40 +342,51 @@ function gatherCandidates(anchor: AnchorMeta): HTMLElement[] {
     return Array.from(found).slice(0, MAX_POOL);
 }
 
+/** A stored scope never gates on a signal it doesn't mention: an anchor captured
+ *  before the scope was saved (or one that has since gained an attribute) must
+ *  not start rejecting candidates on a key the user never chose. */
+function stateOf(scope: AnchorScope, signal: AnchorSignal): SignalState {
+    return scope[signal.key] ?? 'hint';
+}
+
+/**
+ * Resolution under an explicit `AnchorScope`: every **required** signal has to
+ * match, **hint** signals only rank the survivors, and **ignored** signals are
+ * invisible to both. A required `position` pins the note to the stored selector,
+ * so a rotted selector surfaces as broken instead of recovering elsewhere.
+ */
+function resolveWithScope(
+    anchor: AnchorMeta,
+    scope: AnchorScope,
+    candidates: HTMLElement[],
+): HTMLElement | null {
+    const signals = anchorSignals(anchor).filter((s) => stateOf(scope, s) !== 'ignored');
+    const required = signals.filter((s) => s.kind !== 'position' && stateOf(scope, s) === 'required');
+    const gate = (els: HTMLElement[]) => els.filter((el) => required.every((s) => signalMatches(el, s)));
+
+    const direct = gate(candidates);
+    if (direct.length) return bestByScore(direct, signals);
+
+    const pinned = scope.position === 'required';
+    if (pinned) return null;
+    return bestByScore(gate(gatherCandidates(anchor)), signals, MIN_RECOVERY_SCORE);
+}
+
 /** Whether the anchor carries a signal worth verifying against — one an app
  *  rarely shares across unrelated elements (id, accessible name, exact text, or
  *  a strong attr). When it has none, there's nothing to catch a rotted selector
  *  with, so we keep trusting the selector. */
-function hasDiscriminatingIdentity(anchor: AnchorMeta): boolean {
-    return Boolean(
-        anchor.id ||
-        anchor.ariaLabel ||
-        anchor.text ||
-        (anchor.attributes && Object.keys(anchor.attributes).some((name) => STRONG_ATTR.test(name)))
-    );
+function hasDiscriminatingIdentity(signals: AnchorSignal[]): boolean {
+    return signals.some((s) => s.strong);
 }
 
 /**
  * True when `el` corroborates at least one of the anchor's discriminating
  * signals. Used to reject a selector match that landed on a lookalike sibling
  * after the real target was removed (a class/`nth-of-type` selector rotting).
- * Text is matched exactly or by prefix, so minor label edits/truncation still
- * corroborate (e.g. `"Start Analysis"` ↔ `"Start Analysis (beta)"`).
  */
-function sharesDiscriminatingSignal(el: HTMLElement, anchor: AnchorMeta): boolean {
-    if (anchor.id && el.id === anchor.id) return true;
-    if (anchor.ariaLabel && ariaLabelOf(el) === anchor.ariaLabel) return true;
-    if (anchor.attributes) {
-        for (const [name, value] of Object.entries(anchor.attributes)) {
-            if (STRONG_ATTR.test(name) && el.getAttribute(name) === value) return true;
-        }
-    }
-    if (anchor.text) {
-        const text = normalizeText(el.textContent).slice(0, TEXT_MAX);
-        if (text === anchor.text) return true;
-        if (text && (text.startsWith(anchor.text) || anchor.text.startsWith(text))) return true;
-    }
-    return false;
+function sharesDiscriminatingSignal(el: HTMLElement, signals: AnchorSignal[]): boolean {
+    return signals.some((s) => s.strong && signalMatches(el, s));
 }
 
 /**
@@ -327,22 +406,32 @@ function sharesDiscriminatingSignal(el: HTMLElement, anchor: AnchorMeta): boolea
  * an element-specific signal before it can be adopted. Anchors with no
  * discriminating identity keep plain selector-trust behaviour (there's nothing to
  * verify), as do legacy notes without `anchor`.
+ *
+ * `scope` replaces all of the above with the user's own per-signal choice. It is
+ * opt-in because the two gates differ: the default accepts *any one* strong
+ * signal, a scope requires *all* of them (see docs/anchoring.md).
  */
-export function resolveAnchoredElement(target: string, anchor?: AnchorMeta): HTMLElement | null {
+export function resolveAnchoredElement(
+    target: string,
+    anchor?: AnchorMeta,
+    scope?: AnchorScope,
+): HTMLElement | null {
     const candidates = queryAll(target);
 
     if (!anchor) return candidates[0] ?? null;
+    if (scope) return resolveWithScope(anchor, scope, candidates);
 
+    const signals = anchorSignals(anchor);
     // Only elements that corroborate an element-specific signal may be adopted —
     // context/tag alone can't distinguish the target from a sibling the selector
     // rotted onto, and they can reach MIN_RECOVERY_SCORE on their own.
-    const gate = hasDiscriminatingIdentity(anchor)
-        ? (els: HTMLElement[]) => els.filter((el) => sharesDiscriminatingSignal(el, anchor))
+    const gate = hasDiscriminatingIdentity(signals)
+        ? (els: HTMLElement[]) => els.filter((el) => sharesDiscriminatingSignal(el, signals))
         : (els: HTMLElement[]) => els;
 
     const direct = gate(candidates);
     // bestByScore only returns null for an empty list, which direct.length excludes.
-    if (direct.length) return bestByScore(direct, anchor);
+    if (direct.length) return bestByScore(direct, signals);
 
-    return bestByScore(gate(gatherCandidates(anchor)), anchor, MIN_RECOVERY_SCORE);
+    return bestByScore(gate(gatherCandidates(anchor)), signals, MIN_RECOVERY_SCORE);
 }

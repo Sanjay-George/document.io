@@ -23,12 +23,20 @@ export interface AncestorRef {
     testid?: string;
 }
 
+/**
+ * Per-signal anchor strictness, keyed by the signal ids the companion's resolver
+ * derives from `anchor` (`id`, `text`, `attr:data-testid`, `ctx:0`, `position`…).
+ * Absent means the default resolution; opaque to the server, which only stores it.
+ */
+export type AnchorScope = Record<string, 'required' | 'hint' | 'ignored'>;
+
 export interface Annotation {
     id: string;
     title?: string;
     value: string;
     target: string;
     anchor?: AnchorMeta;
+    anchorScope?: AnchorScope;
     url: string;
     urlPattern?: string;
     documentationId: string;

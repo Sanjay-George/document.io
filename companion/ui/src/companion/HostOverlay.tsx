@@ -33,7 +33,7 @@ type RectInfo = { top: number; left: number; width: number; height: number; radi
 
 /** Measure a note's anchor against the live DOM in viewport (fixed) coordinates. */
 function measure(note: Note): RectInfo | null {
-    const el = resolveAnchoredElement(note.selector, note.anchor);
+    const el = resolveAnchoredElement(note.selector, note.anchor, note.anchorScope);
     if (!el) return null;
     const r = el.getBoundingClientRect();
     if (r.width === 0 && r.height === 0) return null;
@@ -155,7 +155,7 @@ export default function HostOverlay({
         if (mode !== 'view' || !selectedId) return;
         const note = notes.find((n) => n.id === selectedId);
         if (!note) return;
-        resolveAnchoredElement(note.selector, note.anchor)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        resolveAnchoredElement(note.selector, note.anchor, note.anchorScope)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, [selectedId, mode, notes]);
 
     // Annotate mode: hover-highlight pickable elements + click to pick a target.

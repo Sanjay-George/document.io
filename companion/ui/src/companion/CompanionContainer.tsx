@@ -122,7 +122,7 @@ export default function CompanionContainer() {
             // baked to a unique attribute, so skip page matching and just resolve.
             if (READ_ONLY) {
                 try {
-                    return { onPage: true, broken: resolveAnchoredElement(a.target, a.anchor) === null };
+                    return { onPage: true, broken: resolveAnchoredElement(a.target, a.anchor, a.anchorScope) === null };
                 } catch {
                     return { onPage: true, broken: true };
                 }
@@ -133,7 +133,7 @@ export default function CompanionContainer() {
             // ids) without blindly matching any page that shares a selector.
             if (!pageMatches(here, a.url, a.urlPattern)) return { onPage: false, broken: false };
             try {
-                const found = resolveAnchoredElement(a.target, a.anchor) !== null;
+                const found = resolveAnchoredElement(a.target, a.anchor, a.anchorScope) !== null;
                 return { onPage: true, broken: !found };
             } catch {
                 return { onPage: true, broken: true };
@@ -145,10 +145,14 @@ export default function CompanionContainer() {
 
     // Signature of the fields the live-DOM watcher depends on (which annotations
     // exist and where each is anchored/scoped). Keying the watcher effect on this
-    // — rather than just the count — re-arms it after a re-anchor or urlPattern
-    // edit that changes anchoring without changing how many notes there are.
+    // — rather than just the count — re-arms it after a re-anchor, a urlPattern
+    // edit or an anchor-scope change: each alters what resolves without changing
+    // how many notes there are.
     const watchKey = useMemo(
-        () => annotations.map((a) => `${a.id}|${a.target}|${a.url}|${a.urlPattern ?? ''}`).join('~'),
+        () =>
+            annotations
+                .map((a) => `${a.id}|${a.target}|${a.url}|${a.urlPattern ?? ''}|${JSON.stringify(a.anchorScope ?? '')}`)
+                .join('~'),
         [annotations],
     );
 
@@ -178,7 +182,7 @@ export default function CompanionContainer() {
             return annotations.some((a) => {
                 if (!pageMatches(here, a.url, a.urlPattern)) return false;
                 try {
-                    return resolveAnchoredElement(a.target, a.anchor) === null;
+                    return resolveAnchoredElement(a.target, a.anchor, a.anchorScope) === null;
                 } catch {
                     return false; // unresolvable selector — never watch for it
                 }
@@ -385,6 +389,7 @@ export default function CompanionContainer() {
                 value: input.value,
                 type: input.type,
                 urlPattern: input.urlPattern,
+                anchorScope: input.anchorScope,
                 updated: new Date(),
             });
             await mutate(ALL_ANNOTATIONS_KEY(documentationId));
@@ -399,6 +404,7 @@ export default function CompanionContainer() {
                 value: input.value,
                 target: input.target,
                 anchor: input.anchor,
+                anchorScope: input.anchorScope,
                 url: input.url,
                 urlPattern: input.urlPattern,
                 type: input.type,
@@ -417,11 +423,12 @@ export default function CompanionContainer() {
         if (!documentationId) return;
         const existing = annotations.find((a) => a.id === id);
         if (existing) {
-            const { url, urlPattern } = reanchorScope(existing, target.url);
+            const { url, urlPattern, anchorScope } = reanchorScope(existing, target.url);
             await updateAnnotation(id, {
                 ...existing,
                 target: target.selector,
                 anchor: target.anchor,
+                anchorScope,
                 url,
                 urlPattern,
                 type: target.type,
