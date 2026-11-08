@@ -1,18 +1,19 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import { Pencil, Power, Link2, Trash2 } from "lucide-react";
-import KebabMenu, { type MenuItem } from "./KebabMenu";
+import MeatballMenu, { type MenuItem } from "./MeatballMenu";
 
 /**
- * Overflow "…" button that opens a popover menu. Closes on outside click or
- * Escape; items can be flagged `danger` and grouped with `separatorBefore`.
+ * Overflow menu behind a horizontal "⋯" (meatball) button — not the vertical
+ * "⋮" kebab. Closes on outside click or Escape; items can be flagged `danger`
+ * and grouped with `separatorBefore`.
  */
 const meta = {
-    title: "Hub/Components/KebabMenu",
-    component: KebabMenu,
+    title: "Hub/Components/MeatballMenu",
+    component: MeatballMenu,
     parameters: { layout: "padded" },
     decorators: [(Story) => <div style={{ display: "flex", justifyContent: "flex-end", width: 240 }}>{Story()}</div>],
-} satisfies Meta<typeof KebabMenu>;
+} satisfies Meta<typeof MeatballMenu>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -29,7 +30,7 @@ export const Default: Story = {
         ];
         return (
             <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 12 }}>
-                <KebabMenu items={items} />
+                <MeatballMenu items={items} />
                 <span style={{ fontSize: 12, color: "var(--dio-text-muted)" }}>
                     {last ? `Clicked: ${last}` : "No action yet"}
                 </span>

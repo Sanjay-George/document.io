@@ -7,7 +7,16 @@ const noop = () => {};
 const meta = {
     title: 'Companion/Components/Popover',
     component: Popover,
-    args: { onClose: noop, onEdit: noop, onReanchor: noop, onDelete: noop },
+    args: {
+        note: sampleNotes[3],
+        onClose: noop,
+        onEdit: noop,
+        onReanchor: noop,
+        onDelete: noop,
+        onPrev: noop,
+        onNext: noop,
+        style: { position: 'absolute', left: 0, top: 0 },
+    },
     // Popover is position:fixed; render it relative to the story frame instead.
     decorators: [(Story) => <div className="relative h-[320px] w-[340px]">{Story()}</div>],
 } satisfies Meta<typeof Popover>;
@@ -15,16 +24,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-    args: { note: sampleNotes[3], style: { position: 'absolute', left: 0, top: 0 } },
-};
-
-// Prev/next enabled — stepping through on-page notes from the header.
-export const WithNavigation: Story = {
-    args: { note: sampleNotes[3], onPrev: noop, onNext: noop, style: { position: 'absolute', left: 0, top: 0 } },
-};
+/** Clear `onPrev`/`onNext` to hide the prev/next stepper in the header. */
+export const Default: Story = {};
 
 /** Read-only (exported file) — the Edit / Re-anchor / Delete action row is hidden. */
-export const ReadOnly: Story = {
-    args: { note: sampleNotes[3], readOnly: true, onPrev: noop, onNext: noop, style: { position: 'absolute', left: 0, top: 0 } },
-};
+export const ReadOnly: Story = { args: { readOnly: true } };

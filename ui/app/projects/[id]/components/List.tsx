@@ -6,7 +6,7 @@ import { Globe, ExternalLink, Pencil, Copy, Trash2 } from "lucide-react";
 import { exportData, remove } from "@/data_access/api/documentations";
 import { ALL_DOCUMENTATIONS_KEY } from "@/data_access/swr/documentations";
 import { Documentation } from "@/data_access/models/documentation";
-import { KebabMenu, useHubToast } from "@/components/hub";
+import { MeatballMenu, useHubToast } from "@/components/hub";
 import { safeUrl } from "@/lib/utils";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -86,7 +86,7 @@ export default function List({
                             <ExternalLink size={14} />
                             Open
                         </button>
-                        <KebabMenu
+                        <MeatballMenu
                             items={[
                                 { label: "Edit", icon: <Pencil size={ICON} />, onClick: () => onEdit(doc._id) },
                                 { label: "Copy config (JSON)", icon: <Copy size={ICON} />, onClick: () => handleCopy(doc._id) },

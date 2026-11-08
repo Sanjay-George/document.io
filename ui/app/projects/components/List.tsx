@@ -6,7 +6,7 @@ import { mutate } from "swr";
 import { Pencil, Power, Link2, Trash2 } from "lucide-react";
 import { edit, remove } from "@/data_access/api/projects";
 import { ALL_PROJECTS_KEY } from "@/data_access/swr/projects";
-import { KebabMenu, StatusPill, useHubToast } from "@/components/hub";
+import { MeatballMenu, StatusPill, useHubToast } from "@/components/hub";
 
 const ICON = 15;
 
@@ -72,7 +72,7 @@ export default function List({ projects, onEdit }: { projects: any[]; onEdit: (i
                                 <span className="hub-row-name">{p.title}</span>
                                 <StatusPill active={active} />
                                 <div style={{ flex: 1 }} />
-                                <KebabMenu
+                                <MeatballMenu
                                     items={[
                                         { label: "Edit", icon: <Pencil size={ICON} />, onClick: () => onEdit(p._id) },
                                         {

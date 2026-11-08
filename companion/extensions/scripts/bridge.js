@@ -24,6 +24,6 @@
             return request("DOCIO_FETCH", "DOCIO_FETCH_RESPONSE", { url, options });
         },
         // Fetch any asset (CORS-bypassed) as { contentType, base64 } for the exporter.
-        fetchAsset: (url) => request("DOCIO_ASSET_FETCH", "DOCIO_ASSET_FETCH_RESPONSE", { url }),
+        fetchAssetForExport: (url) => request("DOCIO_ASSET_FETCH", "DOCIO_ASSET_FETCH_RESPONSE", { url }),
     };
 })();

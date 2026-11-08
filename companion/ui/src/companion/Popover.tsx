@@ -87,7 +87,7 @@ const Popover = forwardRef<HTMLDivElement, Props>(function Popover(
                                 icon={<TargetIcon size={13} />}
                                 className="text-dio-tertiary hover:text-dio-primary"
                             />
-                            <TextButton label="Delete" onClick={onDelete} className="text-[#B79A93] hover:text-dio-danger" />
+                            <TextButton label="Delete" onClick={onDelete} className="text-dio-danger-muted hover:text-dio-danger" />
                         </div>
                     )}
                 </div>

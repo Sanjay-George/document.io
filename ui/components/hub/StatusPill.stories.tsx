@@ -13,8 +13,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Active: Story = { args: { active: true } };
-export const Inactive: Story = { args: { active: false } };
+/** Static chip — flip `active` from the controls. */
+export const Default: Story = {};
 
 /** With `onClick` it becomes an interactive toggle — click to flip the state. */
 export const Clickable: Story = {

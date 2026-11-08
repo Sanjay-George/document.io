@@ -33,9 +33,12 @@ type Props = {
 };
 
 /**
- * A note in the docked list (README §5). Collapses/expands on click and renders
- * a broken/stale state. Off-page notes stay expandable and editable, gaining a
- * "Go to page" action in place of the reorder controls.
+ * A note in the docked list (README §5). Collapses/expands on click.
+ *
+ * Every variant (normal / off-page / broken) renders the same control set —
+ * Edit, Re-anchor, Delete, Move up/down — and differs only in appearance plus
+ * the controls that cannot apply: "Go to page" is off-page only, and the stale
+ * warning is broken only.
  */
 export default function AnnotationCard({
     note,
@@ -74,15 +77,6 @@ export default function AnnotationCard({
     const moveBtn =
         'flex h-[26px] w-[26px] items-center justify-center rounded-dio-tab border-none bg-transparent text-dio-tertiary hover:bg-dio-subtle disabled:cursor-not-allowed disabled:opacity-30';
 
-    const goToPage = otherPage && onOpen && (
-        <TextButton
-            label="Go to page"
-            onClick={stop(onOpen)}
-            icon={<ExternalLinkIcon size={13} />}
-            className="text-dio-tertiary hover:text-dio-primary"
-        />
-    );
-
     return (
         <div
             onClick={onSelect}
@@ -100,11 +94,9 @@ export default function AnnotationCard({
                 </div>
             )}
 
-            {collapsed && goToPage && <div className="ml-9 mt-2">{goToPage}</div>}
-
             {expanded && (
                 <div className="ml-9 mt-[11px]">
-                    <NoteBody note={note} showContext={!broken} />
+                    <NoteBody note={note} />
 
                     {broken && (
                         <div className="mt-[11px] flex items-start gap-2">
@@ -122,18 +114,10 @@ export default function AnnotationCard({
                         </div>
                     )}
 
-                    {!readOnly && (broken ? (
-                        <div className="mt-[14px] flex gap-[14px]">
-                            <TextButton
-                                label="Re-anchor"
-                                onClick={stop(onReanchor)}
-                                icon={<TargetIcon size={13} />}
-                                className="text-dio-danger-2"
-                            />
-                            <TextButton label="Dismiss" onClick={stop(onDelete)} className="text-[#B79A93] hover:text-dio-danger" />
-                        </div>
-                    ) : (
-                        <div className="mt-[14px] flex items-center gap-[14px]">
+                    {!readOnly && (
+                        // Wraps so the trailing icon group drops to its own row in a
+                        // narrow (right-docked) panel instead of overflowing the card.
+                        <div className="mt-[14px] flex flex-wrap items-center gap-x-[14px] gap-y-2">
                             <TextButton
                                 label="Edit"
                                 onClick={stop(onEdit)}
@@ -144,23 +128,28 @@ export default function AnnotationCard({
                                 label="Re-anchor"
                                 onClick={stop(onReanchor)}
                                 icon={<TargetIcon size={13} />}
-                                className="text-dio-tertiary hover:text-dio-primary"
+                                // Re-anchoring is the fix for a broken note, so it leads in the danger tone.
+                                className={broken ? 'text-dio-danger-2' : 'text-dio-tertiary hover:text-dio-primary'}
                             />
-                            <TextButton label="Delete" onClick={stop(onDelete)} className="text-[#B79A93] hover:text-dio-danger" />
-                            {otherPage ? (
-                                onOpen && (
+                            <TextButton
+                                label="Delete"
+                                onClick={stop(onDelete)}
+                                className="text-dio-danger-muted hover:text-dio-danger"
+                            />
+
+                            <div className="ml-auto flex items-center gap-0.5">
+                                {otherPage && onOpen && (
                                     <button
                                         type="button"
                                         title="Go to page"
                                         onClick={stop(onOpen)}
-                                        className={`ml-auto ${moveBtn}`}
+                                        className={moveBtn}
                                     >
                                         <ExternalLinkIcon size={15} />
                                     </button>
-                                )
-                            ) : (
-                                (onMoveUp || onMoveDown) && (
-                                    <div className="ml-auto flex items-center gap-0.5">
+                                )}
+                                {(onMoveUp || onMoveDown) && (
+                                    <>
                                         <button
                                             type="button"
                                             title="Move up"
@@ -179,11 +168,11 @@ export default function AnnotationCard({
                                         >
                                             <ChevronDownIcon size={15} />
                                         </button>
-                                    </div>
-                                )
-                            )}
+                                    </>
+                                )}
+                            </div>
                         </div>
-                    ))}
+                    )}
                 </div>
             )}
         </div>

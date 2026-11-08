@@ -98,6 +98,8 @@ export default {
           'success': '#3FCF8E',
           'danger': '#B03024',
           'danger-2': '#C0392B',
+          // Resting tone for destructive text actions, which deepen to `danger` on hover.
+          'danger-muted': '#B79A93',
           'danger-bg': '#FCEBEA',
           'danger-border': '#F1CFCB',
           'broken-border': '#EAC7C3',
@@ -139,6 +141,12 @@ export default {
           '70%': { boxShadow: '0 0 0 12px rgba(221,98,52,0)' },
           '100%': { boxShadow: '0 0 0 0 rgba(221,98,52,0)' },
         },
+        // Looping "recording" tally light — the mark alone breathes against its
+        // chip, so the signal stays small and never strobes the whole pill.
+        'dio-record': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '.3' },
+        },
         'dio-pop': {
           '0%': { opacity: '0', transform: 'translateY(6px) scale(.985)' },
           '100%': { opacity: '1', transform: 'none' },
@@ -151,6 +159,7 @@ export default {
       },
       animation: {
         'dio-pulse': 'dio-pulse 1.3s ease',
+        'dio-record': 'dio-record 1.8s ease-in-out infinite',
         'dio-pop': 'dio-pop .18s ease',
         'dio-pop-lg': 'dio-pop .22s ease',
         'dio-pop-pill': 'dio-pop .25s ease',

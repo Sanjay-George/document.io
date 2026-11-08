@@ -27,6 +27,9 @@ export function isPrivateHost(hostname) {
         return false;
     }
 
+    // TODO: FIX CASE WHERE DOMAIN NAME IS POINTED TO 127.0.0.1 OR ANY OTHER PRIVATE IPS (SSRF BYPASS)
+    // ALSO HANDLE DNS REBINDING
+
     return false; // non-literal hostnames are treated as public
 }
 
@@ -34,6 +37,7 @@ export function isPrivateHost(hostname) {
  * Validate an asset URL requested by a page before the extension fetches it.
  * Allows only http(s), and blocks cross-origin fetches to private/internal
  * hosts (SSRF) while permitting the page's own origin. Returns the parsed URL.
+ * @returns {URL}
  * @throws if the URL is malformed, non-http(s), or a blocked internal host.
  */
 export function assertAllowedAssetUrl(rawUrl, tabUrl) {
@@ -44,12 +48,12 @@ export function assertAllowedAssetUrl(rawUrl, tabUrl) {
         throw new Error("Invalid asset URL");
     }
     if (target.protocol !== "http:" && target.protocol !== "https:") {
-        throw new Error("Unsupported asset scheme");
+        throw new Error("Unsupported asset scheme. Only http(s) is allowed");
     }
     // Same-origin as the page is always fine (intranet/localhost docs load their
     // own assets); cross-origin to a private/internal host is blocked.
     if (target.origin !== new URL(tabUrl).origin && isPrivateHost(target.hostname)) {
         throw new Error("Blocked non-public asset host");
     }
-    return target;
+    return target; // TODO: return resolved IP
 }

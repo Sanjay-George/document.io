@@ -13,7 +13,5 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Clear `onAddNote` for the read-only export view, which drops the call-to-action. */
 export const Default: Story = {};
-
-/** Read-only export view — no "Add a note" call-to-action. */
-export const ReadOnly: Story = { args: { onAddNote: undefined } };

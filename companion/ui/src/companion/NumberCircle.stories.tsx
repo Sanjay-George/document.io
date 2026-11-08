@@ -13,12 +13,10 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Idle: Story = {};
-export const Selected: Story = { args: { variant: 'selected' } };
-export const OtherPage: Story = { args: { variant: 'other' } };
-export const Broken: Story = { args: { variant: 'broken' } };
+export const Default: Story = {};
 
-export const AllVariants: Story = {
+/** Idle, selected, off-page and broken — the four card states, side by side. */
+export const Variants: Story = {
     render: () => (
         <div className="flex items-center gap-4">
             <NumberCircle number={4} variant="idle" />

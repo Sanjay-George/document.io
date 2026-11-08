@@ -6,7 +6,7 @@
 > it*, via a per-project opt-in flag.
 
 > **TL;DR** — Add a per-project `exportEnabled` flag, **off by default**, flipped
-> from a new **kebab (⋯) menu** on the project page — which also absorbs the
+> from a new **meatball (⋯) menu** on the project page — which also absorbs the
 > existing **Import** and **Upload assets** actions. The companion only shows its
 > "Export this page" button when the project has it enabled. KISS / YAGNI.
 
@@ -17,7 +17,7 @@
 - **Opt-in per project** — export is a beta capability a user deliberately turns on
   for specific projects; **disabled by default** (including all existing projects).
 - **Tidy the project header** — collapse `Import` + `Upload assets` into a `⋯`
-  kebab menu; keep `Add documentation` as the primary button. The export toggle
+  meatball menu; keep `Add documentation` as the primary button. The export toggle
   lives in that menu.
 - **Companion honours the flag** — the footer `⬇ Export this page (beta)` button
   appears only when the project is export-enabled.
@@ -29,7 +29,7 @@
 ```mermaid
 flowchart LR
     subgraph hub["Hub (Next.js)"]
-        kebab["kebab menu - Export (beta) toggle"] -->|PUT /projects/:id| api
+        meatball["meatball menu - Export (beta) toggle"] -->|PUT /projects/:id| api
     end
     subgraph be["Backend (Express/Mongo)"]
         api["projects controller"] --> db[("documents coll. - exportEnabled")]
@@ -76,7 +76,7 @@ documentation object) gates without a second fetch.
 - ✏️ `ui/data_access/models/project.ts` — add `exportEnabled?: boolean` to the client
   `Project` interface.
 - ✏️ `ui/app/projects/[id]/page.tsx` — in `.hub-detail-actions`, replace the standalone
-  **Import** and **Upload assets** buttons with a `KebabMenu` (`@/components/hub`) whose
+  **Import** and **Upload assets** buttons with a `MeatballMenu` (`@/components/hub`) whose
   `items` are:
   1. **Enable/Disable export (beta)** — a click-to-toggle item whose label + icon
      reflect `project.exportEnabled` (e.g. `Check` when on). `onClick` →
@@ -86,12 +86,12 @@ documentation object) gates without a second fetch.
   2. **Import** — `onClick: () => setImportOpen(true)` (unchanged behaviour,
      `separatorBefore: true`).
   3. **Upload assets** — `onClick: () => router.push(\`/projects/${projectId}/upload\`)`.
-  Keep **Add documentation** as the primary button beside the kebab.
-- ♻️ Reuse `KebabMenu`, `Toggle` (if we later want an inline switch), `useHubToast`,
+  Keep **Add documentation** as the primary button beside the meatball.
+- ♻️ Reuse `MeatballMenu`, `Toggle` (if we later want an inline switch), `useHubToast`,
   `edit()` (`ui/data_access/api/projects.ts` — `PUT /projects/:id`), `SINGLE_PROJECT_KEY`,
   `ImportForm`/`HubModal` — all already present.
 
-**Kebab note:** `KebabMenu`'s `MenuItem` is click-only and auto-closes. Using a
+**Meatball note:** `MeatballMenu`'s `MenuItem` is click-only and auto-closes. Using a
 **click-to-toggle menu item** (label/icon reflect state; toast confirms) avoids
 touching the shared component. Extending `MenuItem` to host an inline non-closing
 `Toggle` is possible later polish — deferred (YAGNI).
@@ -126,7 +126,7 @@ default; the "absent === false" convention covers new projects too.)
 - Hub project page: `ui/app/projects/[id]/page.tsx` — `.hub-detail-actions` row
   (≈L87–97); `toggleActive` handler (≈L40–47) is the mutation pattern to mirror;
   `ImportForm` opened via `HubModal` (≈L125–131).
-- Hub components: `KebabMenu`, `Toggle`, `useHubToast` in `ui/components/hub/`
+- Hub components: `MeatballMenu`, `Toggle`, `useHubToast` in `ui/components/hub/`
   (barrel `ui/components/hub/index.ts`); CSS classes in `ui/app/hub.css`.
 - Hub data access: `ui/data_access/api/projects.ts` (`edit`), `ui/data_access/swr/projects.ts`
   (`useProject`, `SINGLE_PROJECT_KEY`, `ALL_PROJECTS_KEY`).
@@ -137,7 +137,7 @@ default; the "absent === false" convention covers new projects too.)
 ## How we'll know it works
 
 - [ ] Backend up (`server.ts`, port 5000/5001) + Hub dev server (`ui`, port 3000).
-- [ ] Project page shows a `⋯` kebab containing **Export (beta)** toggle + **Import** +
+- [ ] Project page shows a `⋯` meatball containing **Export (beta)** toggle + **Import** +
       **Upload assets**; `Add documentation` stays primary.
 - [ ] Toggling **Export (beta)** on → `PUT /projects/:id` persists `exportEnabled: true`;
       toast shown; reopening the menu reflects the new state.
@@ -148,6 +148,6 @@ default; the "absent === false" convention covers new projects too.)
 - [ ] Companion (live, against the backend) on a documentation whose project is **off**
       → no footer Export button; flip the project **on**, reload → `⬇ Export this page (beta)`
       appears and still produces a working file.
-- [ ] Verify the Hub kebab + toggle visually in the Browser pane via the `ui` dev server;
+- [ ] Verify the Hub meatball + toggle visually in the Browser pane via the `ui` dev server;
       verify the companion button show/hide via `CompanionPanel` Storybook (`onExport`
       present/undefined) since the container isn't storybooked.

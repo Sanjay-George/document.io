@@ -11,6 +11,6 @@ export { default as ModalHeader } from "./ModalHeader";
 export { default as Toggle } from "./Toggle";
 export { default as HubModal } from "./HubModal";
 export { default as HubTopBar } from "./HubTopBar";
-export { default as KebabMenu } from "./KebabMenu";
-export type { MenuItem } from "./KebabMenu";
+export { default as MeatballMenu } from "./MeatballMenu";
+export type { MenuItem } from "./MeatballMenu";
 export { HubToastProvider, useHubToast } from "./toast";

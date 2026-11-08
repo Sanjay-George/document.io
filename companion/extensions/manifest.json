@@ -27,6 +27,7 @@
                 "<all_urls>"
             ],
             "js": [
+                "messages.js",
                 "content.js"
             ],
             "css": [],

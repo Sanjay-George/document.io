@@ -11,7 +11,7 @@ export type MenuItem = {
     separatorBefore?: boolean;
 };
 
-export default function KebabMenu({ items, label = "More actions" }: { items: MenuItem[]; label?: string }) {
+export default function MeatballMenu({ items, label = "More actions" }: { items: MenuItem[]; label?: string }) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
     const buttonRef = useRef<HTMLButtonElement>(null);
@@ -71,11 +71,11 @@ export default function KebabMenu({ items, label = "More actions" }: { items: Me
     };
 
     return (
-        <div className="hub-kebab-wrap" ref={ref}>
+        <div className="hub-meatball-wrap" ref={ref}>
             <button
                 ref={buttonRef}
                 type="button"
-                className="hub-kebab"
+                className="hub-meatball"
                 aria-label={label}
                 aria-haspopup="menu"
                 aria-expanded={open}

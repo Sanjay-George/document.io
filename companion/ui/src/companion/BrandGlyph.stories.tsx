@@ -11,19 +11,16 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Accent: Story = {
+/** The glyph inherits `currentColor` — on the accent, and reversed out of it. */
+export const Default: Story = {
     render: (args) => (
-        <span className="text-dio-accent">
-            <BrandGlyph {...args} />
-        </span>
-    ),
-};
-
-export const OnAccentChip: Story = {
-    args: { size: 9 },
-    render: (args) => (
-        <span className="flex h-[26px] w-[26px] items-center justify-center rounded-dio-chip bg-dio-accent text-white">
-            <BrandGlyph {...args} />
-        </span>
+        <div className="flex items-center gap-4">
+            <span className="text-dio-accent">
+                <BrandGlyph {...args} />
+            </span>
+            <span className="flex h-[26px] w-[26px] items-center justify-center rounded-dio-chip bg-dio-accent text-white">
+                <BrandGlyph {...args} />
+            </span>
+        </div>
     ),
 };

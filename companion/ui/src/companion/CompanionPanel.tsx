@@ -26,7 +26,7 @@ type Props = {
     /** Reorder controls — omit to hide the move up/down buttons. */
     onMoveUp?: (id: string) => void;
     onMoveDown?: (id: string) => void;
-    /** Ids at the ends of the global order, used to disable the move buttons. */
+    /** Ids at the ends of the rendered list, used to disable the move buttons. */
     firstNoteId?: string | null;
     lastNoteId?: string | null;
     /** Re-anchor pick flow is active. */

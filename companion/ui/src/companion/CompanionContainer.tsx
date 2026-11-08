@@ -325,14 +325,23 @@ export default function CompanionContainer() {
 
     // Reorder a note in the global step order (persisted via the `index` field).
     // Reindexes the whole set so any legacy null/duplicate indices are normalised.
+    //
+    // The step is taken against the *rendered* list — the scope tab hides off-page
+    // notes and sinks broken ones — so the note lands next to the neighbour the
+    // user actually sees, not next to one filtered out of view.
     const moveNote = async (id: string, dir: 'up' | 'down') => {
         if (!documentationId) return;
+        const shown = displayed.findIndex((n) => n.id === id);
+        const neighbour = displayed[dir === 'up' ? shown - 1 : shown + 1];
+        if (shown < 0 || !neighbour) return;
+
         const ordered = [...notes];
         const i = ordered.findIndex((n) => n.id === id);
-        const j = dir === 'up' ? i - 1 : i + 1;
-        if (i < 0 || j < 0 || j >= ordered.length) return;
+        if (i < 0) return;
         const [moved] = ordered.splice(i, 1);
-        ordered.splice(j, 0, moved);
+        const j = ordered.findIndex((n) => n.id === neighbour.id);
+        if (j < 0) return;
+        ordered.splice(dir === 'up' ? j : j + 1, 0, moved);
 
         const byId = new Map(annotations.map((a) => [a.id, a]));
         const reindexed = ordered
@@ -464,8 +473,8 @@ export default function CompanionContainer() {
     const debouncedHandlePanelResize = useRef(debounce(handlePanelResize, 100)).current;
 
     const reanchorTitle = reanchorId ? notes.find((n) => n.id === reanchorId)?.title : undefined;
-    const firstNoteId = notes[0]?.id ?? null;
-    const lastNoteId = notes[notes.length - 1]?.id ?? null;
+    const firstNoteId = displayed[0]?.id ?? null;
+    const lastNoteId = displayed[displayed.length - 1]?.id ?? null;
     const isVertical = orientation === PanelOrientation.VERTICAL;
     const handleHighlight = highlightResizeHandle ? 'pulsing-animation' : '';
 

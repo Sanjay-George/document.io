@@ -1,3 +1,5 @@
+const { PAGE_REQUEST, PAGE_RESPONSE, RUNTIME_REQUEST } = globalThis.DOCIO_MESSAGES;
+
 (async function () {
     const ROOT_ID = "document-io-root";
 
@@ -17,7 +19,7 @@
     // ---- Functions ----
     function getDocumentationId() {
         return new Promise((resolve) => {
-            chrome.runtime.sendMessage({ type: "GET_DOC_ID" }, (resp) => {
+            chrome.runtime.sendMessage({ type: RUNTIME_REQUEST.getCurrentDocumentationId }, (resp) => {
                 resolve(resp?.documentationId || null);
             });
         });
@@ -63,22 +65,22 @@
             if (event.source !== window || event.origin !== window.location.origin) return;
             const msg = event.data;
             if (!msg || typeof msg !== "object") return;
-            if (msg.type === "DOCIO_FETCH") {
+            if (msg.type === PAGE_REQUEST.fetchData) {
                 try {
                     const result = await apiFetch(msg.url, msg.options);
-                    window.postMessage({ type: "DOCIO_FETCH_RESPONSE", reqId: msg.reqId, ok: true, data: result });
+                    window.postMessage({ type: PAGE_RESPONSE.fetchData, reqId: msg.reqId, ok: true, data: result });
                 } catch (err) {
-                    window.postMessage({ type: "DOCIO_FETCH_RESPONSE", reqId: msg.reqId, ok: false, error: err.message });
+                    window.postMessage({ type: PAGE_RESPONSE.fetchData, reqId: msg.reqId, ok: false, error: err.message });
                 }
                 return;
             }
 
-            if (msg.type === "DOCIO_ASSET_FETCH") {
+            if (msg.type === PAGE_REQUEST.fetchAsset) {
                 try {
                     const result = await assetFetch(msg.url);
-                    window.postMessage({ type: "DOCIO_ASSET_FETCH_RESPONSE", reqId: msg.reqId, ok: true, data: result });
+                    window.postMessage({ type: PAGE_RESPONSE.fetchAsset, reqId: msg.reqId, ok: true, data: result });
                 } catch (err) {
-                    window.postMessage({ type: "DOCIO_ASSET_FETCH_RESPONSE", reqId: msg.reqId, ok: false, error: err.message });
+                    window.postMessage({ type: PAGE_RESPONSE.fetchAsset, reqId: msg.reqId, ok: false, error: err.message });
                 }
                 return;
             }
@@ -88,7 +90,7 @@
     // ---- Asset Fetch Bridge (CORS-bypassed, base64) — used by the export serializer ----
     function assetFetch(url) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ type: "ASSET_FETCH", url }, (resp) => {
+            chrome.runtime.sendMessage({ type: RUNTIME_REQUEST.fetchAsset, url }, (resp) => {
                 if (chrome.runtime.lastError) return reject(chrome.runtime.lastError);
                 if (!resp?.ok) return reject(new Error(resp?.error || "Unknown error"));
                 resolve(resp.data);
@@ -99,7 +101,7 @@
     // ---- API Fetch Bridge ----
     function apiFetch(url, options = {}) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ type: "API_FETCH", url, options }, (resp) => {
+            chrome.runtime.sendMessage({ type: RUNTIME_REQUEST.fetchData, url, options }, (resp) => {
                 if (chrome.runtime.lastError) return reject(chrome.runtime.lastError);
                 if (!resp?.ok) return reject(new Error(resp?.error || "Unknown error"));
                 resolve(resp.data);

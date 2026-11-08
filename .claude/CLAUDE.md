@@ -14,6 +14,10 @@ Reference: `companion/ui/src/companion/*.stories.tsx` and `ui/components/hub/*.s
 
 - **Keep stories in sync.** Every presentational component has a co-located `*.stories.tsx`. Add/adjust stories when you add a component, prop, or visual state.
 - **Cover states that matter (KISS/YAGNI)** — not every prop combination.
+- **1–3 stories per component. Never one story per prop value:**
+  - `Default` — the canonical instance, args-driven so `argTypes` controls reach the other states. A state reachable by flipping a control does not get its own story.
+  - `Variants` — only when seeing states *side by side* is the point (a variant set that must stay consistent, a tone scale).
+  - At most one more, for a genuinely distinct mode that can't share a frame (`ReadOnly`, an integration-seam harness).
 - **Titles are hierarchical:** `<Area>/Primitives/*` (small pieces) and `<Area>/Components/*` (e.g. `Hub/`, `Companion/`).
 - **Type it:** `const meta = { ... } satisfies Meta<typeof C>` + `type Story = StoryObj<typeof meta>`.
 - **Document via JSDoc** on `meta` and individual stories (feeds `autodocs`); expose props with `argTypes` controls.
