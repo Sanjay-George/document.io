@@ -2,7 +2,12 @@
   "name": "documenter",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
+    "audit": "npm audit",
+    "test": "echo \"(no backend tests yet)\" && exit 0",
     "build": "tsc",
     "clean": "rimraf dist",
     "prestart": "npm run clean && npm run build",
@@ -16,7 +21,6 @@
     "@types/node": "^22.5.1",
     "rimraf": "^6.0.1",
     "swagger-autogen": "^2.23.7",
-    "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "typescript": "^5.5.4"
   },
@@ -25,5 +29,8 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mongodb": "^6.8.0"
+  },
+  "overrides": {
+    "brace-expansion": "^5.0.8"
   }
 }

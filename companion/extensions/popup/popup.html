@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Document.io Companion</title>
+    <style>
+      :root {
+        /* Mirror ui/app/tokens.css */
+        --brand: #dd6234;
+        --brand-hover: #c9542a;
+        --danger-text: #b03024;
+        --success-text: #2e8b63;
+        --bg: #f6f4f0;
+        --surface: #ffffff;
+        --surface-subtle: #fbfaf8;
+        --warm-border: #e9e5de;
+        --border-field: #e7e2da;
+        --ink: #14171f;
+        --text-secondary: #5a6270;
+        --text-tertiary: #7a8290;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        width: 320px;
+        padding: 12px;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+      }
+
+      .panel {
+        border: 1px solid var(--warm-border);
+        border-radius: 12px;
+        padding: 14px;
+        background: var(--surface);
+        box-shadow: 0 6px 18px rgba(20, 23, 31, 0.06);
+      }
+
+      h1 {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      h1 span {
+        color: var(--brand);
+      }
+
+      label {
+        display: block;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        text-transform: capitalize;
+        margin-bottom: 6px;
+      }
+
+      input {
+        display: block;
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 12px;
+        border: 1px solid var(--border-field);
+        border-radius: 8px;
+        outline: none;
+        color: var(--ink);
+        background: var(--surface-subtle);
+        transition: border-color 0.15s, box-shadow 0.15s;
+      }
+
+      input:focus {
+        border-color: var(--brand);
+        box-shadow: 0 0 0 3px rgba(221, 98, 52, 0.15);
+      }
+
+      button {
+        margin-top: 12px;
+        width: 100%;
+        padding: 9px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        border: 1px solid var(--brand);
+        border-radius: 8px;
+        background: var(--brand);
+        cursor: pointer;
+        transition: background 0.15s, border-color 0.15s;
+      }
+
+      button:hover {
+        background: var(--brand-hover);
+        border-color: var(--brand-hover);
+      }
+
+      .hint {
+        font-size: 11px;
+        font-style: italic;
+        color: var(--text-tertiary);
+        margin-top: 7px;
+      }
+
+      .status {
+        font-size: 11px;
+        margin-top: 8px;
+        color: var(--text-secondary);
+        font-weight: 500;
+        min-height: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="panel">
+      <h1>Document.io <span>Companion</span></h1>
+      <label for="host">Connect to:</label>
+      <input id="host" type="url" placeholder="http://localhost:5001" />
+      <p class="hint">(The URL of your document.io server.)</p>
+      <button id="save">Save</button>
+      <p class="status" id="status"></p>
+    </main>
+    <script src="../messages.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

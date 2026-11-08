@@ -1,0 +1,3 @@
+/* document.io companion — webfonts.
+   Import once wherever the companion renders (app entry, Storybook preview). */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');

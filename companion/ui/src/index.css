@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+:host {
+  --var-primary: #0075A0;
+  --var-accent: #ff8749;
+  --var-danger: #B74606;
+
+  --var-slate-50: #f8fafc;
+  --var-slate-100: #f1f5f9;
+  --var-slate-200: #e2e8f0;
+  --var-slate-300: #cbd5e1;
+  --var-slate-400: #94a3b8;
+  --var-slate-500: #64748b;
+  --var-slate-600: #475569;
+  --var-slate-700: #334155;
+  --var-slate-800: #1e293b;
+  --var-slate-900: #0f172a;
+  --var-slate-950: #020617;
+
+  --var-text-xs: 12px;
+  --var-text-sm: 14px;
+  --var-text-base: 16px;
+  --var-text-lg: 18px;
+  --var-text-xl: 20px;
+  --var-text-2xl: 24px;
+  --var-text-3xl: 30px;
+  --var-text-4xl: 36px;
+  --var-text-5xl: 48px;
+  --var-text-6xl: 64px;
+  --var-text-7xl: 72px;
+  --var-text-8xl: 96px;
+
+  --var-line-height-xs: 16px;
+  --var-line-height-sm: 20px;
+  --var-line-height-base: 24px;
+  --var-line-height-lg: 28px;
+  --var-line-height-xl: 28px;
+  --var-line-height-2xl: 32px;
+  --var-line-height-3xl: 36px;
+  --var-line-height-4xl: 40px;
+  --var-line-height-5xl: 48px;
+
+
+  /* Font */
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-size: var(--var-text-base);
+  line-height: var(--var-line-height-base);
+  font-weight: 400;
+  font-synthesis: none;
+  color-scheme: light;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+
+
+/* Typography */
+h1 {
+  margin-bottom: 1rem;
+  font-weight: 500;
+  font-size: var(--var-text-4xl);
+  line-height: var(--var-line-height-4xl);
+  color: inherit !important;
+}
+
+h2 {
+  margin-bottom: 1rem;
+  font-size: var(--var-text-3xl);
+  line-height: var(--var-line-height-3xl);
+  font-weight: 500;
+}
+
+h3 {
+  margin-bottom: 1rem;
+  font-size: var(--var-text-2xl);
+  line-height: var(--var-line-height-2xl);
+  font-weight: 500;
+}
+
+h4 {
+  margin-bottom: 1rem;
+  font-size: var(--var-text-xl);
+  line-height: var(--var-line-height-xl);
+  font-weight: 500;
+}
+
+h5 {
+  margin-bottom: 1rem;
+  font-size: var(--var-text-lg);
+  line-height: var(--var-line-height-lg);
+  font-weight: 600;
+  line-height: 1;
+}
+
+h6 {
+  margin-bottom: 1rem;
+  font-size: var(--var-text-sm);
+  line-height: var(--var-line-height-sm);
+  font-weight: 600;
+  line-height: 1;
+}
+
+p {
+  margin-bottom: 0;
+}
+
+p,
+td,
+li,
+a {
+  font-size: var(--var-text-base);
+}

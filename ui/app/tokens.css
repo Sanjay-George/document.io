@@ -1,0 +1,114 @@
+/* =============================================================================
+   document.io design tokens — SINGLE SOURCE OF TRUTH for theme colors.
+   Plain CSS custom properties (no @tailwind), so this file is safe to import
+   from globals.css AND from Storybook's preview.css.
+
+   Values are HSL channel triplets (`H S% L%`) so they compose with Tailwind's
+   alpha modifier via the `hsl(var(--x) / <alpha-value>)` pattern in
+   tailwind.config.ts. Reference from CSS as `hsl(var(--token))` or
+   `hsl(var(--token) / .5)`. Do NOT hardcode hex/rgb anywhere else.
+   ========================================================================== */
+
+:root {
+    /* ---- Design palette (primitives) ---- */
+    /* Base */
+    --white: 0 0% 100%;   /* #FFFFFF */
+    --black: 0 0% 0%;   /* #000 */
+
+    /* Brand / clay */
+    --brand: 16.3 71.3% 53.5%;   /* #DD6234 */
+    --brand-hover: 15.8 65.4% 47.6%;   /* #C9542A */
+    --brand-deep: 20.4 72.7% 44.5%;   /* #C4571F */
+    --clay-tan: 26.6 43.5% 56.3%;   /* #C08A5F */
+    --brand-ink: 22.4 49.5% 40.4%;   /* #9A5A34 */
+    --brand-ink-strong: 20.9 60.5% 29.8%;   /* #7A3E1E */
+    --clay-tint: 22.9 70% 88.2%;   /* #F6DCCC */
+    --clay-tint-2: 18.6 58.3% 85.9%;   /* #F0D3C6 */
+    --clay-tint-3: 23.6 40% 86.3%;   /* #EAD9CE */
+    --clay-tint-soft: 20 65.2% 95.5%;   /* #FBF1EC */
+    --clay-tint-strong: 19.4 57.5% 77.8%;   /* #E7BBA6 */
+
+    /* Warm neutrals (sand) — surfaces & borders */
+    --bg: 40 25% 95.3%;   /* #F6F4F0 */
+    --surface-subtle: 40 27.3% 97.8%;   /* #FBFAF8 */
+    --surface-subtle-2: 40 33.3% 98.2%;   /* #FCFBF9 */
+    --sand-100: 37.5 26.7% 94.1%;   /* #F4F1EC */
+    --sand-150: 40 27.3% 93.5%;   /* #F3F0EA */
+    --sand-180: 27.7 31.7% 92%;   /* #F1EAE4 */
+    --sand-200: 40 24.3% 92.7%;   /* #F1EEE8 */
+    --sand-250: 40 23.1% 92.4%;   /* #F0EDE7 */
+    --sand-300: 42 22.7% 91.4%;   /* #EEEBE4 */
+    --sand-320: 38.2 25.6% 91.6%;   /* #EFEBE4 */
+    --sand-350: 38.2 21.6% 90%;   /* #EBE7E0 */
+    --warm-border: 38.2 20% 89.2%;   /* #E9E5DE */
+    --warm-border-2: 36.9 23.6% 89.2%;   /* #EAE5DD */
+    --border-field: 36.9 21.3% 88%;   /* #E7E2DA */
+    --warm-border-strong: 36.9 20% 87.3%;   /* #E5E0D8 */
+    --warm-border-strong-2: 36 21.1% 86.1%;   /* #E3DDD4 */
+    --sand-540: 38.6 19.4% 85.9%;   /* #E2DDD4 */
+    --sand-600: 36.7 18% 80.4%;   /* #D6CFC4 */
+    --sand-650: 36 17.2% 77.3%;   /* #CFC7BB */
+    --sand-680: 25.7 25.9% 73.5%;   /* #CDB9AA */
+    --sand-700: 37.9 13.5% 72.4%;   /* #C2BBAF */
+
+    /* Cool grays */
+    --gray-50: 220 23.1% 97.5%;   /* #F7F8FA */
+    --gray-75: 210 10% 96.1%;   /* #F4F5F6 */
+    --gray-100: 220 13% 95.5%;   /* #F2F3F5 */
+    --gray-150: 225 12.5% 93.7%;   /* #EDEEF1 */
+    --border-panel: 225 11.8% 93.3%;   /* #ECEDF0 */
+    --gray-300: 222 13.2% 85.1%;   /* #D4D7DE */
+    --gray-400: 218.8 13.4% 75.1%;   /* #B7BDC8 */
+    --text-faint: 220 10.2% 71.2%;   /* #AEB3BD */
+    --text-muted: 222 11% 64.3%;   /* #9AA0AE */
+    --gray-550: 215.5 10.4% 58.4%;   /* #8A93A0 */
+
+    /* Ink / slate text */
+    --ink: 223.6 21.6% 10%;   /* #14171F */
+    --text-body: 217.9 14.1% 26.5%;   /* #3A414D */
+    --text-secondary: 218.2 10.9% 39.6%;   /* #5A6270 */
+    --text-tertiary: 218.2 9% 52.2%;   /* #7A8290 */
+    --mute-warm: 44.2 7.5% 50.4%;   /* #8A8577 */
+    --mute-warm-faint: 36.7 10.2% 65.5%;   /* #B0A99E */
+
+    /* Status / accents */
+    --info: 203.1 38.6% 39.6%;   /* #3E6E8C */
+    --success: 152.9 60% 52.9%;   /* #3FCF8E */
+    --success-text: 154.2 50.3% 36.3%;   /* #2E8B63 */
+    --success-bg: 147.7 44.8% 94.3%;   /* #EAF7F0 */
+    --danger: 5 77.6% 45.5%;   /* #CE291A */
+    --danger-text: 5.1 66% 41.6%;   /* #B03024 */
+    --danger-bg: 3.3 75% 95.3%;   /* #FCEBEA */
+
+    /* ---- Semantic tokens (shadcn/Tailwind utilities map to these) ---- */
+    --background: var(--bg);
+    --foreground: var(--ink);
+    --card: var(--white);
+    --card-foreground: var(--ink);
+    --popover: var(--white);
+    --popover-foreground: var(--ink);
+    --primary: var(--brand);
+    --primary-foreground: var(--white);
+    --primary-hover: var(--brand-hover);
+    --secondary: var(--sand-100);
+    --secondary-foreground: var(--ink);
+    --muted: var(--sand-100);
+    --muted-foreground: var(--text-secondary);
+    --accent: var(--sand-100);
+    --accent-foreground: var(--ink);
+    --destructive: var(--danger);
+    --destructive-foreground: var(--white);
+    --border: var(--warm-border);
+    --input: var(--border-field);
+    --ring: var(--brand);
+
+    /* charts (unchanged categorical scale) */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    --radius: 0.5rem;
+}
+

@@ -1,0 +1,26 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "ui",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "ui", "run", "dev"],
+      "port": 3000,
+      "autoPort": true
+    },
+    {
+      "name": "storybook",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "ui", "run", "storybook", "--", "--ci"],
+      "port": 6006,
+      "autoPort": true
+    },
+    {
+      "name": "companion-storybook",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "companion/ui", "run", "storybook", "--", "--ci"],
+      "port": 6007,
+      "autoPort": true
+    }
+  ]
+}

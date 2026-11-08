@@ -1,0 +1,11 @@
+/* Storybook-only stylesheet: pulls in the companion webfonts and generates the
+   Tailwind utilities (including the `dio-*` design tokens) used by the stories. */
+@import '../src/companion/fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    background: #f5f6fb;
+}

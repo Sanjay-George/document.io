@@ -1,14 +1,14 @@
-import Navbar from "@/components/Navbar";
+import "../hub.css";
+import HubTopBar from "@/components/hub/HubTopBar";
+import { HubToastProvider } from "@/components/hub/toast";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-
     return (
-        <>
-            <Navbar />
-            <div className="container mx-auto pt-1">
+        <div className="hub-scope">
+            <HubToastProvider>
+                <HubTopBar />
                 {children}
-            </div>
-        </>
-
-    )
+            </HubToastProvider>
+        </div>
+    );
 }

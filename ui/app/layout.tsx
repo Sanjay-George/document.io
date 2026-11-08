@@ -1,9 +1,19 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from './providers';
 
 const inter = Inter({ subsets: ["latin"] });
+const instrumentSans = Instrument_Sans({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-instrument",
+});
+const jetbrainsMono = JetBrains_Mono({
+    subsets: ["latin"],
+    weight: ["400", "500", "600"],
+    variable: "--font-jetbrains",
+});
 
 export const metadata: Metadata = {
     title: "Document.io",
@@ -16,7 +26,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en">
+        <html lang="en" className={`${instrumentSans.variable} ${jetbrainsMono.variable}`}>
             <body className={inter.className}>
                 <Providers>
                     {children}
