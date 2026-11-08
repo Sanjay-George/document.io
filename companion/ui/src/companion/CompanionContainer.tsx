@@ -23,7 +23,7 @@ import ConfirmDialog from '@/companion/ConfirmDialog';
 import HostOverlay from '@/companion/HostOverlay';
 import { debounce } from '@/utils';
 import { AnchorMeta, resolveAnchoredElement } from '@/utils/anchor';
-import { pageMatches, safeUrl, toRelativeUrl } from '@/companion/helpers';
+import { pageMatches, reanchorScope, safeUrl, toRelativeUrl } from '@/companion/helpers';
 import { exportCurrentPage } from '@/export/serializePage';
 
 /** True inside an exported HTML file: data is inlined, all editing is hidden. */
@@ -115,7 +115,8 @@ export default function CompanionContainer() {
     const notes: Note[] = useMemo(() => {
         // Match on the origin-independent path so notes stay attached when a
         // documentation moves between domains (localhost → dev-server, etc.).
-        const here = toRelativeUrl(window.location.href);
+        // Pass the full href: a note's pattern may also require query params.
+        const here = window.location.href;
         const flagsFor = (a: Annotation): NoteFlags => {
             // In an export the payload is already scoped to this page and anchors are
             // baked to a unique attribute, so skip page matching and just resolve.
@@ -173,7 +174,7 @@ export default function CompanionContainer() {
         bump(); // quick first pass for static pages
 
         const hasUnresolvedOnPage = () => {
-            const here = toRelativeUrl(window.location.href);
+            const here = window.location.href;
             return annotations.some((a) => {
                 if (!pageMatches(here, a.url, a.urlPattern)) return false;
                 try {
@@ -416,11 +417,13 @@ export default function CompanionContainer() {
         if (!documentationId) return;
         const existing = annotations.find((a) => a.id === id);
         if (existing) {
+            const { url, urlPattern } = reanchorScope(existing, target.url);
             await updateAnnotation(id, {
                 ...existing,
                 target: target.selector,
                 anchor: target.anchor,
-                url: target.url,
+                url,
+                urlPattern,
                 type: target.type,
                 updated: new Date(),
             });
@@ -434,14 +437,25 @@ export default function CompanionContainer() {
         showToast('Note re-anchored', 'ok');
     };
 
+    /** Confirmation copy — a scoped note is losing its pattern, so say so. */
+    const reanchorMessage = (existing: Annotation | undefined, target: PickedTarget) => {
+        const to = toRelativeUrl(target.url);
+        if (existing?.urlPattern) {
+            return `This note applies to ${existing.urlPattern}. Re-anchoring here will move it to ${to} and reset its scope to that one page.`;
+        }
+        return `This note was made on ${toRelativeUrl(existing?.url ?? '')}. Re-anchoring here will move it to ${to}.`;
+    };
+
     // ---- Element pick (Annotate-mode click / re-anchor completion) ----
     const handlePickTarget = async (target: PickedTarget) => {
         if (reanchorId) {
             const existing = annotations.find((a) => a.id === reanchorId);
-            // Re-anchoring onto a different page re-homes the note there — a
-            // silent, easy-to-make mistake for off-page notes. Confirm first;
-            // a same-page re-anchor (e.g. fixing a broken pin) applies directly.
-            if (existing && toRelativeUrl(existing.url) !== toRelativeUrl(target.url)) {
+            // Re-anchoring outside a note's scope re-homes it and drops its page
+            // pattern — a silent, easy-to-make mistake for off-page notes, so
+            // confirm first. Landing anywhere the note already applies (a sibling
+            // page of a wildcarded note, or a same-page broken-pin fix) is not a
+            // move and applies directly.
+            if (existing && reanchorScope(existing, target.url).movesPage) {
                 setPendingReanchor({ id: reanchorId, target });
                 return;
             }
@@ -600,7 +614,10 @@ export default function CompanionContainer() {
             {pendingReanchor && (
                 <ConfirmDialog
                     title="Move note to this page?"
-                    message={`This note was made on ${toRelativeUrl(annotations.find((a) => a.id === pendingReanchor.id)?.url ?? '')}. Re-anchoring here will move it to ${toRelativeUrl(pendingReanchor.target.url)}.`}
+                    message={reanchorMessage(
+                        annotations.find((a) => a.id === pendingReanchor.id),
+                        pendingReanchor.target,
+                    )}
                     confirmLabel="Move it here"
                     onConfirm={() => applyReanchor(pendingReanchor.id, pendingReanchor.target)}
                     onCancel={() => setPendingReanchor(null)}

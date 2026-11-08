@@ -1,6 +1,6 @@
 import { Annotation } from '@/models/annotations';
 import { resolveAnchoredElement } from '@/utils/anchor';
-import { pageMatches, toRelativeUrl } from '@/companion/helpers';
+import { pageMatches } from '@/companion/helpers';
 import { MODAL_ROOT_ID } from '@/utils/constants';
 
 /**
@@ -134,7 +134,7 @@ async function bundleText(url: string): Promise<string> {
  * act as a recovery fallback if the stamped element is ever missing).
  */
 function bakedPayloadAnnotations(annotations: Annotation[]): Annotation[] {
-    const here = toRelativeUrl(window.location.href);
+    const here = window.location.href;
     return annotations
         .filter((a) => a.id && pageMatches(here, a.url, a.urlPattern))
         .map((a) => ({ ...a, target: `[${NOTE_ID_ATTR}="${a.id}"]` }));
