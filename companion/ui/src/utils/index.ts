@@ -12,41 +12,6 @@ export const renderAnnotationId = (id: string) => {
 };
 
 /**
- * Get the title of an annotation from its value
- * @param value The string value of the annotation
- * @param maxLength Maximum length of the title (Returns a truncated title if the length exceeds this value)
- * @returns 
- */
-export const renderTitleFromValue = (value: string, maxLength: number) => {
-    if (!value || !value.length) {
-        return '';
-    }
-    const maxParseLength = 1000;
-    const title = removeMarkdownSyntax(value.slice(0, maxParseLength)).split('\n')[0];
-    if (!title.length) {
-        return '';
-    }
-    return title.length > maxLength ? title.slice(0, maxLength - 3) + '...' : title;
-};
-
-/**
- * Remove Markdown syntax from a string and return plain text
- * @param markdown The string containing Markdown syntax
- * @returns A plain text string without Markdown syntax
- */
-function removeMarkdownSyntax(markdown: string): string {
-    return markdown
-        .replace(/!\[.*?\]\(.*?\)/g, '') // Remove images
-        .replace(/\[.*?\]\(.*?\)/g, '') // Remove links
-        .replace(/`{1,3}.*?`{1,3}/g, '') // Remove inline and block code
-        .replace(/[*_~`>#+=-]/g, '') // Remove Markdown special characters
-        .replace(/!\[.*?\]/g, '') // Remove alt text for images
-        .replace(/^\s*[\r]/gm, '') // Remove empty lines
-        .trim(); // Trim leading and trailing whitespace
-}
-
-
-/**
  * Function to get the query selector of an element
  * @param element 
  * @returns 

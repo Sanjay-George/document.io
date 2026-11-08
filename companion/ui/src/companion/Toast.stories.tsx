@@ -12,5 +12,5 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Success: Story = { args: { text: 'Note saved', tone: 'ok' } };
-export const Warn: Story = { args: { text: '1 note couldn’t be placed on this page', tone: 'warn' } };
+/** `ok` auto-dismisses; switch `tone` to `warn` for the persistent treatment. */
+export const Default: Story = {};

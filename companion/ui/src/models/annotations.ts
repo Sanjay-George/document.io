@@ -1,3 +1,5 @@
+import { AnchorMeta } from '@/utils/anchor';
+
 export interface Annotation {
     id?: string;
     /** Short heading shown on cards/popovers. Optional for legacy notes — the
@@ -5,7 +7,16 @@ export interface Annotation {
     title?: string;
     value: string;
     target: string;
+    /** Resilient anchor descriptor (selector + identity signals). Optional —
+     *  legacy notes only have `target`, which stays the source of truth. */
+    anchor?: AnchorMeta;
+    /** Page the note was captured on (origin-independent path, plus the host's
+     *  own query params — matching still compares paths). */
     url: string;
+    /** Optional glob that generalises which pages the note shows on: `*` is one
+     *  segment, `**` is any number, and a `?k=v` suffix requires that param.
+     *  When absent, the note matches `url`'s path exactly. See `pageMatches`. */
+    urlPattern?: string;
     documentationId: string;
     created: Date;
     updated: Date;

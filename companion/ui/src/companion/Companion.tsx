@@ -173,7 +173,6 @@ const Companion = forwardRef<CompanionHandle, Props>(function Companion(
         <>
             {minimized ? (
                 <MinimizedPill
-                    count={onPageHealthy.length}
                     mode={mode}
                     onModeChange={setMode}
                     onRestore={() => setMinimized(false)}

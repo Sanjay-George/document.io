@@ -18,7 +18,8 @@
         "default_popup": "popup/popup.html"
     },
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "background.js",
+        "type": "module"
     },
     "content_scripts": [
         {
@@ -26,6 +27,7 @@
                 "<all_urls>"
             ],
             "js": [
+                "messages.js",
                 "content.js"
             ],
             "css": [],

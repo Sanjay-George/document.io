@@ -18,4 +18,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const DeleteNote: Story = {};
+/**
+ * Also carries non-destructive confirmations — re-anchoring an off-page note
+ * moves it, so `title`/`message`/`confirmLabel` are all overridable.
+ */
+export const Default: Story = {};

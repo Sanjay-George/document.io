@@ -37,6 +37,7 @@ export default class ProjectDB {
                     title: data.title,
                     description: data.description,
                     status: data.status,
+                    exportEnabled: data.exportEnabled ?? false,
                     updated: new Date(),
                 }
             }

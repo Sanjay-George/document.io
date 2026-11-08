@@ -7,13 +7,17 @@ type Props = {
     variant?: 'panel' | 'pill';
 };
 
-const SEGMENTS: { mode: Mode; label: string }[] = [
-    { mode: 'view', label: 'Read' },
-    { mode: 'edit', label: 'Annotate' },
+/** In the pill, Read is the orange accent and Annotate the red danger tone; the letter is the collapsed form. */
+const SEGMENTS: { mode: Mode; label: string; letter: string; activeBg: string }[] = [
+    { mode: 'view', label: 'Read', letter: 'R', activeBg: 'bg-dio-accent' },
+    { mode: 'edit', label: 'Annotate', letter: 'A', activeBg: 'bg-dio-danger' },
 ];
 
 /**
- * Read / Annotate segmented toggle (README §2). Two skins share one behaviour.
+ * Read / Annotate segmented toggle.
+ * `panel` (light, docked header) shows both full labels with a neutral active tab.
+ * `pill` (dark, minimized) collapses the inactive mode to its initial and tints
+ * the active mode by mode — orange Read / red Annotate — to save space and stand out.
  */
 export default function SegmentedControl({ value, onChange, variant = 'panel' }: Props) {
     const isPill = variant === 'pill';
@@ -23,19 +27,26 @@ export default function SegmentedControl({ value, onChange, variant = 'panel' }:
 
     return (
         <div className={`flex ${track}`}>
-            {SEGMENTS.map(({ mode, label }) => {
+            {SEGMENTS.map(({ mode, label, letter, activeBg }) => {
                 const active = value === mode;
-                const base = 'h-[30px] cursor-pointer border-none font-dio-ui text-[12.5px] font-semibold';
+                const base =
+                    'h-[30px] cursor-pointer border-none font-dio-ui text-[12.5px] font-semibold transition-colors';
                 const skin = isPill
                     ? active
-                        ? 'rounded-[16px] bg-dio-accent px-3 text-white'
-                        : 'rounded-[16px] bg-transparent px-3 text-dio-muted'
+                        ? `rounded-[16px] ${activeBg} px-3 text-white`
+                        : 'w-[30px] rounded-[16px] bg-transparent text-dio-muted'
                     : active
                         ? 'rounded-dio-tab bg-white px-[14px] text-dio-primary shadow-dio-seg'
                         : 'rounded-dio-tab bg-transparent px-[14px] text-[#8A93A0]';
                 return (
-                    <button key={mode} type="button" onClick={() => onChange(mode)} className={`${base} ${skin}`}>
-                        {label}
+                    <button
+                        key={mode}
+                        type="button"
+                        onClick={() => onChange(mode)}
+                        title={label}
+                        className={`${base} ${skin}`}
+                    >
+                        {isPill && !active ? letter : label}
                     </button>
                 );
             })}

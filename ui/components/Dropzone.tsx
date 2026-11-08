@@ -1,4 +1,7 @@
+"use client";
+
 import React, { useRef, useState } from "react";
+import { UploadCloud } from "lucide-react";
 
 interface FileDropZoneProps {
     onFilesSelected?: (files: File[]) => void;
@@ -8,9 +11,7 @@ export default function Dropzone({ onFilesSelected }: FileDropZoneProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const [isDragging, setIsDragging] = useState(false);
 
-    const handleClick = () => {
-        inputRef.current?.click();
-    };
+    const handleClick = () => inputRef.current?.click();
 
     const handleFiles = (fileList: FileList | null) => {
         if (!fileList) return;
@@ -22,17 +23,14 @@ export default function Dropzone({ onFilesSelected }: FileDropZoneProps) {
         e.target.value = "";
     };
 
-    // Drag & drop handlers
     const onDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(true);
     };
-
     const onDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(false);
     };
-
     const onDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsDragging(false);
@@ -41,8 +39,7 @@ export default function Dropzone({ onFilesSelected }: FileDropZoneProps) {
 
     return (
         <div
-            className={`w-full h-[220px] flex items-center justify-center border border-dashed ${isDragging ? "border-gray-400 bg-gray-50" : "border-gray-300 bg-white"} 
-                cursor-pointer select-none`}
+            className={`hub-dropzone${isDragging ? " is-drag" : ""}`}
             onClick={handleClick}
             onDragOver={onDragOver}
             onDragLeave={onDragLeave}
@@ -50,16 +47,10 @@ export default function Dropzone({ onFilesSelected }: FileDropZoneProps) {
             tabIndex={0}
             role="button"
         >
-            <input
-                type="file"
-                multiple
-                ref={inputRef}
-                onChange={handleChange}
-                style={{ display: "none" }}
-            />
-            <span className="text-center text-gray-400 text-base">
-                Click or Drag files to this area to upload
-            </span>
+            <input type="file" multiple ref={inputRef} onChange={handleChange} style={{ display: "none" }} />
+            <UploadCloud className="hub-dropzone-icon" size={30} strokeWidth={1.6} />
+            <span className="hub-dropzone-title">Drag files here, or click to browse</span>
+            <span className="hub-dropzone-hint">Images and video for your documentation</span>
         </div>
     );
-};
+}

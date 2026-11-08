@@ -147,6 +147,7 @@ export default function Background() {
         if (!ctx) return;
 
         function setCanvasSize() {
+            if (!ctx || !canvasRef.current) return;
             const dpr = window.devicePixelRatio || 1;
             canvasRef.current!.width = window.innerWidth * dpr;
             canvasRef.current!.height = window.innerHeight * dpr;

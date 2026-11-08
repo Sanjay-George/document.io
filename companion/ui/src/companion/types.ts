@@ -1,3 +1,5 @@
+import { AnchorMeta } from '@/utils/anchor';
+
 /**
  * Types for the document.io in-context annotation companion.
  * Mirrors the state model documented in design/README.md.
@@ -28,6 +30,8 @@ export interface Note {
     type: NoteType;
     /** CSS selector the note is anchored to (empty for whole-page notes). */
     selector: string;
+    /** Resilient anchor descriptor used to resolve the element robustly. */
+    anchor?: AnchorMeta;
     /** Page URL/path the note was captured on. */
     url: string;
     title: string;
@@ -43,7 +47,11 @@ export interface Note {
 export interface Draft {
     type: NoteType;
     selector: string;
+    /** Anchor descriptor captured at pick time; carried through save. */
+    anchor?: AnchorMeta;
     url: string;
+    /** Optional page glob (`*`/`**`); when absent the note matches `url` exactly. */
+    urlPattern?: string;
     title: string;
     body: string;
 }

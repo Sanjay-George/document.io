@@ -50,18 +50,24 @@ export default class AnnotationDB {
         if (!this.validateData(data)) {
             throw new Error("Invalid data");
         }
+        const changes: Record<string, unknown> = {
+            title: data.title ?? null,
+            value: data.value,
+            target: data.target,
+            url: data.url,
+            urlPattern: data.urlPattern ?? null,
+            type: data.type,
+            index: data.index,
+            updated: new Date(),
+        };
+        // Only touch `anchor` when supplied, so updates to legacy notes (which
+        // carry no anchor) don't overwrite it with null.
+        if (data.anchor !== undefined) {
+            changes.anchor = data.anchor;
+        }
         const result = await this.collection.updateOne(
             { _id: new ObjectId(id) },
-            {
-                $set: {
-                    value: data.value,
-                    target: data.target,
-                    url: data.url,
-                    type: data.type,
-                    index: data.index,
-                    updated: new Date(),
-                }
-            }
+            { $set: changes }
         );
         return result.modifiedCount > 0;
     }

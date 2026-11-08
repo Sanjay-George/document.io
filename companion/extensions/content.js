@@ -1,3 +1,5 @@
+const { PAGE_REQUEST, PAGE_RESPONSE, RUNTIME_REQUEST } = globalThis.DOCIO_MESSAGES;
+
 (async function () {
     const ROOT_ID = "document-io-root";
 
@@ -13,12 +15,11 @@
     injectAssets();
     injectBridge();
     setupMessageListener();
-    setupNavigationListener();
 
     // ---- Functions ----
     function getDocumentationId() {
         return new Promise((resolve) => {
-            chrome.runtime.sendMessage({ type: "GET_DOC_ID" }, (resp) => {
+            chrome.runtime.sendMessage({ type: RUNTIME_REQUEST.getCurrentDocumentationId }, (resp) => {
                 resolve(resp?.documentationId || null);
             });
         });
@@ -32,6 +33,9 @@
             root.dataset.documentationId = docId;
             document.body.appendChild(root);
         }
+        // Expose the companion bundle URLs so the export serializer can inline them.
+        root.dataset.assetJs = chrome.runtime.getURL("dist/assets/index.js");
+        root.dataset.assetCss = chrome.runtime.getURL("dist/assets/index.css");
     }
 
     function injectAssets() {
@@ -56,28 +60,37 @@
     // ---- Message Listener ----
     function setupMessageListener() {
         window.addEventListener("message", async (event) => {
-            if (event.source !== window) return;
+            // Only accept messages from this page's own context — not cross-origin
+            // frames or opener windows. The bridge runs in-page, so origin matches.
+            if (event.source !== window || event.origin !== window.location.origin) return;
             const msg = event.data;
-            if (msg.type !== "DOCIO_FETCH") return;
+            if (!msg || typeof msg !== "object") return;
+            if (msg.type === PAGE_REQUEST.fetchData) {
+                try {
+                    const result = await apiFetch(msg.url, msg.options);
+                    window.postMessage({ type: PAGE_RESPONSE.fetchData, reqId: msg.reqId, ok: true, data: result });
+                } catch (err) {
+                    window.postMessage({ type: PAGE_RESPONSE.fetchData, reqId: msg.reqId, ok: false, error: err.message });
+                }
+                return;
+            }
 
-            try {
-                const result = await apiFetch(msg.url, msg.options);
-                window.postMessage({ type: "DOCIO_FETCH_RESPONSE", reqId: msg.reqId, ok: true, data: result });
-            } catch (err) {
-                window.postMessage({
-                    type: "DOCIO_FETCH_RESPONSE",
-                    reqId: msg.reqId,
-                    ok: false,
-                    error: err.message,
-                });
+            if (msg.type === PAGE_REQUEST.fetchAsset) {
+                try {
+                    const result = await assetFetch(msg.url);
+                    window.postMessage({ type: PAGE_RESPONSE.fetchAsset, reqId: msg.reqId, ok: true, data: result });
+                } catch (err) {
+                    window.postMessage({ type: PAGE_RESPONSE.fetchAsset, reqId: msg.reqId, ok: false, error: err.message });
+                }
+                return;
             }
         });
     }
 
-    // ---- API Fetch Bridge ----
-    function apiFetch(url, options = {}) {
+    // ---- Asset Fetch Bridge (CORS-bypassed, base64) — used by the export serializer ----
+    function assetFetch(url) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ type: "API_FETCH", url, options }, (resp) => {
+            chrome.runtime.sendMessage({ type: RUNTIME_REQUEST.fetchAsset, url }, (resp) => {
                 if (chrome.runtime.lastError) return reject(chrome.runtime.lastError);
                 if (!resp?.ok) return reject(new Error(resp?.error || "Unknown error"));
                 resolve(resp.data);
@@ -85,23 +98,14 @@
         });
     }
 
-    // ---- SPA Navigation Detection ----
-    function setupNavigationListener() {
-        const notify = () => window.postMessage({ type: "DOCIO_NAVIGATION_UPDATED" }, "*");
-
-        const originalPushState = history.pushState.bind(history);
-        const originalReplaceState = history.replaceState.bind(history);
-
-        history.pushState = function (...args) {
-            originalPushState(...args);
-            notify();
-        };
-
-        history.replaceState = function (...args) {
-            originalReplaceState(...args);
-            notify();
-        };
-
-        window.addEventListener("popstate", notify);
+    // ---- API Fetch Bridge ----
+    function apiFetch(url, options = {}) {
+        return new Promise((resolve, reject) => {
+            chrome.runtime.sendMessage({ type: RUNTIME_REQUEST.fetchData, url, options }, (resp) => {
+                if (chrome.runtime.lastError) return reject(chrome.runtime.lastError);
+                if (!resp?.ok) return reject(new Error(resp?.error || "Unknown error"));
+                resolve(resp.data);
+            });
+        });
     }
 })();

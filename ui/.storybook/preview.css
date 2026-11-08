@@ -1,0 +1,14 @@
+/* Storybook-only styling: font-var fallbacks + the keyframes hub.css relies on.
+   (globals.css isn't imported here because it uses @tailwind directives.) */
+@import "../app/tokens.css";
+
+:root {
+    --font-instrument: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-jetbrains: "JetBrains Mono", ui-monospace, monospace;
+}
+
+@keyframes dio-pop { 0% { opacity: 0; transform: translateY(6px) scale(.985) } 100% { opacity: 1; transform: none } }
+@keyframes dio-fade { from { opacity: 0 } to { opacity: 1 } }
+@keyframes dio-toast { 0% { opacity: 0; transform: translate(-50%, 8px) } 100% { opacity: 1; transform: translate(-50%, 0) } }
+@keyframes dio-spin { to { transform: rotate(360deg) } }
+@keyframes dio-rise { 0% { opacity: 0; transform: translateY(14px) scale(.96) } 100% { opacity: 1; transform: none } }

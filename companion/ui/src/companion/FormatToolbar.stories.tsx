@@ -12,18 +12,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
-    args: { onInsert: () => {} },
-};
+function Harness() {
+    const [last, setLast] = useState<FormatToken | null>(null);
+    return (
+        <div>
+            <FormatToolbar onInsert={setLast} />
+            <p className="mt-2 text-[12px] text-dio-muted">Inserted: {last ?? '—'}</p>
+        </div>
+    );
+}
 
-export const WithLog: Story = {
-    render: () => {
-        const [last, setLast] = useState<FormatToken | null>(null);
-        return (
-            <div>
-                <FormatToolbar onInsert={setLast} />
-                <p className="mt-2 text-[12px] text-dio-muted">Inserted: {last ?? '—'}</p>
-            </div>
-        );
-    },
-};
+/** Click a button — the token it would insert is echoed below. */
+export const Default: Story = { render: () => <Harness /> };
